@@ -6,7 +6,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction } from "@remix-run/server-runtime";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "/styles/global.css" },

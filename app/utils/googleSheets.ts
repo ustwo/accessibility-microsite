@@ -1,4 +1,20 @@
-import { google } from 'googleapis';
+import { mockTools, mockPatterns } from '../data/mockData';
+
+// Dynamically import googleapis only in Node.js environment
+let google: any = undefined;
+try {
+  if (typeof process !== 'undefined' && process.versions && process.versions.node) {
+    // We're in a Node.js environment
+    // Using dynamic import for ESM compatibility
+    import('googleapis').then((module) => {
+      google = module.google;
+    }).catch(() => {
+      console.log('Error importing googleapis');
+    });
+  }
+} catch (e) {
+  console.log('Running in Edge environment, googleapis not available');
+}
 
 // Types for our data
 export interface AccessibilityTool {
@@ -28,10 +44,22 @@ const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID || 'your-spreadsheet-id';
 const TOOLS_SHEET_NAME = 'Tools';
 const PATTERNS_SHEET_NAME = 'Patterns';
 
+// Check if we're running in an Edge environment
+function isEdgeEnvironment(): boolean {
+  return typeof process === 'undefined' || 
+         !process.versions || 
+         !process.versions.node ||
+         process.env.NETLIFY === 'true';
+}
+
 /**
  * Get Google Sheets authorization
  */
 function getGoogleSheetsClient() {
+  if (isEdgeEnvironment() || !google) {
+    return null; // No Google Sheets client in Edge environment
+  }
+
   // For public sheets, we can use API key authentication
   // For private sheets, you'd need OAuth2 or service account authentication
   const auth = process.env.GOOGLE_API_KEY 
@@ -50,8 +78,18 @@ function getGoogleSheetsClient() {
  * Fetch all accessibility tools from Google Sheets
  */
 export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
+  // If we're in an Edge environment, return mock data
+  if (isEdgeEnvironment() || !google) {
+    console.log('Using mock tools data in Edge environment');
+    return mockTools;
+  }
+
   try {
     const sheets = getGoogleSheetsClient();
+    
+    if (!sheets) {
+      return mockTools;
+    }
     
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
@@ -61,11 +99,11 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
     const rows = response.data.values;
     
     if (!rows || rows.length === 0) {
-      return [];
+      return mockTools;
     }
     
     // Transform the rows into our AccessibilityTool type
-    const tools: AccessibilityTool[] = rows.map((row, index) => {
+    const tools: AccessibilityTool[] = rows.map((row: any[], index: number) => {
       return {
         id: `tool-${index + 1}`,
         name: row[0] || '',
@@ -81,7 +119,7 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
     return tools;
   } catch (error) {
     console.error('Error fetching accessibility tools:', error);
-    return [];
+    return mockTools;
   }
 }
 
@@ -89,8 +127,18 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
  * Fetch all accessibility patterns from Google Sheets
  */
 export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern[]> {
+  // If we're in an Edge environment, return mock data
+  if (isEdgeEnvironment() || !google) {
+    console.log('Using mock patterns data in Edge environment');
+    return mockPatterns;
+  }
+
   try {
     const sheets = getGoogleSheetsClient();
+    
+    if (!sheets) {
+      return mockPatterns;
+    }
     
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
@@ -100,11 +148,11 @@ export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern
     const rows = response.data.values;
     
     if (!rows || rows.length === 0) {
-      return [];
+      return mockPatterns;
     }
     
     // Transform the rows into our AccessibilityPattern type
-    const patterns: AccessibilityPattern[] = rows.map((row, index) => {
+    const patterns: AccessibilityPattern[] = rows.map((row: any[], index: number) => {
       return {
         id: `pattern-${index + 1}`,
         name: row[0] || '',
@@ -120,7 +168,7 @@ export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern
     return patterns;
   } catch (error) {
     console.error('Error fetching accessibility patterns:', error);
-    return [];
+    return mockPatterns;
   }
 }
 
@@ -131,8 +179,18 @@ export async function submitNewItem(
   type: 'tool' | 'pattern', 
   data: Partial<AccessibilityTool | AccessibilityPattern>
 ): Promise<boolean> {
+  // If we're in an Edge environment, just return success
+  if (isEdgeEnvironment() || !google) {
+    console.log('Mock submission in Edge environment');
+    return true;
+  }
+
   try {
     const sheets = getGoogleSheetsClient();
+    
+    if (!sheets) {
+      return true;
+    }
     
     // Determine which sheet to write to
     const sheetName = type === 'tool' ? 'ToolSubmissions' : 'PatternSubmissions';

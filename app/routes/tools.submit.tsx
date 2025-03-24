@@ -1,4 +1,4 @@
-import { json, redirect, ActionFunctionArgs } from "@remix-run/node";
+import { json, redirect, ActionFunctionArgs } from "@remix-run/server-runtime";
 import { useActionData, Form, useNavigation } from "@remix-run/react";
 import Layout from "~/components/Layout";
 import { submitNewItem } from "~/utils/googleSheets";
