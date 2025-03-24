@@ -17,7 +17,9 @@
     "@remix-run/node": "^2.16.2",
     "@remix-run/react": "^2.16.2",
     "@remix-run/serve": "^2.16.2",
-    "isbot": "^4.1.0"
+    "googleapis": "^148.0.0",
+    "isbot": "^4.1.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.16.2",
