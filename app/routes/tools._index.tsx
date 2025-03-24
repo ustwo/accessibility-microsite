@@ -1,11 +1,11 @@
 import { json } from "@remix-run/server-runtime";
 import { useLoaderData } from "@remix-run/react";
 import Layout from "~/components/Layout";
-import { fetchAccessibilityTools } from "~/utils/googleSheets";
+import { fetchAccessibilityTools } from "~/utils/edgeGoogleSheets";
 import { getMockData } from "~/data/mockData";
 
 export async function loader() {
-  // Try to fetch from Google Sheets API, fall back to mock data
+  // Try to fetch from our Edge-compatible Google Sheets API, fall back to mock data
   try {
     const tools = await fetchAccessibilityTools();
     
