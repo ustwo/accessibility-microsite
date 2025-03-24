@@ -26,55 +26,63 @@ export default function ToolsIndex() {
   
   return (
     <Layout title="Accessibility Tools">
-      <div className="tools-container">
-        <p className="mb-6">
-          Discover tools that can help you evaluate, test, and improve the accessibility of your digital products. From automated testing tools to screen readers and more.
-        </p>
-        
-        <div className="mb-8 p-6 bg-gray-100 rounded-lg">
-          <h2 className="text-xl mb-4">Filter Tools</h2>
-          <p>Search and filter functionality will be implemented here.</p>
+      <section className="content-section">
+        <div className="container container-content">
+          <p className="mb-6">
+            Discover tools that can help you evaluate, test, and improve the accessibility of your digital products. From automated testing tools to screen readers and more.
+          </p>
+          
+          <div className="mb-8 p-6 bg-gray-100 rounded-lg">
+            <h2 className="text-xl mb-4">Filter Tools</h2>
+            <p>Search and filter functionality will be implemented here.</p>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {tools.map((tool) => (
-            <div key={tool.id} className="card">
-              <h3>{tool.name}</h3>
-              <p>{tool.description}</p>
-              <div className="mt-4">
-                <a 
-                  href={tool.url} 
-                  className="button"
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  Visit Website
-                </a>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="px-2 py-1 bg-gray-200 rounded text-sm">
-                  Category: {tool.category}
-                </span>
-                <span className="px-2 py-1 bg-gray-200 rounded text-sm">
-                  Cost: {tool.cost}
-                </span>
-                {tool.platforms.map((platform) => (
-                  <span key={platform} className="px-2 py-1 bg-gray-200 rounded text-sm">
-                    {platform}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {tool.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-1 bg-secondary text-light rounded text-sm">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+      </section>
+      
+      <section className="content-section bg-gray-100">
+        <div className="container container-full">
+          <div className="container container-content">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {tools.map((tool) => (
+                <div key={tool.id} className="card">
+                  <h3>{tool.name}</h3>
+                  <p>{tool.description}</p>
+                  <div className="mt-4">
+                    <a 
+                      href={tool.url} 
+                      className="button"
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      Visit Website
+                    </a>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="px-2 py-1 bg-gray-200 rounded text-sm">
+                      Category: {tool.category}
+                    </span>
+                    <span className="px-2 py-1 bg-gray-200 rounded text-sm">
+                      Cost: {tool.cost}
+                    </span>
+                    {tool.platforms.map((platform) => (
+                      <span key={platform} className="px-2 py-1 bg-gray-200 rounded text-sm">
+                        {platform}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {tool.tags.map((tag) => (
+                      <span key={tag} className="px-2 py-1 bg-secondary text-light rounded text-sm">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      </section>
     </Layout>
   );
 } 

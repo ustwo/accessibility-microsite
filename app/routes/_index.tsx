@@ -106,27 +106,6 @@ export default function Index() {
       </section>
 
 
-
-      <section id="contribute-section" className="content-section bg-secondary" aria-labelledby="contribute-heading">
-        <div className="container container-content">
-          <h2 id="contribute-heading" className="mb-6 text-light">
-            Contribute Your Knowledge
-          </h2>
-          <p className="mb-6 text-light">
-            We welcome contributions from the accessibility community. Share
-            your favorite tools or patterns to help others create more
-            accessible digital experiences.
-          </p>
-          <div className="flex gap-4">
-            <Link to="/tools/submit" className="button bg-light text-secondary">
-              Submit a Tool
-            </Link>
-            <Link to="/patterns/submit" className="button bg-light text-secondary">
-              Submit a Pattern
-            </Link>
-          </div>
-        </div>
-      </section>
     </Layout>
   );
 }

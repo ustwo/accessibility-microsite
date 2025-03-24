@@ -1,11 +1,10 @@
-import { ActionFunctionArgs } from "@remix-run/server-runtime";
+import { ActionFunctionArgs, json } from "@remix-run/server-runtime";
 import { useActionData, Form, useNavigation } from "@remix-run/react";
 import Layout from "~/components/Layout";
 import { z } from "zod";
 import { useAccessibleForm, ErrorSummary, ErrorMessage, formatZodErrors } from "~/utils/formUtils";
 import { handleFormSubmission } from "~/utils/formSubmission";
 import { useEffect } from "react";
-import { json } from "@remix-run/node";
 
 // Define validation schema using Zod
 const PatternSchema = z.object({
@@ -18,16 +17,16 @@ const PatternSchema = z.object({
   codeLanguage: z.string().min(1, "Code language is required")
 });
 
-// Define the type for our form errors for TypeScript
-type FormErrors = {
-  _form?: string;
-  name?: string;
-  description?: string;
-  example?: string;
-  wcagCriteria?: string;
-  tags?: string;
-  code?: string;
-  codeLanguage?: string;
+// Type definition for successful response
+type SuccessResponse = {
+  success: true;
+  redirect: string;
+};
+
+// Type definition for error response
+type ErrorResponse = {
+  success: false;
+  errors: Record<string, string>;
 };
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -40,13 +39,11 @@ export async function action({ request }: ActionFunctionArgs) {
   
   if (!validationResult.success) {
     console.log("===== SERVER: Validation errors:", validationResult.error.format());
-    return json({ 
+    return json<ErrorResponse>({ 
       success: false, 
       errors: formatZodErrors(validationResult.error.format()) 
     });
   }
-
-  const validatedData = validationResult.data;
   
   // Submit to Google Sheet
   await handleFormSubmission({
@@ -54,20 +51,20 @@ export async function action({ request }: ActionFunctionArgs) {
     schema: PatternSchema,
     type: "pattern",
     successPath: "/patterns/submit/success",
-    formatData: (validatedData) => ({
-      "Pattern Name": validatedData.name,
-      "Description": validatedData.description,
-      "Example Use Case": validatedData.example,
-      "WCAG Criteria": validatedData.wcagCriteria,
-      "Tags": validatedData.tags,
-      "Code Sample": validatedData.code,
+    formatData: (data) => ({
+      "Pattern Name": data.name,
+      "Description": data.description,
+      "Example Use Case": data.example,
+      "WCAG Criteria": data.wcagCriteria,
+      "Tags": data.tags,
+      "Code Sample": data.code,
       "Timestamp": new Date().toISOString()
     })
   });
   
   // We shouldn't reach here if handleFormSubmission does its job
   // but add this as a fallback
-  return json({
+  return json<SuccessResponse>({
     success: true,
     redirect: "/patterns/submit/success"
   });
@@ -81,9 +78,10 @@ export default function SubmitPattern() {
   
   // Handle successful submission by redirecting client-side
   useEffect(() => {
-    if (actionData?.success && 'redirect' in (actionData || {})) {
-      console.log("===== CLIENT: Successful submission, redirecting to", actionData.redirect);
-      window.location.href = actionData.redirect as string;
+    if (actionData?.success) {
+      const successData = actionData as SuccessResponse;
+      console.log("===== CLIENT: Successful submission, redirecting to", successData.redirect);
+      window.location.href = successData.redirect;
     }
   }, [actionData]);
   
@@ -111,148 +109,152 @@ export default function SubmitPattern() {
   
   return (
     <Layout title="Submit an Accessibility Pattern">
-      <div className="max-w-2xl mx-auto">
-        <p className="mb-6">
-          Share an accessibility pattern with the community. Your submission will be reviewed before being added to the directory.
-        </p>
-        
-        {/* Error summary - only shown when there are errors */}
-        {hasErrors && <ErrorSummary errors={formErrors} />}
-        
-        <Form method="post" noValidate className="space-y-6" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name" id="name-label">Pattern Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formValues.name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              aria-describedby={formErrors.name ? "name-error" : undefined}
-              aria-invalid={formErrors.name ? "true" : undefined}
-              className={formErrors.name ? "input-error" : ""}
-            />
-            <ErrorMessage id="name-error" error={formErrors.name} />
-          </div>
+      <section className="content-section">
+        <div className="container container-content">
+          <p className="mb-6">
+            Share an accessibility pattern with the community. Your submission will be reviewed before being added to the library.
+          </p>
           
-          <div className="form-group">
-            <label htmlFor="description" id="description-label">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formValues.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              rows={4}
-              aria-describedby={formErrors.description ? "description-error" : undefined}
-              aria-invalid={formErrors.description ? "true" : undefined}
-              className={formErrors.description ? "input-error" : ""}
-            ></textarea>
-            <ErrorMessage id="description-error" error={formErrors.description} />
-          </div>
+          {/* Show error summary if there are form errors */}
+          {hasErrors && (
+            <ErrorSummary errors={formErrors} />
+          )}
           
-          <div className="form-group">
-            <label htmlFor="example" id="example-label">Example Use Case</label>
-            <textarea
-              id="example"
-              name="example"
-              value={formValues.example}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              rows={3}
-              placeholder="Describe a real-world example of when to use this pattern"
-              aria-describedby={formErrors.example ? "example-error" : undefined}
-              aria-invalid={formErrors.example ? "true" : undefined}
-              className={formErrors.example ? "input-error" : ""}
-            ></textarea>
-            <ErrorMessage id="example-error" error={formErrors.example} />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="wcagCriteria" id="wcagCriteria-label">WCAG Criteria (comma-separated)</label>
-            <input
-              type="text"
-              id="wcagCriteria"
-              name="wcagCriteria"
-              value={formValues.wcagCriteria}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="1.3.1, 2.4.3, 4.1.2"
-              aria-describedby={formErrors.wcagCriteria ? "wcagCriteria-error" : undefined}
-              aria-invalid={formErrors.wcagCriteria ? "true" : undefined}
-              className={formErrors.wcagCriteria ? "input-error" : ""}
-            />
-            <ErrorMessage id="wcagCriteria-error" error={formErrors.wcagCriteria} />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="tags" id="tags-label">Tags (comma-separated)</label>
-            <input
-              type="text"
-              id="tags"
-              name="tags"
-              value={formValues.tags}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Focus management, Forms, ARIA"
-              aria-describedby={formErrors.tags ? "tags-error" : undefined}
-              aria-invalid={formErrors.tags ? "true" : undefined}
-              className={formErrors.tags ? "input-error" : ""}
-            />
-            <ErrorMessage id="tags-error" error={formErrors.tags} />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="code" id="code-label">Code Sample</label>
-            <textarea
-              id="code"
-              name="code"
-              value={formValues.code}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              rows={8}
-              placeholder="Paste your code example here"
-              aria-describedby={formErrors.code ? "code-error" : undefined}
-              aria-invalid={formErrors.code ? "true" : undefined}
-              className={formErrors.code ? "input-error" : ""}
-            ></textarea>
-            <ErrorMessage id="code-error" error={formErrors.code} />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="codeLanguage" id="codeLanguage-label">Code Language</label>
-            <select
-              id="codeLanguage"
-              name="codeLanguage"
-              value={formValues.codeLanguage}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              aria-describedby={formErrors.codeLanguage ? "codeLanguage-error" : undefined}
-              aria-invalid={formErrors.codeLanguage ? "true" : undefined}
-              className={formErrors.codeLanguage ? "input-error" : ""}
-            >
-              <option value="html">HTML</option>
-              <option value="css">CSS</option>
-              <option value="javascript">JavaScript</option>
-              <option value="typescript">TypeScript</option>
-              <option value="jsx">JSX</option>
-              <option value="tsx">TSX</option>
-            </select>
-            <ErrorMessage id="codeLanguage-error" error={formErrors.codeLanguage} />
-          </div>
-          
-          <div className="form-actions">
-            <button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="button"
-            >
-              {isSubmitting ? "Submitting..." : "Submit Pattern"}
-            </button>
-          </div>
-        </Form>
-      </div>
+          <Form method="post" onSubmit={handleSubmit} noValidate className="space-y-6">
+            <div className="form-group">
+              <label htmlFor="name" id="name-label">Pattern Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formValues.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                aria-describedby={formErrors.name ? "name-error" : undefined}
+                aria-invalid={formErrors.name ? "true" : undefined}
+                className={formErrors.name ? "input-error" : ""}
+              />
+              <ErrorMessage id="name-error" error={formErrors.name} />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="description" id="description-label">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formValues.description}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                rows={4}
+                aria-describedby={formErrors.description ? "description-error" : undefined}
+                aria-invalid={formErrors.description ? "true" : undefined}
+                className={formErrors.description ? "input-error" : ""}
+              ></textarea>
+              <ErrorMessage id="description-error" error={formErrors.description} />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="example" id="example-label">Example Use Case</label>
+              <textarea
+                id="example"
+                name="example"
+                value={formValues.example}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                rows={3}
+                placeholder="Describe a real-world example of when to use this pattern"
+                aria-describedby={formErrors.example ? "example-error" : undefined}
+                aria-invalid={formErrors.example ? "true" : undefined}
+                className={formErrors.example ? "input-error" : ""}
+              ></textarea>
+              <ErrorMessage id="example-error" error={formErrors.example} />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="wcagCriteria" id="wcagCriteria-label">WCAG Criteria (comma-separated)</label>
+              <input
+                type="text"
+                id="wcagCriteria"
+                name="wcagCriteria"
+                value={formValues.wcagCriteria}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="1.3.1, 2.4.3, 4.1.2"
+                aria-describedby={formErrors.wcagCriteria ? "wcagCriteria-error" : undefined}
+                aria-invalid={formErrors.wcagCriteria ? "true" : undefined}
+                className={formErrors.wcagCriteria ? "input-error" : ""}
+              />
+              <ErrorMessage id="wcagCriteria-error" error={formErrors.wcagCriteria} />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="tags" id="tags-label">Tags (comma-separated)</label>
+              <input
+                type="text"
+                id="tags"
+                name="tags"
+                value={formValues.tags}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="Focus management, Forms, ARIA"
+                aria-describedby={formErrors.tags ? "tags-error" : undefined}
+                aria-invalid={formErrors.tags ? "true" : undefined}
+                className={formErrors.tags ? "input-error" : ""}
+              />
+              <ErrorMessage id="tags-error" error={formErrors.tags} />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="code" id="code-label">Code Sample</label>
+              <textarea
+                id="code"
+                name="code"
+                value={formValues.code}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                rows={8}
+                placeholder="Paste your code example here"
+                aria-describedby={formErrors.code ? "code-error" : undefined}
+                aria-invalid={formErrors.code ? "true" : undefined}
+                className={formErrors.code ? "input-error" : ""}
+              ></textarea>
+              <ErrorMessage id="code-error" error={formErrors.code} />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="codeLanguage" id="codeLanguage-label">Code Language</label>
+              <select
+                id="codeLanguage"
+                name="codeLanguage"
+                value={formValues.codeLanguage}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                aria-describedby={formErrors.codeLanguage ? "codeLanguage-error" : undefined}
+                aria-invalid={formErrors.codeLanguage ? "true" : undefined}
+                className={formErrors.codeLanguage ? "input-error" : ""}
+              >
+                <option value="html">HTML</option>
+                <option value="css">CSS</option>
+                <option value="javascript">JavaScript</option>
+                <option value="typescript">TypeScript</option>
+                <option value="jsx">JSX</option>
+                <option value="tsx">TSX</option>
+              </select>
+              <ErrorMessage id="codeLanguage-error" error={formErrors.codeLanguage} />
+            </div>
+            
+            <div className="form-actions">
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="button"
+              >
+                {isSubmitting ? "Submitting..." : "Submit Pattern"}
+              </button>
+            </div>
+          </Form>
+        </div>
+      </section>
     </Layout>
   );
 } 

@@ -36,8 +36,8 @@ export function loader() {
 export default function ScreenReaderGuideIndex() {
   return (
     <Layout title="Screen Reader Guide">
-      <div className="screen-reader-guide-container">
-        <section className="mb-8">
+      <section className="content-section">
+        <div className="container container-content">
           <h2 className="mb-4">Why Test with Screen Readers?</h2>
           <p>
             Screen readers are essential tools for people with visual impairments to navigate the web. Testing your websites and applications with screen readers helps ensure they&apos;re accessible to all users.
@@ -51,37 +51,69 @@ export default function ScreenReaderGuideIndex() {
             <li>Common testing scenarios</li>
             <li>Tips for effective testing</li>
           </ul>
-        </section>
+        </div>
+      </section>
 
-        <section>
-          <h2 className="mb-6">Choose a Screen Reader Guide</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="card">
-              <h3>VoiceOver (macOS)</h3>
-              <p>
-                Learn how to use the screen reader built into macOS to test your websites and applications.
-              </p>
-              <div className="mt-4">
-                <Link to="/screen-reader-guide/voiceover-mac" className="button">
-                  Start VoiceOver Guide
-                </Link>
+      <section className="content-section bg-gray-100">
+        <div className="container container-full">
+          <h2 className="mb-6 text-center">Choose a Screen Reader Guide</h2>
+          <div className="container container-content">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="card">
+                <h3>VoiceOver (macOS)</h3>
+                <p>
+                  Learn how to use the screen reader built into macOS to test your websites and applications.
+                </p>
+                <div className="mt-4">
+                  <Link to="/screen-reader-guide/voiceover-mac" className="button">
+                    Start VoiceOver Guide
+                  </Link>
+                </div>
               </div>
-            </div>
-            
-            <div className="card">
-              <h3>NVDA (Windows)</h3>
-              <p>
-                Learn how to use the free, open-source screen reader for Windows to test your websites and applications.
-              </p>
-              <div className="mt-4">
-                <Link to="/screen-reader-guide/nvda-windows" className="button">
-                  Start NVDA Guide
-                </Link>
+              
+              <div className="card">
+                <h3>NVDA (Windows)</h3>
+                <p>
+                  Learn how to use the free, open-source screen reader for Windows to test your websites and applications.
+                </p>
+                <div className="mt-4">
+                  <Link to="/screen-reader-guide/nvda-windows" className="button">
+                    Start NVDA Guide
+                  </Link>
+                </div>
+              </div>
+
+              <div className="card">
+                <h3>JAWS (Windows)</h3>
+                <p>
+                  Learn how to use the commercial screen reader for Windows to test your websites and applications.
+                </p>
+                <div className="mt-4">
+                  <Link to="/screen-reader-guide/jaws-windows" className="button">
+                    Start JAWS Guide
+                  </Link>
+                </div>
+              </div>
+
+              <div className="card">
+                <h3>TalkBack (Android)</h3>
+                <p>
+                  Learn how to use the built-in screen reader on Android devices to test your mobile websites and applications.
+                </p>
+                <div className="mt-4">
+                  <Link to="/screen-reader-guide/talkback-android" className="button">
+                    Start TalkBack Guide
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="mt-8 bg-gray-100 p-6 rounded-lg">
+      <section className="content-section">
+        <div className="container container-content">
+          <div className="bg-gray-100 p-6 rounded-lg">
             <h3 className="mb-4">Screen Reader Testing Tips</h3>
             <ul className="list-disc pl-8">
               <li>Test with multiple screen readers when possible.</li>
@@ -92,8 +124,8 @@ export default function ScreenReaderGuideIndex() {
               <li>Verify that the reading order matches the visual order.</li>
             </ul>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </Layout>
   );
 } 
