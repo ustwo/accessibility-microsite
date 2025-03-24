@@ -178,11 +178,21 @@ a:focus {
 /* Layouts */
 .container {
   width: 100%;
-  max-width: var(--container-lg);
   margin-left: auto;
   margin-right: auto;
   padding-left: var(--space-4);
   padding-right: var(--space-4);
+}
+
+/* Container width variants */
+.container,
+.container-content {
+  max-width: var(--container-lg);
+}
+
+.container-full {
+  width: 100%;
+  max-width: none;
 }
 
 .container-sm {
@@ -199,6 +209,12 @@ a:focus {
 
 .container-xl {
   max-width: var(--container-xl);
+}
+
+/* Content section padding */
+.content-section {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
 }
 
 /* Form elements */
@@ -467,3 +483,462 @@ label {
     scroll-behavior: auto !important;
   }
 } 
+
+
+
+/* ustwo visual makeover: homepage polish */
+
+:root {
+  --font-size-hero: 3rem;
+  --font-size-section-title: 2rem;
+
+  --color-discover: #72D8E0;
+  --color-pilot: #D8A4F4;
+  --color-launch: #9EE6C3;
+  --color-boost: #F9A25A;
+
+  --color-footer-bg: #14161F;
+  --color-footer-text: #FFFFFFCC;
+}
+
+/* Hero Section */
+.hero-section {
+  padding-top: var(--space-20);
+  padding-bottom: var(--space-20);
+}
+
+.hero-section h1 {
+  font-size: var(--font-size-hero);
+  font-weight: 700;
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-section p {
+  font-size: var(--font-size-xl);
+  color: var(--color-gray-600);
+}
+
+/* Section Headings */
+section h2 {
+  font-size: var(--font-size-section-title);
+  margin-bottom: var(--space-6);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Principle Cards */
+.card {
+  background-color: var(--color-light);
+  border: none;
+  border-radius: var(--border-radius-xl);
+  padding: var(--space-6);
+  box-shadow: none;
+  transition: background 0.2s ease;
+}
+
+.card h3 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+}
+
+.card a.button {
+  margin-top: var(--space-4);
+}
+
+/* Coloured Cards for Steps (optional use) */
+.card:nth-child(1) { background-color: var(--color-discover); }
+.card:nth-child(2) { background-color: var(--color-pilot); }
+.card:nth-child(3) { background-color: var(--color-launch); }
+.card:nth-child(4) { background-color: var(--color-boost); }
+
+/* Resource section cards */
+.bg-gray-100 {
+  background-color: var(--color-gray-100);
+}
+
+/* Footer / dark section style */
+footer,
+.section-dark,
+.bg-dark {
+  background-color: var(--color-footer-bg);
+  color: var(--color-footer-text);
+  padding: var(--space-12) var(--space-4);
+}
+
+footer h2,
+.section-dark h2 {
+  color: var(--color-light);
+  font-size: var(--font-size-section-title);
+}
+
+footer p,
+.section-dark p {
+  color: var(--color-footer-text);
+}
+
+/* CTA buttons */
+.button {
+  font-weight: 600;
+  border-radius: var(--border-radius-full);
+  padding: var(--space-2) var(--space-5);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+/* Mobile & grid refinements */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2.25rem;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
+  }
+}
+
+
+/* ustwo Accessibility Microsite – Refined Principles Section */
+
+section#principles {
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-16);
+  width: 100%;
+  background-color: var(--color-gray-100);
+}
+
+section#principles h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: var(--space-10);
+}
+
+/* Responsive flex layout for principles */
+
+.principles-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-6);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  max-width: var(--container-xl);
+}
+
+.principle-card {
+  flex: 1 1 300px; /* Grow/shrink, min width 300px */
+  max-width: 360px;
+  background-color: var(--color-light);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-6);
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+/* Responsive adjustments for principles cards */
+@media (min-width: 1200px) {
+  .principle-card {
+    /* 3-up layout for large screens */
+    flex: 0 1 calc(33.333% - var(--space-6));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .principle-card {
+    /* 2-up layout for medium screens */
+    flex: 0 1 calc(50% - var(--space-6));
+  }
+}
+
+@media (max-width: 767px) {
+  .principle-card {
+    /* Single column for small screens */
+    flex: 0 1 100%;
+    max-width: 100%;
+  }
+}
+
+.principle-card:hover {
+  background-color: var(--color-gray-200);
+  transform: translateY(-2px);
+}
+
+.principle-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.principle-card p {
+  font-size: 1rem;
+  color: var(--color-gray-700);
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.principle-card .button {
+  margin-top: var(--space-4);
+  align-self: flex-start;
+  background-color: var(--color-primary);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--border-radius-full);
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.principle-card .button:hover {
+  background-color: var(--color-secondary);
+}
+
+/* Card background colors for brand alignment */
+.principle-card:nth-child(1) {
+  background-color: var(--color-discover);
+}
+
+.principle-card:nth-child(2) {
+  background-color: var(--color-pilot);
+}
+
+.principle-card:nth-child(3) {
+  background-color: var(--color-launch);
+}
+
+.principle-card:nth-child(4),
+.principle-card:nth-child(5),
+.principle-card:nth-child(6) {
+  background-color: var(--color-boost);
+}
+
+/* Contribute section styles */
+section#contribute-section {
+  background-color: var(--color-secondary);
+  color: var(--color-light);
+}
+
+section#contribute-section h2,
+section#contribute-section p {
+  color: var(--color-light);
+}
+
+
+/* ustwo-style Hero Section */
+
+.hero-section {
+  padding-top: var(--space-20);
+  padding-bottom: var(--space-20);
+  background-color: var(--color-light);
+  text-align: center;
+}
+
+.hero-eyebrow {
+  text-transform: uppercase;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  max-width: 20ch;
+  margin: 0 auto var(--space-6);
+  line-height: 1.2;
+  color: var(--color-gray-900);
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--color-gray-600);
+  max-width: 42ch;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.5rem;
+  }
+}
+
+
+/* ustwo-style Footer */
+
+.site-footer {
+  background-color: var(--color-dark);
+  color: var(--color-footer-text);
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-16);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+@media (min-width: 768px) {
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.footer-logo {
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-light);
+  fill: var(--color-light);
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-8);
+  width: 100%;
+}
+
+.footer-links h4 {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--color-light);
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: var(--space-2);
+}
+
+.footer-links a {
+  color: var(--color-footer-text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--color-light);
+}
+
+/* Dark header theme */
+
+.site-header {
+  background-color: var(--color-dark);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-gray-800);
+}
+
+.logo svg {
+  color: var(--color-light); 
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.site-nav a {
+  color: var(--color-light);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.site-nav a:hover {
+  color: var(--color-secondary); /* ustwo purple */
+}
+
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-decoration: none;
+  fill: var(--color-light);
+}
+
+.site-nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding: 0;
+  margin: 0;
+  align-items: center;
+}
+
+
+/* Mobile stack */
+@media (max-width: 640px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-nav ul {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+}
+
+
+.site-nav a[aria-current="page"] {
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+/* Footer logo styling */
+.footer-logo svg {
+  height: 40px;
+  width: auto;
+  margin-bottom: var(--space-4);
+}
+
+/* Contribute section styles */
+#contribute-section {
+  background-color: var(--color-secondary);
+  color: var(--color-light);
+}
+
+#contribute-section h2,
+#contribute-section p {
+  color: var(--color-light);
+}
+
+#contribute-section .button {
+  background-color: var(--color-light);
+  color: var(--color-secondary);
+  border: 2px solid var(--color-light);
+}
+
+#contribute-section .button:hover {
+  background-color: transparent;
+  color: var(--color-light);
+}
