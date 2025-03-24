@@ -1,13 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
+import { z } from "zod";
 
 /**
  * Custom hook for handling accessible form validation
- * - Only validates on submit (server-side)
+ * - Validates on submit (client-side)
  * - Clears errors on blur (client-side) without revalidating
  * - Tracks form values for controlled inputs
+ * - Integrates with server-side validation errors
  */
 export function useAccessibleForm<T extends Record<string, unknown>>(
   initialValues: T,
+  validationSchema?: z.ZodSchema,
   actionData?: { success?: boolean; errors?: Record<string, string> }
 ) {
   if (typeof window !== 'undefined') {
@@ -21,6 +24,9 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
   // State to track form values
   const [formValues, setFormValues] = useState<T>(initialValues);
   
+  // State to track if form has been submitted (for error display)
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  
   // Update local errors when actionData changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -29,6 +35,7 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
     
     if (actionData?.errors) {
       setLocalErrors(actionData.errors);
+      setIsSubmitted(true);
     }
   }, [actionData]);
   
@@ -68,13 +75,81 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
     });
   }, [localErrors]);
   
+  // Client-side validation function
+  const validateForm = useCallback(() => {
+    if (!validationSchema) return true;
+    
+    if (typeof window !== 'undefined') {
+      window.console.log("🔍 VALIDATING FORM DATA:", formValues);
+    }
+    
+    try {
+      validationSchema.parse(formValues);
+      if (typeof window !== 'undefined') {
+        window.console.log("✅ VALIDATION SUCCESSFUL");
+      }
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        
+        error.errors.forEach(err => {
+          const fieldName = err.path[0] as string;
+          newErrors[fieldName] = err.message;
+        });
+        
+        if (typeof window !== 'undefined') {
+          window.console.log("❌ VALIDATION FAILED:", newErrors);
+        }
+        
+        setLocalErrors(newErrors);
+        return false;
+      }
+      
+      // Handle unexpected validation errors
+      setLocalErrors({ _form: "An unexpected error occurred. Please try again." });
+      return false;
+    }
+  }, [formValues, validationSchema]);
+  
+  // Handle form submission with client-side validation
+  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    if (typeof window !== 'undefined') {
+      window.console.log("📝 FORM SUBMIT EVENT");
+    }
+    
+    setIsSubmitted(true);
+    
+    if (validationSchema) {
+      const isValid = validateForm();
+      
+      if (!isValid) {
+        e.preventDefault();
+        
+        // Focus the first field with an error
+        if (typeof window !== 'undefined') {
+          const firstErrorField = Object.keys(localErrors)[0];
+          if (firstErrorField && firstErrorField !== '_form') {
+            const element = document.getElementById(firstErrorField);
+            if (element) {
+              element.focus();
+            }
+          }
+        }
+      }
+    }
+  }, [validateForm, localErrors, validationSchema]);
+  
   // Expose filtered errors and form state
   return {
     formValues,
     formErrors: localErrors,
+    isSubmitted,
     hasErrors: Object.keys(localErrors).length > 0,
     handleChange,
-    handleBlur
+    handleBlur,
+    handleSubmit,
+    validateForm
   };
 }
 

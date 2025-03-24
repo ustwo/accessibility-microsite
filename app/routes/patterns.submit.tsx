@@ -84,13 +84,14 @@ export default function SubmitPattern() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   
-  // Use the accessible form hook
+  // Use the accessible form hook with client-side validation
   const {
     formValues,
     formErrors,
     hasErrors,
     handleChange,
-    handleBlur
+    handleBlur,
+    handleSubmit
   } = useAccessibleForm(
     {
       name: "",
@@ -101,6 +102,7 @@ export default function SubmitPattern() {
       code: "",
       codeLanguage: "html"
     },
+    PatternSchema, // Pass the Zod schema for client-side validation
     actionData
   );
   
@@ -114,7 +116,7 @@ export default function SubmitPattern() {
         {/* Error summary - only shown when there are errors */}
         {hasErrors && <ErrorSummary errors={formErrors} />}
         
-        <Form method="post" noValidate className="space-y-6">
+        <Form method="post" noValidate className="space-y-6" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name" id="name-label">Pattern Name</label>
             <input
