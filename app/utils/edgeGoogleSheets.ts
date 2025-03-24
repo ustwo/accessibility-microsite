@@ -154,8 +154,15 @@ export async function submitNewItem(
   type: 'tool' | 'pattern', 
   data: Partial<AccessibilityTool | AccessibilityPattern>
 ): Promise<boolean> {
+  console.log(`===== submitNewItem called with type: ${type} =====`);
+  console.log("===== submitNewItem data:", data);
+  
   // Determine which sheet to write to
   const sheetName = type === 'tool' ? TOOL_SUBMISSIONS_SHEET_NAME : PATTERN_SUBMISSIONS_SHEET_NAME;
+  
+  // Log API credential status
+  console.log(`===== API credentials available: ${hasApiCredentials()} =====`);
+  console.log(`===== Target sheet: ${sheetName} =====`);
   
   // Prepare the row data based on the type
   let rowData: string[] = [];
@@ -186,15 +193,31 @@ export async function submitNewItem(
     ];
   }
   
-  // Append the row to the sheet
-  const success = await appendSheetValues(sheetName, [rowData]);
+  console.log("===== Prepared row data:", rowData);
   
-  if (!success) {
-    console.log('Failed to submit item to Google Sheets, but returning success anyway for demo purposes');
-    return true; // Return true for demo purposes
+  // When in development/demo mode, return success without actually submitting
+  if (process.env.NODE_ENV === 'development' || !hasApiCredentials()) {
+    console.log('===== DEV/DEMO MODE: Skipping actual submission to Google Sheets =====');
+    console.log('===== Returning success for demo purposes =====');
+    return true;
   }
   
-  return true;
+  // Append the row to the sheet
+  try {
+    const success = await appendSheetValues(sheetName, [rowData]);
+    
+    if (!success) {
+      console.log('===== Failed to submit item to Google Sheets, but returning success anyway for demo purposes =====');
+      return true; // Return true for demo purposes
+    }
+    
+    console.log('===== Successfully submitted to Google Sheets =====');
+    return true;
+  } catch (error) {
+    console.error('===== Error in appendSheetValues:', error);
+    // Still return true for demo purposes
+    return true;
+  }
 }
 
 /**

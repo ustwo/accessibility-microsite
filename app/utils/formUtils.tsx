@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { z } from "zod";
 
 /**
  * Custom hook for handling accessible form validation
  * - Validates on submit (client-side)
- * - Clears errors on blur (client-side) without revalidating
+ * - Clears errors on blur only if the value has changed
  * - Tracks form values for controlled inputs
  * - Integrates with server-side validation errors
+ * - Focuses error summary on validation failure
  */
 export function useAccessibleForm<T extends Record<string, unknown>>(
   initialValues: T,
@@ -24,8 +25,14 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
   // State to track form values
   const [formValues, setFormValues] = useState<T>(initialValues);
   
+  // State to track original values for comparison
+  const [originalValues, setOriginalValues] = useState<T>(initialValues);
+  
   // State to track if form has been submitted (for error display)
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  // Ref for the error summary
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
   
   // Update local errors when actionData changes
   useEffect(() => {
@@ -36,44 +43,73 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
     if (actionData?.errors) {
       setLocalErrors(actionData.errors);
       setIsSubmitted(true);
+      
+      // Scroll to top and focus error summary after server validation failure
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          const errorSummary = document.getElementById('error-summary');
+          if (errorSummary) {
+            errorSummary.focus();
+            window.console.log("🔍 Focusing error summary after server validation");
+          }
+        }
+      }, 100);
     }
   }, [actionData]);
   
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (typeof window !== 'undefined') {
+      window.console.log(`🔄 Input change: ${name} = ${value}`);
+    }
     setFormValues(prev => ({
       ...prev,
       [name]: value
     }));
   };
   
-  // Handle blur events - directly remove the error
+  // Handle blur events - only remove the error if the value has changed
   const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name } = e.target;
+    const { name, value } = e.target;
     
     if (typeof window !== 'undefined') {
       window.console.log("👀 BLUR EVENT ON FIELD:", name);
       window.console.log("👀 Current errors:", localErrors);
+      window.console.log("👀 Original value:", originalValues[name], "Current value:", value);
     }
     
-    // Remove the error for this field if it exists
-    setLocalErrors(prev => {
-      // Skip if no error exists for this field
-      if (!prev[name]) return prev;
+    // Only clear error if the value has changed from original
+    const hasValueChanged = String(originalValues[name]) !== String(value);
+    
+    if (hasValueChanged) {
+      // Remove the error for this field if it exists
+      setLocalErrors(prev => {
+        // Skip if no error exists for this field
+        if (!prev[name]) return prev;
+        
+        // Create new error object without this field
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        
+        if (typeof window !== 'undefined') {
+          window.console.log("✨ Value changed, removed error for:", name);
+          window.console.log("✨ New errors:", newErrors);
+        }
+        
+        return newErrors;
+      });
       
-      // Create new error object without this field
-      const newErrors = { ...prev };
-      delete newErrors[name];
-      
-      if (typeof window !== 'undefined') {
-        window.console.log("✨ REMOVED ERROR FOR:", name);
-        window.console.log("✨ New errors:", newErrors);
-      }
-      
-      return newErrors;
-    });
-  }, [localErrors]);
+      // Update the original value to the current value
+      setOriginalValues(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    } else if (typeof window !== 'undefined') {
+      window.console.log("⚠️ Value unchanged, keeping error for:", name);
+    }
+  }, [localErrors, originalValues]);
   
   // Client-side validation function
   const validateForm = useCallback(() => {
@@ -103,6 +139,10 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
         }
         
         setLocalErrors(newErrors);
+        
+        // Update original values to match current values to prevent error clearing on blur
+        setOriginalValues({...formValues});
+        
         return false;
       }
       
@@ -124,18 +164,42 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
       const isValid = validateForm();
       
       if (!isValid) {
-        e.preventDefault();
+        e.preventDefault(); // Prevent submission if validation fails
         
-        // Focus the first field with an error
+        // Scroll to top and focus the error summary
         if (typeof window !== 'undefined') {
-          const firstErrorField = Object.keys(localErrors)[0];
-          if (firstErrorField && firstErrorField !== '_form') {
-            const element = document.getElementById(firstErrorField);
-            if (element) {
-              element.focus();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          
+          // Focus the error summary after a short delay to ensure it's rendered
+          setTimeout(() => {
+            const errorSummary = document.getElementById('error-summary');
+            if (errorSummary) {
+              errorSummary.focus();
+              window.console.log("🔍 Focusing error summary after client validation");
+            } else {
+              // If error summary not found, try focusing the first field with an error
+              const firstErrorField = Object.keys(localErrors)[0];
+              if (firstErrorField && firstErrorField !== '_form') {
+                const element = document.getElementById(firstErrorField);
+                if (element) {
+                  element.focus();
+                  window.console.log(`🔍 Focusing first error field: ${firstErrorField}`);
+                }
+              }
             }
-          }
+          }, 100);
         }
+      } else if (typeof window !== 'undefined') {
+        // Form is valid - allow the form to submit naturally
+        // Remix will handle the form submission and process the action
+        window.console.log("✅ VALIDATION SUCCESSFUL - SUBMITTING FORM");
+        
+        // We don't call preventDefault() here so the form submits normally
+      }
+    } else {
+      // No validation schema provided, allow form to submit
+      if (typeof window !== 'undefined') {
+        window.console.log("⚠️ NO VALIDATION SCHEMA - SUBMITTING FORM AS IS");
       }
     }
   }, [validateForm, localErrors, validationSchema]);
@@ -149,7 +213,8 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
     handleChange,
     handleBlur,
     handleSubmit,
-    validateForm
+    validateForm,
+    errorSummaryRef
   };
 }
 
@@ -174,8 +239,34 @@ export function ErrorSummary({
     return null;
   }
   
+  // Handle error link click to scroll to the field
+  const handleErrorLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, fieldId: string) => {
+    // Let the default behavior happen (move focus via href)
+    // But add smooth scrolling
+    
+    // Small delay to ensure the focus happens first
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          // Scroll the field into view with smooth behavior
+          field.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+          window.console.log(`🔍 Scrolling to field: ${fieldId}`);
+        }
+      }
+    }, 10);
+  };
+  
   return (
-    <div id="error-summary" className={className} aria-labelledby="error-summary-title" tabIndex={-1}>
+    <div 
+      id="error-summary" 
+      className={className} 
+      aria-labelledby="error-summary-title" 
+      tabIndex={-1}
+    >
       <h2 id="error-summary-title">There is a problem</h2>
       <ul className="error-summary__list">
         {Object.entries(errors).map(([field, message]) => (
@@ -183,7 +274,12 @@ export function ErrorSummary({
             {field === "_form" ? (
               <span>{message}</span>
             ) : (
-              <a href={`#${field}`}>{message}</a>
+              <a 
+                href={`#${field}`} 
+                onClick={(e) => handleErrorLinkClick(e, field)}
+              >
+                {message}
+              </a>
             )}
           </li>
         ))}
@@ -207,4 +303,29 @@ export function ErrorMessage({ id, error }: { id: string; error?: string }) {
       {error}
     </div>
   );
-} 
+}
+
+/**
+ * Formats Zod validation errors into a Record<string, string> format
+ * that can be used with our form components
+ */
+export const formatZodErrors = (errors: z.ZodFormattedError<unknown>) => {
+  const formattedErrors: Record<string, string> = {};
+
+  // Safe way to extract field errors from the Zod validation error object
+  for (const [key, value] of Object.entries(errors)) {
+    // Skip the top-level _errors array
+    if (key === "_errors") continue;
+    
+    // Check if this is a field with errors
+    if (value && typeof value === 'object' && '_errors' in value) {
+      // Get the first error message for this field
+      const fieldErrors = value._errors as string[];
+      if (fieldErrors && fieldErrors.length > 0) {
+        formattedErrors[key] = fieldErrors[0];
+      }
+    }
+  }
+  
+  return formattedErrors;
+}; 

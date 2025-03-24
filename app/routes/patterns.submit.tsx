@@ -1,9 +1,11 @@
-import { json, redirect, ActionFunctionArgs } from "@remix-run/server-runtime";
+import { ActionFunctionArgs } from "@remix-run/server-runtime";
 import { useActionData, Form, useNavigation } from "@remix-run/react";
 import Layout from "~/components/Layout";
-import { submitNewItem } from "~/utils/edgeGoogleSheets";
 import { z } from "zod";
-import { useAccessibleForm, ErrorSummary, ErrorMessage } from "~/utils/formUtils";
+import { useAccessibleForm, ErrorSummary, ErrorMessage, formatZodErrors } from "~/utils/formUtils";
+import { handleFormSubmission } from "~/utils/formSubmission";
+import { useEffect } from "react";
+import { json } from "@remix-run/node";
 
 // Define validation schema using Zod
 const PatternSchema = z.object({
@@ -16,7 +18,7 @@ const PatternSchema = z.object({
   codeLanguage: z.string().min(1, "Code language is required")
 });
 
-// Define the type for our form errors
+// Define the type for our form errors for TypeScript
 type FormErrors = {
   _form?: string;
   name?: string;
@@ -29,60 +31,61 @@ type FormErrors = {
 };
 
 export async function action({ request }: ActionFunctionArgs) {
+  // Use the shared form submission utility
   const formData = await request.formData();
-  const rawFormData = Object.fromEntries(formData);
+  console.log("===== SERVER: Form data received:", Object.fromEntries(formData));
+
+  // Validate the form data using Zod
+  const validationResult = PatternSchema.safeParse(Object.fromEntries(formData));
   
-  // Return a specific error response when we have validation errors
-  try {
-    const validatedData = PatternSchema.parse(rawFormData);
-    
-    // Format the data for the API
-    const submissionData = {
-      name: validatedData.name,
-      description: validatedData.description,
-      example: validatedData.example,
-      wcagCriteria: validatedData.wcagCriteria.split(",").map(criteria => criteria.trim()),
-      tags: validatedData.tags.split(",").map(tag => tag.trim()),
-      code: validatedData.code,
-      codeLanguage: validatedData.codeLanguage
-    };
-    
-    // Submit to Google Sheets
-    const success = await submitNewItem("pattern", submissionData);
-    
-    if (success) {
-      return redirect("/patterns/submit/success");
-    } else {
-      return json<{ success: boolean; errors: FormErrors }>({
-        success: false,
-        errors: { _form: "Failed to submit the pattern. Please try again." }
-      });
-    }
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const fieldErrors = error.errors.reduce((acc, curr) => {
-        const fieldName = curr.path[0];
-        acc[fieldName as keyof FormErrors] = curr.message;
-        return acc;
-      }, {} as FormErrors);
-      
-      return json<{ success: boolean; errors: FormErrors }>({
-        success: false,
-        errors: fieldErrors
-      });
-    }
-    
-    return json<{ success: boolean; errors: FormErrors }>({
-      success: false,
-      errors: { _form: "An unexpected error occurred. Please try again." }
+  if (!validationResult.success) {
+    console.log("===== SERVER: Validation errors:", validationResult.error.format());
+    return json({ 
+      success: false, 
+      errors: formatZodErrors(validationResult.error.format()) 
     });
   }
+
+  const validatedData = validationResult.data;
+  
+  // Submit to Google Sheet
+  await handleFormSubmission({
+    formData: formData,
+    schema: PatternSchema,
+    type: "pattern",
+    successPath: "/patterns/submit/success",
+    formatData: (validatedData) => ({
+      "Pattern Name": validatedData.name,
+      "Description": validatedData.description,
+      "Example Use Case": validatedData.example,
+      "WCAG Criteria": validatedData.wcagCriteria,
+      "Tags": validatedData.tags,
+      "Code Sample": validatedData.code,
+      "Timestamp": new Date().toISOString()
+    })
+  });
+  
+  // We shouldn't reach here if handleFormSubmission does its job
+  // but add this as a fallback
+  return json({
+    success: true,
+    redirect: "/patterns/submit/success"
+  });
 }
 
 export default function SubmitPattern() {
+  console.log("===== CLIENT: SubmitPattern component rendering =====");
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  
+  // Handle successful submission by redirecting client-side
+  useEffect(() => {
+    if (actionData?.success && 'redirect' in (actionData || {})) {
+      console.log("===== CLIENT: Successful submission, redirecting to", actionData.redirect);
+      window.location.href = actionData.redirect as string;
+    }
+  }, [actionData]);
   
   // Use the accessible form hook with client-side validation
   const {

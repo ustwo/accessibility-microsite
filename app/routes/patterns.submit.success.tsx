@@ -1,7 +1,13 @@
 import { Link } from "@remix-run/react";
 import Layout from "~/components/Layout";
+import { useEffect } from "react";
 
 export default function SubmitPatternSuccess() {
+  // Log when the success page renders
+  useEffect(() => {
+    console.log("===== SUCCESS PAGE: Pattern submission success page rendered =====");
+  }, []);
+
   return (
     <Layout title="Submission Successful">
       <div className="max-w-2xl mx-auto">
