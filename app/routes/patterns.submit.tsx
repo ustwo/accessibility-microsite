@@ -73,10 +73,6 @@ export async function action({ request }: ActionFunctionArgs) {
       where: result.data.where,
       description: result.data.description,
       linkyDinks: linkyDinks,
-      // For backward compatibility
-      link: linkyDinks.length > 0 ? 
-        linkyDinks.map(link => link.title).join(', ') : '',
-      tags: [],
     };
     
     // Submit the data

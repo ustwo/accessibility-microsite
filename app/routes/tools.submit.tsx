@@ -10,11 +10,10 @@ import { useEffect } from "react";
 const ToolSchema = z.object({
   name: z.string().min(1, "Please enter a tool name"),
   description: z.string().min(1, "Please provide a description"),
-  url: z.string().url("Please enter a valid URL"),
-  category: z.string().min(1, "Please select a category"),
-  tags: z.string(),
-  cost: z.string().min(1, "Please select a cost option"),
-  platforms: z.string()
+  url: z.string().min(1, "Please enter a URL"),
+  discipline: z.string().min(1, "Please specify which disciplines this tool is for"),
+  source: z.string().min(1, "Please specify the source of the tool"),
+  notes: z.string().optional(),
 });
 
 // Type definition for successful response
@@ -23,7 +22,7 @@ type SuccessResponse = {
   redirect: string;
 };
 
-// Type definition for errors
+// Type definition for error response
 type ErrorResponse = {
   success: false;
   errors: Record<string, string>;
@@ -61,10 +60,9 @@ export async function action({ request }: ActionFunctionArgs) {
       name: result.data.name,
       description: result.data.description,
       url: result.data.url,
-      category: result.data.category,
-      tags: result.data.tags ? result.data.tags.split(',').map(tag => tag.trim()) : [],
-      cost: result.data.cost,
-      platforms: result.data.platforms ? result.data.platforms.split(',').map(platform => platform.trim()) : [],
+      discipline: result.data.discipline.split(',').map(d => d.trim()).filter(Boolean),
+      source: result.data.source,
+      notes: result.data.notes || '',
     };
     
     // Submit the data
@@ -124,32 +122,18 @@ export default function SubmitTool() {
       name: "",
       description: "",
       url: "",
-      category: "",
-      tags: "",
-      cost: "",
-      platforms: ""
+      discipline: "",
+      source: "",
+      notes: ""
     },
     ToolSchema, // Pass the Zod schema for client-side validation
     actionData
   );
 
-  // Categories for the dropdown
-  const categories = [
-    "Evaluation",
-    "Screen Reader",
-    "Design",
-    "Developer",
-    "Browser Extension",
-    "Testing"
-  ];
-
-  // Cost options
-  const costOptions = [
-    "Free",
-    "Paid",
-    "Free / Paid",
-    "Free (Built-in)",
-    "Free Trial"
+  // Source options for the dropdown
+  const sourceOptions = [
+    "ustwo",
+    "external"
   ];
   
   return (
@@ -183,6 +167,49 @@ export default function SubmitTool() {
             </div>
             
             <div className="form-group">
+              <label htmlFor="discipline" id="discipline-label">Discipline (comma-separated)</label>
+              <input
+                type="text"
+                id="discipline"
+                name="discipline"
+                value={formValues.discipline}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="All, Design, Tech, QA, Product, Client, Delivery, Strategy"
+                aria-describedby={formErrors.discipline ? "discipline-error" : undefined}
+                aria-invalid={formErrors.discipline ? "true" : undefined}
+                className={formErrors.discipline ? "input-error" : ""}
+              />
+              <ErrorMessage id="discipline-error" error={formErrors.discipline} />
+              <div className="text-sm text-gray-600 mt-1">
+                Who is this tool for? E.g., &quot;All&quot; or &quot;Design, Tech, QA&quot;
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="source" id="source-label">Source</label>
+              <select
+                id="source"
+                name="source"
+                value={formValues.source}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                aria-describedby={formErrors.source ? "source-error" : undefined}
+                aria-invalid={formErrors.source ? "true" : undefined}
+                className={formErrors.source ? "input-error" : ""}
+              >
+                <option value="">Select a source</option>
+                {sourceOptions.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+              <ErrorMessage id="source-error" error={formErrors.source} />
+              <div className="text-sm text-gray-600 mt-1">
+                Is this an ustwo tool or an external tool?
+              </div>
+            </div>
+            
+            <div className="form-group">
               <label htmlFor="description" id="description-label">Description</label>
               <textarea
                 id="description"
@@ -199,93 +226,39 @@ export default function SubmitTool() {
             </div>
             
             <div className="form-group">
-              <label htmlFor="url" id="url-label">Website URL</label>
+              <label htmlFor="url" id="url-label">URL</label>
               <input
-                type="url"
+                type="text"
                 id="url"
                 name="url"
                 value={formValues.url}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                placeholder="Link or actual URL"
                 aria-describedby={formErrors.url ? "url-error" : undefined}
                 aria-invalid={formErrors.url ? "true" : undefined}
                 className={formErrors.url ? "input-error" : ""}
               />
               <ErrorMessage id="url-error" error={formErrors.url} />
+              <div className="text-sm text-gray-600 mt-1">
+                Enter a direct URL or &quot;Link&quot; placeholder for internal links
+              </div>
             </div>
             
             <div className="form-group">
-              <label htmlFor="category" id="category-label">Category</label>
-              <select
-                id="category"
-                name="category"
-                value={formValues.category}
+              <label htmlFor="notes" id="notes-label">Notes (optional)</label>
+              <textarea
+                id="notes"
+                name="notes"
+                value={formValues.notes}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                aria-describedby={formErrors.category ? "category-error" : undefined}
-                aria-invalid={formErrors.category ? "true" : undefined}
-                className={formErrors.category ? "input-error" : ""}
-              >
-                <option value="">Select a category</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-              <ErrorMessage id="category-error" error={formErrors.category} />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="tags" id="tags-label">Tags (comma-separated)</label>
-              <input
-                type="text"
-                id="tags"
-                name="tags"
-                value={formValues.tags}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Automated testing, Browser extension, Visual feedback"
-                aria-describedby={formErrors.tags ? "tags-error" : undefined}
-                aria-invalid={formErrors.tags ? "true" : undefined}
-                className={formErrors.tags ? "input-error" : ""}
-              />
-              <ErrorMessage id="tags-error" error={formErrors.tags} />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="cost" id="cost-label">Cost</label>
-              <select
-                id="cost"
-                name="cost"
-                value={formValues.cost}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                aria-describedby={formErrors.cost ? "cost-error" : undefined}
-                aria-invalid={formErrors.cost ? "true" : undefined}
-                className={formErrors.cost ? "input-error" : ""}
-              >
-                <option value="">Select cost option</option>
-                {costOptions.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-              <ErrorMessage id="cost-error" error={formErrors.cost} />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="platforms" id="platforms-label">Platforms (comma-separated)</label>
-              <input
-                type="text"
-                id="platforms"
-                name="platforms"
-                value={formValues.platforms}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Web, Chrome, iOS, Android, Windows, macOS"
-                aria-describedby={formErrors.platforms ? "platforms-error" : undefined}
-                aria-invalid={formErrors.platforms ? "true" : undefined}
-                className={formErrors.platforms ? "input-error" : ""}
-              />
-              <ErrorMessage id="platforms-error" error={formErrors.platforms} />
+                rows={2}
+                aria-describedby={formErrors.notes ? "notes-error" : undefined}
+                aria-invalid={formErrors.notes ? "true" : undefined}
+                className={formErrors.notes ? "input-error" : ""}
+              ></textarea>
+              <ErrorMessage id="notes-error" error={formErrors.notes} />
             </div>
             
             <div className="mt-8">

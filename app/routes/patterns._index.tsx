@@ -86,31 +86,6 @@ export default function PatternsIndex() {
                         </ul>
                       </div>
                     )}
-                    {/* Fallback to legacy link if no linkyDinks */}
-                    {(!pattern.linkyDinks || pattern.linkyDinks.length === 0) && pattern.link && (
-                      <div className="mt-4">
-                        <h4 className="font-semibold mb-2">Learn more:</h4>
-                        <a 
-                          href={pattern.link.startsWith('http') ? pattern.link : `https://www.google.com/search?q=${encodeURIComponent(pattern.link)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline text-primary hover:text-secondary"
-                        >
-                          {pattern.link}
-                        </a>
-                      </div>
-                    )}
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {pattern.tags.filter(tag => tag !== pattern.category && tag !== pattern.where).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 bg-secondary text-light rounded text-sm"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 ))}
               </div>

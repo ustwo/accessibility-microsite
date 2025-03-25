@@ -6,10 +6,9 @@ export interface AccessibilityTool {
   name: string;
   description: string;
   url: string;
-  category: string;
-  tags: string[];
-  cost: string;
-  platforms: string[];
+  discipline: string[];
+  source: string;
+  notes: string;
 }
 
 export interface AccessibilityPattern {
@@ -19,12 +18,6 @@ export interface AccessibilityPattern {
   where: string;
   description: string;
   linkyDinks: Array<{url: string, title: string}>;
-  link: string;
-  example: string;
-  wcagCriteria: string[];
-  tags: string[];
-  code: string;
-  codeLanguage: string;
 }
 
 /**
@@ -231,31 +224,38 @@ async function appendSheetValues(spreadsheetId: string, sheetRange: string, valu
  */
 export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
   // Using a more generic range to accommodate different sheet structures
-  const rows = await fetchSheetValues(TOOLS_SHEET_ID, 'A:Z');
+  const rows = await fetchSheetValues(TOOLS_SHEET_ID, 'A:F');
   
   if (!rows || rows.length === 0) {
     console.log('No tool data found, returning mock data');
     return mockTools;
   }
   
-  // Skip the header row
-  const dataRows = rows.slice(1);
+  // Skip the header row and any empty rows
+  const dataRows = rows.slice(1).filter(row => 
+    row.some(cell => cell && cell.trim() !== '')
+  );
   
   // Transform the rows into our AccessibilityTool type
   const tools: AccessibilityTool[] = dataRows
-    .filter(row => row.length >= 2 && row[0]?.trim()) // Filter out empty rows and section headers
+    .filter(row => row.length >= 3) // At least discipline, source, and name
     .map((row, index) => {
+      // Parse discipline field which can have multiple values
+      const disciplineText = row[0]?.trim() || '';
+      const disciplines = disciplineText.split(',')
+        .map(d => d.trim())
+        .filter(Boolean);
+      
       return {
         id: `tool-${index + 1}`,
-        name: row[0]?.trim() || '',
-        description: row[1]?.trim() || '',
-        url: row[2]?.trim() || '',
-        category: row[3]?.trim() || '',
-        tags: (row[4] || '').split(',').map((tag: string) => tag.trim()).filter(Boolean),
-        cost: row[5]?.trim() || '',
-        platforms: (row[6] || '').split(',').map((platform: string) => platform.trim()).filter(Boolean),
+        discipline: disciplines,
+        source: row[1]?.trim() || '',
+        name: row[2]?.trim() || '',
+        url: row[3]?.trim() || '',
+        description: row[4]?.trim() || '',
+        notes: row[5]?.trim() || '',
       };
-  });
+    });
   
   return tools;
 }
@@ -349,13 +349,6 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
         where: row[1]?.trim() || '',
         description: row[2]?.trim() || '',
         linkyDinks: linkyDinks,
-        link: row[3]?.trim() || '', // Keep for backward compatibility
-        // Legacy fields - we'll keep these for backward compatibility
-        example: row[2]?.trim() || '', // Same as description for backward compatibility
-        wcagCriteria: [],
-        tags: [currentCategory, row[1]?.trim()].filter(Boolean),
-        code: '',
-        codeLanguage: 'html',
       });
     }
   }
@@ -388,7 +381,7 @@ export async function submitNewItem(
   try {
     // Determine which sheet to write to based on type
     const spreadsheetId = type === 'tool' ? TOOLS_SHEET_ID : PATTERNS_SHEET_ID;
-    const sheetRange = type === 'tool' ? 'Submissions!A:H' : 'Submissions!A:E';
+    const sheetRange = type === 'tool' ? 'Submissions!A:G' : 'Submissions!A:E';
     
     // Prepare the row data based on the type
     let rowData: string[] = [];
@@ -396,13 +389,12 @@ export async function submitNewItem(
     if (type === 'tool') {
       const tool = data as Partial<AccessibilityTool>;
       rowData = [
+        tool.discipline ? tool.discipline.join(', ') : '',
+        tool.source || '',
         tool.name || '',
-        tool.description || '',
         tool.url || '',
-        tool.category || '',
-        (tool.tags || []).join(','),
-        tool.cost || '',
-        (tool.platforms || []).join(','),
+        tool.description || '',
+        tool.notes || '',
         new Date().toISOString(), // Submission timestamp
       ];
     } else {
@@ -424,9 +416,6 @@ export async function submitNewItem(
             return link.title || link.url;
           })
           .join(', ');
-      } else if (pattern.link) {
-        // For backward compatibility, use the legacy link field
-        linksText = pattern.link;
       }
       
       rowData = [
@@ -451,23 +440,17 @@ export async function submitNewItem(
  * Used for filtering options
  */
 export function getToolsFilterOptions(tools: AccessibilityTool[]) {
-  const categories = new Set<string>();
-  const tags = new Set<string>();
-  const platforms = new Set<string>();
-  const costs = new Set<string>();
+  const disciplines = new Set<string>();
+  const sources = new Set<string>();
   
   tools.forEach(tool => {
-    if (tool.category) categories.add(tool.category);
-    tool.tags.forEach(tag => tags.add(tag));
-    tool.platforms.forEach(platform => platforms.add(platform));
-    if (tool.cost) costs.add(tool.cost);
+    tool.discipline.forEach(disc => disciplines.add(disc));
+    if (tool.source) sources.add(tool.source);
   });
   
   return {
-    categories: Array.from(categories).sort(),
-    tags: Array.from(tags).sort(),
-    platforms: Array.from(platforms).sort(),
-    costs: Array.from(costs).sort(),
+    disciplines: Array.from(disciplines).sort(),
+    sources: Array.from(sources).sort(),
   };
 }
 
@@ -477,18 +460,15 @@ export function getToolsFilterOptions(tools: AccessibilityTool[]) {
  */
 export function getPatternsFilterOptions(patterns: AccessibilityPattern[]) {
   const categories = new Set<string>();
-  const tags = new Set<string>();
   const locations = new Set<string>();
   
   patterns.forEach(pattern => {
     if (pattern.category) categories.add(pattern.category);
     if (pattern.where) locations.add(pattern.where);
-    pattern.tags.forEach(tag => tags.add(tag));
   });
   
   return {
     categories: Array.from(categories).sort(),
-    tags: Array.from(tags).sort(),
     locations: Array.from(locations).sort(),
   };
 } 

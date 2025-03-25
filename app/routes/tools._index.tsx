@@ -24,6 +24,19 @@ export async function loader() {
 export default function ToolsIndex() {
   const { tools } = useLoaderData<typeof loader>();
 
+  // Group tools by source for easier browsing
+  const toolsBySource = tools.reduce((acc, tool) => {
+    const source = tool.source || 'Other';
+    if (!acc[source]) {
+      acc[source] = [];
+    }
+    acc[source].push(tool);
+    return acc;
+  }, {} as Record<string, typeof tools>);
+
+  // Get sorted sources
+  const sources = Object.keys(toolsBySource).sort();
+
   return (
     <Layout title="Accessibility Tools">
       <section className="content-section">
@@ -38,50 +51,61 @@ export default function ToolsIndex() {
 
       <section className="content-section">
         <div className="container container-full">
-          <div className="grid grid-cols-1 tools-grid gap-6">
-            {tools.map((tool) => (
-              <div key={tool.id} className="card light-background">
-                <h3>{tool.name}</h3>
-                <p>{tool.description}</p>
-                <div className="mt-4">
-                  <a
-                    href={tool.url}
-                    className="button"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Visit Website
-                  </a>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-gray-200 rounded text-sm">
-                    Category: {tool.category}
-                  </span>
-                  <span className="px-2 py-1 bg-gray-200 rounded text-sm">
-                    Cost: {tool.cost}
-                  </span>
-                  {tool.platforms.map((platform) => (
-                    <span
-                      key={platform}
-                      className="px-2 py-1 bg-gray-200 rounded text-sm"
-                    >
-                      {platform}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {tool.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-1 bg-secondary text-light rounded text-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+          {sources.map((source) => (
+            <div key={source} className="mb-12">
+              <h2 className="text-2xl font-bold mb-6">
+                {source === 'ustwo' ? 'ustwo Tools' : source === 'external' ? 'External Tools' : source}
+              </h2>
+              <div className="grid grid-cols-1 tools-grid gap-6">
+                {toolsBySource[source].map((tool) => (
+                  <div key={tool.id} className="card light-background">
+                    <h3>{tool.name}</h3>
+                    <p>{tool.description}</p>
+                    
+                    {/* Tool info section */}
+                    <div className="mt-4">
+                      {tool.url && tool.url !== "Link" && tool.url !== "WIP" && (
+                        <a
+                          href={tool.url}
+                          className="button"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Visit Website
+                        </a>
+                      )}
+                      {(tool.url === "Link" || tool.url === "WIP") && (
+                        <span className="px-2 py-1 bg-gray-200 rounded text-sm">
+                          {tool.url === "WIP" ? "Work in Progress" : "Internal Link"}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Discipline tags */}
+                    {tool.discipline && tool.discipline.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {tool.discipline.map((disc) => (
+                          <span
+                            key={disc}
+                            className="px-2 py-1 bg-secondary text-light rounded text-sm"
+                          >
+                            {disc}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Notes section (if available) */}
+                    {tool.notes && (
+                      <div className="mt-4 text-sm text-gray-700 bg-gray-100 p-3 rounded">
+                        <strong>Notes:</strong> {tool.notes}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
     </Layout>
