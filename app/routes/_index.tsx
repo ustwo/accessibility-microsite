@@ -34,7 +34,7 @@ export default function Index() {
 
       <section
         id="principles"
-        className="container-full content-section"
+        className="principles-section container-full content-section"
         aria-labelledby="principles-heading"
       >
         <h2 id="principles-heading">ustwo&apos;s Inclusivity Principles</h2>

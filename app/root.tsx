@@ -9,7 +9,17 @@ import {
 import type { LinksFunction } from "@remix-run/server-runtime";
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: "/styles/global.css" },
+  /* CSS files ordered by importance and dependency */
+  { rel: "stylesheet", href: "/styles/variables.css" },
+  { rel: "stylesheet", href: "/styles/variables-extras.css" },
+  { rel: "stylesheet", href: "/styles/reset.css" },
+  { rel: "stylesheet", href: "/styles/typography.css" },
+  { rel: "stylesheet", href: "/styles/layout.css" },
+  { rel: "stylesheet", href: "/styles/components.css" },
+  { rel: "stylesheet", href: "/styles/theme-dark.css" },
+  { rel: "stylesheet", href: "/styles/sections.css" },
+  { rel: "stylesheet", href: "/styles/utilities.css" },
+  /* Google fonts */
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",

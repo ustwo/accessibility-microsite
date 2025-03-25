@@ -10,7 +10,7 @@ interface LayoutProps {
 export default function Layout({ children, title }: LayoutProps) {
   return (
     <div className="page-wrapper">
-      <header className="site-header" role="banner">
+      <header className="site-header bg-dark-theme" role="banner">
         <div className="container container-content header-inner">
           <a href="/" className="logo" aria-current="page">
             <UsTwo className="fill-current" />
@@ -34,29 +34,29 @@ export default function Layout({ children, title }: LayoutProps) {
           </div>
         )}
         {children}
-        <section id="contribute-section" className="content-section" aria-labelledby="contribute-heading">
-        <div className="container container-content">
-          <h2 id="contribute-heading" className="mb-6 text-dark">
-            Contribute Your Knowledge
-          </h2>
-          <p className="mb-6 text-dark">
-            We welcome contributions from the accessibility community. Share
-            your favorite tools or patterns to help others create more
-            accessible digital experiences.
-          </p>
-          <div className="flex gap-4">
-            <Link to="/tools/submit" className="button bg-tertiary text-dark">
-              Submit a Tool
-            </Link>
-            <Link to="/patterns/submit" className="button bg-tertiary text-dark">
-              Submit a Pattern
-            </Link>
+        <section className="content-section contribute-section" aria-labelledby="contribute-heading">
+          <div className="container container-content">
+            <h2 id="contribute-heading" className="mb-6">
+              Contribute Your Knowledge
+            </h2>
+            <p className="mb-6">
+              We welcome contributions from the accessibility community. Share
+              your favorite tools or patterns to help others create more
+              accessible digital experiences.
+            </p>
+            <div className="flex gap-4">
+              <Link to="/tools/submit" className="button">
+                Submit a Tool
+              </Link>
+              <Link to="/patterns/submit" className="button">
+                Submit a Pattern
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       </main>
 
-      <footer className="site-footer" role="contentinfo">
+      <footer className="site-footer bg-dark-theme" role="contentinfo">
         <div className="container container-content footer-inner">
           <div className="footer-logo">
             <UsTwo className="fill-current text-light" />

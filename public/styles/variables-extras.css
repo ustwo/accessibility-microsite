@@ -1,0 +1,11 @@
+/* 
+ * ustwo Accessibility Microsite - Additional Variables
+ */
+
+:root {
+  /* Additional variables for sections */
+  --font-size-hero: 3rem;
+  --font-size-section-title: 2rem;
+  --color-footer-bg: #14161F;
+  --color-footer-text: #FFFFFFCC;
+} 

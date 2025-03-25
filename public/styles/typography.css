@@ -1,0 +1,132 @@
+/* 
+ * ustwo Accessibility Microsite - Typography Styles
+ */
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-heading);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+  color: var(--color-gray-900);
+}
+
+h1 {
+  font-size: var(--font-size-4xl);
+}
+
+h2 {
+  font-size: var(--font-size-3xl);
+}
+
+h3 {
+  font-size: var(--font-size-2xl);
+}
+
+h4 {
+  font-size: var(--font-size-xl);
+}
+
+h5 {
+  font-size: var(--font-size-lg);
+}
+
+h6 {
+  font-size: var(--font-size-base);
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+  line-height: var(--line-height-normal);
+}
+
+/* Regular links (not in navigation, buttons, etc.) */
+p a, 
+li:not(.site-nav li) a,
+.regular-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.15em;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  padding: 0.1em 0.2em;
+  margin: -0.1em -0.2em;
+  border-radius: var(--border-radius-sm);
+}
+
+p a:hover, 
+li:not(.site-nav li) a:hover,
+.regular-link:hover {
+  color: var(--color-primary);
+  background-color: rgba(255, 103, 54, 0.1); /* light tint of primary color */
+}
+
+/* Default link styles that apply to all links */
+a {
+  transition: color 0.2s ease, background-color 0.2s ease;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+a:focus {
+  text-decoration: underline;
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Section Headings */
+section h2 {
+  font-size: var(--font-size-section-title);
+  margin-bottom: var(--space-6);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Hero Typography */
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  max-width: 20ch;
+  margin: 0 auto var(--space-6);
+  line-height: 1.2;
+  color: var(--color-gray-900);
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--color-gray-600);
+  max-width: 42ch;
+  margin: 0 auto;
+}
+
+.hero-eyebrow {
+  text-transform: uppercase;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+/* Mobile typography adjustments */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2.25rem;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.5rem;
+  }
+} 
