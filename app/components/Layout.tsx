@@ -34,21 +34,21 @@ export default function Layout({ children, title }: LayoutProps) {
           </div>
         )}
         {children}
-        <section id="contribute-section" className="content-section bg-secondary" aria-labelledby="contribute-heading">
+        <section id="contribute-section" className="content-section" aria-labelledby="contribute-heading">
         <div className="container container-content">
-          <h2 id="contribute-heading" className="mb-6 text-light">
+          <h2 id="contribute-heading" className="mb-6 text-dark">
             Contribute Your Knowledge
           </h2>
-          <p className="mb-6 text-light">
+          <p className="mb-6 text-dark">
             We welcome contributions from the accessibility community. Share
             your favorite tools or patterns to help others create more
             accessible digital experiences.
           </p>
           <div className="flex gap-4">
-            <Link to="/tools/submit" className="button bg-light text-secondary">
+            <Link to="/tools/submit" className="button bg-tertiary text-dark">
               Submit a Tool
             </Link>
-            <Link to="/patterns/submit" className="button bg-light text-secondary">
+            <Link to="/patterns/submit" className="button bg-tertiary text-dark">
               Submit a Pattern
             </Link>
           </div>
