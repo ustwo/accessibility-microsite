@@ -1,7 +1,31 @@
 import { mockTools, mockPatterns } from '../data/mockData';
 
-// Import types from original googleSheets.ts
-import type { AccessibilityTool, AccessibilityPattern } from './googleSheets';
+// Define types based on spreadsheet structure
+export interface AccessibilityTool {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  category: string;
+  tags: string[];
+  cost: string;
+  platforms: string[];
+}
+
+export interface AccessibilityPattern {
+  id: string;
+  name: string;
+  category: string;
+  where: string;
+  description: string;
+  linkyDinks: Array<{url: string, title: string}>;
+  link: string;
+  example: string;
+  wcagCriteria: string[];
+  tags: string[];
+  code: string;
+  codeLanguage: string;
+}
 
 /**
  * Edge-compatible Google Sheets API client
@@ -26,12 +50,9 @@ interface ServiceAccountCredentials {
 }
 
 // Configuration
-const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID || '';
+const PATTERNS_SHEET_ID = process.env.GOOGLE_PATTERNS_SHEET_ID || '1lxc12mHxlBCuhWEx_r4ce7jr1vPbiwuF_t4xt0RvsEs';
+const TOOLS_SHEET_ID = process.env.GOOGLE_TOOLS_SHEET_ID || '1vjzCZobdvV1tvLy-k38Tpr6AGJX8fs9wKv6tXg55s7k';
 const SERVICE_ACCOUNT_CREDENTIALS_JSON = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS || '';
-const TOOLS_SHEET_NAME = 'Tools';
-const PATTERNS_SHEET_NAME = 'Patterns';
-const TOOL_SUBMISSIONS_SHEET_NAME = 'ToolSubmissions';
-const PATTERN_SUBMISSIONS_SHEET_NAME = 'PatternSubmissions';
 
 // Parse the service account credentials
 let serviceAccountCredentials: ServiceAccountCredentials | null = null;
@@ -45,7 +66,7 @@ try {
 
 // Helper function to check if required API credentials are available
 function hasApiCredentials(): boolean {
-  return Boolean(SPREADSHEET_ID && serviceAccountCredentials?.client_email && serviceAccountCredentials?.private_key);
+  return Boolean(serviceAccountCredentials?.client_email && serviceAccountCredentials?.private_key);
 }
 
 /**
@@ -131,7 +152,7 @@ async function getAccessToken(): Promise<string | null> {
 /**
  * Fetch values from a Google Sheet using the Sheets API v4 REST endpoint with OAuth
  */
-async function fetchSheetValues(sheetName: string, range: string): Promise<string[][] | null> {
+async function fetchSheetValues(spreadsheetId: string, range: string): Promise<string[][] | null> {
   if (!hasApiCredentials()) {
     console.log('Google Sheets API credentials not available');
     return null;
@@ -144,7 +165,7 @@ async function fetchSheetValues(sheetName: string, range: string): Promise<strin
       return null;
     }
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${sheetName}!${range}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`;
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -167,7 +188,7 @@ async function fetchSheetValues(sheetName: string, range: string): Promise<strin
 /**
  * Append values to a Google Sheet using the Sheets API v4 REST endpoint with OAuth
  */
-async function appendSheetValues(sheetName: string, values: string[][]): Promise<boolean> {
+async function appendSheetValues(spreadsheetId: string, sheetRange: string, values: string[][]): Promise<boolean> {
   if (!hasApiCredentials()) {
     console.log('Google Sheets API credentials not available');
     return false;
@@ -180,7 +201,7 @@ async function appendSheetValues(sheetName: string, values: string[][]): Promise
       return false;
     }
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${sheetName}!A2:append?valueInputOption=USER_ENTERED`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetRange}?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -209,56 +230,152 @@ async function appendSheetValues(sheetName: string, values: string[][]): Promise
  * Fetch all accessibility tools from Google Sheets
  */
 export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
-  const rows = await fetchSheetValues(TOOLS_SHEET_NAME, 'A2:H');
+  // Using a more generic range to accommodate different sheet structures
+  const rows = await fetchSheetValues(TOOLS_SHEET_ID, 'A:Z');
   
   if (!rows || rows.length === 0) {
     console.log('No tool data found, returning mock data');
     return mockTools;
   }
   
+  // Skip the header row
+  const dataRows = rows.slice(1);
+  
   // Transform the rows into our AccessibilityTool type
-  const tools: AccessibilityTool[] = rows.map((row, index) => {
-    return {
-      id: `tool-${index + 1}`,
-      name: row[0] || '',
-      description: row[1] || '',
-      url: row[2] || '',
-      category: row[3] || '',
-      tags: (row[4] || '').split(',').map((tag: string) => tag.trim()).filter(Boolean),
-      cost: row[5] || '',
-      platforms: (row[6] || '').split(',').map((platform: string) => platform.trim()).filter(Boolean),
-    };
+  const tools: AccessibilityTool[] = dataRows
+    .filter(row => row.length >= 2 && row[0]?.trim()) // Filter out empty rows and section headers
+    .map((row, index) => {
+      return {
+        id: `tool-${index + 1}`,
+        name: row[0]?.trim() || '',
+        description: row[1]?.trim() || '',
+        url: row[2]?.trim() || '',
+        category: row[3]?.trim() || '',
+        tags: (row[4] || '').split(',').map((tag: string) => tag.trim()).filter(Boolean),
+        cost: row[5]?.trim() || '',
+        platforms: (row[6] || '').split(',').map((platform: string) => platform.trim()).filter(Boolean),
+      };
   });
   
   return tools;
 }
 
 /**
+ * Process patterns data from spreadsheet to handle the section headers and grouped patterns
+ */
+function processPatternRows(rows: string[][]): AccessibilityPattern[] {
+  if (!rows || rows.length === 0) return [];
+  
+  // Get the headers (should be the first row)
+  const headers = rows[0];
+  
+  // Check if headers match expected format (Where?, What why how?, Linky dinks)
+  const hasExpectedFormat = headers.some(header => 
+    header.includes('Where?') || header.includes('What') || header.includes('Linky'));
+  
+  if (!hasExpectedFormat) {
+    console.warn('Pattern sheet headers do not match expected format');
+  }
+  
+  let currentCategory = '';
+  const patterns: AccessibilityPattern[] = [];
+  let patternId = 1;
+  
+  // Start from row 3 to skip headers and empty rows
+  for (let i = 2; i < rows.length; i++) {
+    const row = rows[i];
+    
+    // Skip completely empty rows
+    if (row.every(cell => !cell || cell.trim() === '')) {
+      continue;
+    }
+    
+    // Check if this is a category row (bold text in first column, empty in others)
+    if (row[0]?.trim() && row.slice(1).every(cell => !cell || cell.trim() === '')) {
+      currentCategory = row[0].trim();
+      continue;
+    }
+    
+    // Otherwise, it's a pattern row
+    if (row[0]?.trim() || row[1]?.trim()) {
+      // Parse linkyDinks from the links cell (index 3)
+      const linksText = row[3]?.trim() || '';
+      const linkyDinks: Array<{url: string, title: string}> = [];
+      
+      // If there are links, process them
+      if (linksText) {
+        // Handle possible multiple links separated by commas or line breaks
+        const linkSegments = linksText.split(/,|\n/).filter(Boolean);
+        
+        for (const segment of linkSegments) {
+          const trimmedSegment = segment.trim();
+          
+          // Try to identify if there's a title and URL
+          if (trimmedSegment.includes(':')) {
+            // Format might be "Title: URL" or just "Title:"
+            const [title, url] = trimmedSegment.split(':', 2).map(s => s.trim());
+            
+            if (url && url.includes('http')) {
+              // Clear case of "Title: http://example.com"
+              linkyDinks.push({ title, url });
+            } else {
+              // Format is likely "Title:" without explicit URL
+              // Create a Google search URL
+              linkyDinks.push({ 
+                title: trimmedSegment, 
+                url: `https://www.google.com/search?q=${encodeURIComponent(trimmedSegment)}`
+              });
+            }
+          } else if (trimmedSegment.includes('http')) {
+            // Just a URL without a clear title
+            linkyDinks.push({ 
+              title: trimmedSegment,
+              url: trimmedSegment
+            });
+          } else {
+            // Just a text reference, no explicit URL
+            linkyDinks.push({ 
+              title: trimmedSegment,
+              url: `https://www.google.com/search?q=${encodeURIComponent(trimmedSegment)}`
+            });
+          }
+        }
+      }
+      
+      patterns.push({
+        id: `pattern-${patternId++}`,
+        category: currentCategory,
+        name: row[0]?.trim() || '',
+        where: row[1]?.trim() || '',
+        description: row[2]?.trim() || '',
+        linkyDinks: linkyDinks,
+        link: row[3]?.trim() || '', // Keep for backward compatibility
+        // Legacy fields - we'll keep these for backward compatibility
+        example: row[2]?.trim() || '', // Same as description for backward compatibility
+        wcagCriteria: [],
+        tags: [currentCategory, row[1]?.trim()].filter(Boolean),
+        code: '',
+        codeLanguage: 'html',
+      });
+    }
+  }
+  
+  return patterns;
+}
+
+/**
  * Fetch all accessibility patterns from Google Sheets
  */
 export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern[]> {
-  const rows = await fetchSheetValues(PATTERNS_SHEET_NAME, 'A2:G');
+  // Using a more generic range to accommodate pattern structure
+  const rows = await fetchSheetValues(PATTERNS_SHEET_ID, 'A:E');
   
   if (!rows || rows.length === 0) {
     console.log('No pattern data found, returning mock data');
     return mockPatterns;
   }
   
-  // Transform the rows into our AccessibilityPattern type
-  const patterns: AccessibilityPattern[] = rows.map((row, index) => {
-    return {
-      id: `pattern-${index + 1}`,
-      name: row[0] || '',
-      description: row[1] || '',
-      example: row[2] || '',
-      wcagCriteria: (row[3] || '').split(',').map((criteria: string) => criteria.trim()).filter(Boolean),
-      tags: (row[4] || '').split(',').map((tag: string) => tag.trim()).filter(Boolean),
-      code: row[5] || '',
-      codeLanguage: row[6] || 'html',
-    };
-  });
-  
-  return patterns;
+  return processPatternRows(rows);
 }
 
 /**
@@ -268,69 +385,64 @@ export async function submitNewItem(
   type: 'tool' | 'pattern', 
   data: Partial<AccessibilityTool | AccessibilityPattern>
 ): Promise<boolean> {
-  console.log(`===== submitNewItem called with type: ${type} =====`);
-  console.log("===== submitNewItem data:", data);
-  
-  // Determine which sheet to write to
-  const sheetName = type === 'tool' ? TOOL_SUBMISSIONS_SHEET_NAME : PATTERN_SUBMISSIONS_SHEET_NAME;
-  
-  // Log API credential status
-  console.log(`===== API credentials available: ${hasApiCredentials()} =====`);
-  console.log(`===== Target sheet: ${sheetName} =====`);
-  
-  // Prepare the row data based on the type
-  let rowData: string[] = [];
-  
-  if (type === 'tool') {
-    const tool = data as Partial<AccessibilityTool>;
-    rowData = [
-      tool.name || '',
-      tool.description || '',
-      tool.url || '',
-      tool.category || '',
-      (tool.tags || []).join(','),
-      tool.cost || '',
-      (tool.platforms || []).join(','),
-      new Date().toISOString(), // Submission timestamp
-    ];
-  } else {
-    const pattern = data as Partial<AccessibilityPattern>;
-    rowData = [
-      pattern.name || '',
-      pattern.description || '',
-      pattern.example || '',
-      (pattern.wcagCriteria || []).join(','),
-      (pattern.tags || []).join(','),
-      pattern.code || '',
-      pattern.codeLanguage || 'html',
-      new Date().toISOString(), // Submission timestamp
-    ];
-  }
-  
-  console.log("===== Prepared row data:", rowData);
-  
-  // When in development/demo mode, return success without actually submitting
-  if (process.env.NODE_ENV === 'development' || !hasApiCredentials()) {
-    console.log('===== DEV/DEMO MODE: Skipping actual submission to Google Sheets =====');
-    console.log('===== Returning success for demo purposes =====');
-    return true;
-  }
-  
-  // Append the row to the sheet
   try {
-    const success = await appendSheetValues(sheetName, [rowData]);
+    // Determine which sheet to write to based on type
+    const spreadsheetId = type === 'tool' ? TOOLS_SHEET_ID : PATTERNS_SHEET_ID;
+    const sheetRange = type === 'tool' ? 'Submissions!A:H' : 'Submissions!A:E';
     
-    if (!success) {
-      console.log('===== Failed to submit item to Google Sheets, but returning success anyway for demo purposes =====');
-      return true; // Return true for demo purposes
+    // Prepare the row data based on the type
+    let rowData: string[] = [];
+    
+    if (type === 'tool') {
+      const tool = data as Partial<AccessibilityTool>;
+      rowData = [
+        tool.name || '',
+        tool.description || '',
+        tool.url || '',
+        tool.category || '',
+        (tool.tags || []).join(','),
+        tool.cost || '',
+        (tool.platforms || []).join(','),
+        new Date().toISOString(), // Submission timestamp
+      ];
+    } else {
+      const pattern = data as Partial<AccessibilityPattern>;
+      
+      // Format linkyDinks as a string for Google Sheets
+      let linksText = '';
+      if (pattern.linkyDinks && pattern.linkyDinks.length > 0) {
+        linksText = pattern.linkyDinks
+          .map(link => {
+            // Format each link as "Title: URL" if both exist
+            if (link.title && link.url) {
+              // If URL is a Google search, just use the title
+              if (link.url.startsWith('https://www.google.com/search')) {
+                return link.title;
+              }
+              return `${link.title}: ${link.url}`;
+            }
+            return link.title || link.url;
+          })
+          .join(', ');
+      } else if (pattern.link) {
+        // For backward compatibility, use the legacy link field
+        linksText = pattern.link;
+      }
+      
+      rowData = [
+        pattern.name || '',
+        pattern.where || '',
+        pattern.description || '',
+        linksText,
+        new Date().toISOString(), // Submission timestamp
+      ];
     }
     
-    console.log('===== Successfully submitted to Google Sheets =====');
-    return true;
+    // Append the row to the sheet
+    return await appendSheetValues(spreadsheetId, sheetRange, [rowData]);
   } catch (error) {
-    console.error('===== Error in appendSheetValues:', error);
-    // Still return true for demo purposes
-    return true;
+    console.error(`Error submitting new ${type}:`, error);
+    return false;
   }
 }
 
@@ -360,20 +472,23 @@ export function getToolsFilterOptions(tools: AccessibilityTool[]) {
 }
 
 /**
- * Get unique tags and WCAG criteria from patterns data
+ * Get unique categories and tags from patterns data
  * Used for filtering options
  */
 export function getPatternsFilterOptions(patterns: AccessibilityPattern[]) {
+  const categories = new Set<string>();
   const tags = new Set<string>();
-  const wcagCriteria = new Set<string>();
+  const locations = new Set<string>();
   
   patterns.forEach(pattern => {
+    if (pattern.category) categories.add(pattern.category);
+    if (pattern.where) locations.add(pattern.where);
     pattern.tags.forEach(tag => tags.add(tag));
-    pattern.wcagCriteria.forEach(criteria => wcagCriteria.add(criteria));
   });
   
   return {
+    categories: Array.from(categories).sort(),
     tags: Array.from(tags).sort(),
-    wcagCriteria: Array.from(wcagCriteria).sort(),
+    locations: Array.from(locations).sort(),
   };
 } 

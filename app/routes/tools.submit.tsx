@@ -2,8 +2,8 @@ import { ActionFunctionArgs, json } from "@remix-run/server-runtime";
 import { useActionData, Form, useNavigation } from "@remix-run/react";
 import Layout from "~/components/Layout";
 import { z } from "zod";
-import { useAccessibleForm, ErrorSummary, ErrorMessage, formatZodErrors } from "~/utils/formUtils";
-import { handleFormSubmission } from "~/utils/formSubmission";
+import { useAccessibleForm, ErrorSummary, ErrorMessage } from "~/utils/formUtils";
+import { submitNewItem } from "~/utils/edgeGoogleSheets";
 import { useEffect } from "react";
 
 // Define validation schema using Zod
@@ -23,63 +23,78 @@ type SuccessResponse = {
   redirect: string;
 };
 
-// Type definition for error response
+// Type definition for errors
 type ErrorResponse = {
   success: false;
   errors: Record<string, string>;
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  console.log("===== SERVER: Tool form submission received =====");
-
+export async function action({ request }: ActionFunctionArgs) {
+  console.log("===== SERVER: tools.submit action function starting =====");
+  
   try {
-    // Parse the form data
+    // Get form data
     const formData = await request.formData();
-    console.log("===== SERVER: Form data received:", Object.fromEntries(formData));
-
-    // Validate the form data using Zod
-    const validationResult = ToolSchema.safeParse(Object.fromEntries(formData));
+    const formValues = Object.fromEntries(formData);
     
-    if (!validationResult.success) {
-      console.log("===== SERVER: Validation errors:", validationResult.error.format());
-      return json<ErrorResponse>({ 
-        success: false, 
-        errors: formatZodErrors(validationResult.error.format()) 
+    // Validate the form data
+    const result = ToolSchema.safeParse(formValues);
+    
+    if (!result.success) {
+      console.log("===== SERVER: Validation failed =====");
+      
+      // Convert ZodError to a simple Record<string, string>
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const path = err.path[0] as string;
+        errors[path] = err.message;
+      });
+      
+      return json<ErrorResponse>({
+        success: false,
+        errors,
       });
     }
     
-    // Submit to Google Sheet
-    await handleFormSubmission({
-      formData: formData,
-      schema: ToolSchema,
-      type: "tool",
-      successPath: "/tools/submit/success",
-      formatData: (data) => ({
-        "Tool Name": data.name,
-        "Description": data.description,
-        "URL": data.url,
-        "Category": data.category,
-        "Tags": data.tags,
-        "Cost": data.cost,
-        "Platforms": data.platforms,
-        "Timestamp": new Date().toISOString()
-      })
-    });
+    // Prepare the data for submission
+    const tool = {
+      name: result.data.name,
+      description: result.data.description,
+      url: result.data.url,
+      category: result.data.category,
+      tags: result.data.tags ? result.data.tags.split(',').map(tag => tag.trim()) : [],
+      cost: result.data.cost,
+      platforms: result.data.platforms ? result.data.platforms.split(',').map(platform => platform.trim()) : [],
+    };
     
-    // We shouldn't reach here if handleFormSubmission does its job
-    // but add this as a fallback
-    return json<SuccessResponse>({
-      success: true,
-      redirect: "/tools/submit/success"
-    });
+    // Submit the data
+    const success = await submitNewItem('tool', tool);
+    
+    if (success) {
+      console.log("===== SERVER: Submission successful, redirecting to success page =====");
+      return json<SuccessResponse>({
+        success: true,
+        redirect: '/tools/submit/success',
+      });
+    } else {
+      console.log("===== SERVER: Submission failed =====");
+      return json<ErrorResponse>({
+        success: false,
+        errors: {
+          form: "Failed to submit the tool. Please try again later."
+        }
+      });
+    }
   } catch (error) {
-    console.error("===== SERVER: Error submitting tool form:", error);
-    return json<ErrorResponse>({ 
-      success: false, 
-      errors: { _form: "An unexpected error occurred. Please try again." } 
+    console.error("===== SERVER: Error in action function =====", error);
+    return json<ErrorResponse>({
+      success: false,
+      errors: {
+        form: "An unexpected error occurred. Please try again later."
+      }
     });
   }
-};
+}
 
 export default function SubmitTool() {
   console.log("===== CLIENT: SubmitTool component rendering =====");
@@ -117,6 +132,25 @@ export default function SubmitTool() {
     ToolSchema, // Pass the Zod schema for client-side validation
     actionData
   );
+
+  // Categories for the dropdown
+  const categories = [
+    "Evaluation",
+    "Screen Reader",
+    "Design",
+    "Developer",
+    "Browser Extension",
+    "Testing"
+  ];
+
+  // Cost options
+  const costOptions = [
+    "Free",
+    "Paid",
+    "Free / Paid",
+    "Free (Built-in)",
+    "Free Trial"
+  ];
   
   return (
     <Layout title="Submit an Accessibility Tool">
@@ -131,7 +165,7 @@ export default function SubmitTool() {
             <ErrorSummary errors={formErrors} />
           )}
           
-          <Form method="post" onSubmit={handleSubmit} noValidate>
+          <Form method="post" onSubmit={handleSubmit} noValidate className="space-y-6">
             <div className="form-group">
               <label htmlFor="name" id="name-label">Tool Name</label>
               <input
@@ -173,7 +207,6 @@ export default function SubmitTool() {
                 value={formValues.url}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="https://example.com"
                 aria-describedby={formErrors.url ? "url-error" : undefined}
                 aria-invalid={formErrors.url ? "true" : undefined}
                 className={formErrors.url ? "input-error" : ""}
@@ -194,13 +227,9 @@ export default function SubmitTool() {
                 className={formErrors.category ? "input-error" : ""}
               >
                 <option value="">Select a category</option>
-                <option value="Evaluation">Evaluation</option>
-                <option value="Design">Design</option>
-                <option value="Development">Development</option>
-                <option value="Testing">Testing</option>
-                <option value="Screen Reader">Screen Reader</option>
-                <option value="Color">Color</option>
-                <option value="Other">Other</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
               </select>
               <ErrorMessage id="category-error" error={formErrors.category} />
             </div>
@@ -214,7 +243,7 @@ export default function SubmitTool() {
                 value={formValues.tags}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Automated testing, Browser extension, Open source"
+                placeholder="Automated testing, Browser extension, Visual feedback"
                 aria-describedby={formErrors.tags ? "tags-error" : undefined}
                 aria-invalid={formErrors.tags ? "true" : undefined}
                 className={formErrors.tags ? "input-error" : ""}
@@ -234,13 +263,10 @@ export default function SubmitTool() {
                 aria-invalid={formErrors.cost ? "true" : undefined}
                 className={formErrors.cost ? "input-error" : ""}
               >
-                <option value="">Select cost</option>
-                <option value="Free">Free</option>
-                <option value="Freemium">Freemium</option>
-                <option value="Paid">Paid</option>
-                <option value="Free / Paid">Free / Paid</option>
-                <option value="Free Trial">Free Trial</option>
-                <option value="Subscription">Subscription</option>
+                <option value="">Select cost option</option>
+                {costOptions.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
               </select>
               <ErrorMessage id="cost-error" error={formErrors.cost} />
             </div>
@@ -254,7 +280,7 @@ export default function SubmitTool() {
                 value={formValues.platforms}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Web, macOS, Windows, Chrome, Firefox"
+                placeholder="Web, Chrome, iOS, Android, Windows, macOS"
                 aria-describedby={formErrors.platforms ? "platforms-error" : undefined}
                 aria-invalid={formErrors.platforms ? "true" : undefined}
                 className={formErrors.platforms ? "input-error" : ""}
@@ -262,11 +288,11 @@ export default function SubmitTool() {
               <ErrorMessage id="platforms-error" error={formErrors.platforms} />
             </div>
             
-            <div className="form-actions">
-              <button 
-                type="submit" 
-                disabled={isSubmitting}
+            <div className="mt-8">
+              <button
+                type="submit"
                 className="button"
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Submitting..." : "Submit Tool"}
               </button>

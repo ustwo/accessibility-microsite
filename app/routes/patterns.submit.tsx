@@ -2,19 +2,19 @@ import { ActionFunctionArgs, json } from "@remix-run/server-runtime";
 import { useActionData, Form, useNavigation } from "@remix-run/react";
 import Layout from "~/components/Layout";
 import { z } from "zod";
-import { useAccessibleForm, ErrorSummary, ErrorMessage, formatZodErrors } from "~/utils/formUtils";
-import { handleFormSubmission } from "~/utils/formSubmission";
+import { useAccessibleForm, ErrorSummary, ErrorMessage } from "~/utils/formUtils";
+import { submitNewItem } from "~/utils/edgeGoogleSheets";
 import { useEffect } from "react";
 
 // Define validation schema using Zod
 const PatternSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  category: z.string().min(1, "Category is required"),
+  where: z.string().min(1, "Please specify where this pattern applies"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  example: z.string().min(10, "Example must be at least 10 characters"),
-  wcagCriteria: z.string().min(1, "At least one WCAG criterion is required"),
-  tags: z.string().min(1, "At least one tag is required"),
-  code: z.string().min(10, "Code sample must be at least 10 characters"),
-  codeLanguage: z.string().min(1, "Code language is required")
+  // Using linkyDinks instead of simple link
+  linkTitles: z.string().optional(),
+  linkUrls: z.string().optional(),
 });
 
 // Type definition for successful response
@@ -30,48 +30,87 @@ type ErrorResponse = {
 };
 
 export async function action({ request }: ActionFunctionArgs) {
-  // Use the shared form submission utility
-  const formData = await request.formData();
-  console.log("===== SERVER: Form data received:", Object.fromEntries(formData));
-
-  // Validate the form data using Zod
-  const validationResult = PatternSchema.safeParse(Object.fromEntries(formData));
+  console.log("===== SERVER: patterns.submit action function starting =====");
   
-  if (!validationResult.success) {
-    console.log("===== SERVER: Validation errors:", validationResult.error.format());
-    return json<ErrorResponse>({ 
-      success: false, 
-      errors: formatZodErrors(validationResult.error.format()) 
+  try {
+    // Get form data
+    const formData = await request.formData();
+    const formValues = Object.fromEntries(formData);
+    
+    // Validate the form data
+    const result = PatternSchema.safeParse(formValues);
+    
+    if (!result.success) {
+      console.log("===== SERVER: Validation failed =====");
+      
+      // Convert ZodError to a simple Record<string, string>
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        const path = err.path[0] as string;
+        errors[path] = err.message;
+      });
+      
+      return json<ErrorResponse>({
+        success: false,
+        errors,
+      });
+    }
+    
+    // Process linkyDinks from the form data
+    const linkTitles = result.data.linkTitles ? result.data.linkTitles.split('\n').filter(Boolean) : [];
+    const linkUrls = result.data.linkUrls ? result.data.linkUrls.split('\n').filter(Boolean) : [];
+    
+    // Create linkyDinks array
+    const linkyDinks = linkTitles.map((title, index) => ({
+      title,
+      url: index < linkUrls.length ? linkUrls[index] : `https://www.google.com/search?q=${encodeURIComponent(title)}`
+    }));
+    
+    // Prepare the data for submission
+    const pattern = {
+      name: result.data.name,
+      category: result.data.category,
+      where: result.data.where,
+      description: result.data.description,
+      linkyDinks: linkyDinks,
+      // For backward compatibility
+      link: linkyDinks.length > 0 ? 
+        linkyDinks.map(link => link.title).join(', ') : '',
+      tags: [],
+    };
+    
+    // Submit the data
+    const success = await submitNewItem('pattern', pattern);
+    
+    if (success) {
+      console.log("===== SERVER: Submission successful, redirecting to success page =====");
+      return json<SuccessResponse>({
+        success: true,
+        redirect: '/patterns/submit/success',
+      });
+    } else {
+      console.log("===== SERVER: Submission failed =====");
+      return json<ErrorResponse>({
+        success: false,
+        errors: {
+          form: "Failed to submit the pattern. Please try again later."
+        }
+      });
+    }
+  } catch (error) {
+    console.error("===== SERVER: Error in action function =====", error);
+    return json<ErrorResponse>({
+      success: false,
+      errors: {
+        form: "An unexpected error occurred. Please try again later."
+      }
     });
   }
-  
-  // Submit to Google Sheet
-  await handleFormSubmission({
-    formData: formData,
-    schema: PatternSchema,
-    type: "pattern",
-    successPath: "/patterns/submit/success",
-    formatData: (data) => ({
-      "Pattern Name": data.name,
-      "Description": data.description,
-      "Example Use Case": data.example,
-      "WCAG Criteria": data.wcagCriteria,
-      "Tags": data.tags,
-      "Code Sample": data.code,
-      "Timestamp": new Date().toISOString()
-    })
-  });
-  
-  // We shouldn't reach here if handleFormSubmission does its job
-  // but add this as a fallback
-  return json<SuccessResponse>({
-    success: true,
-    redirect: "/patterns/submit/success"
-  });
 }
 
 export default function SubmitPattern() {
   console.log("===== CLIENT: SubmitPattern component rendering =====");
+  
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -96,16 +135,30 @@ export default function SubmitPattern() {
   } = useAccessibleForm(
     {
       name: "",
+      category: "",
+      where: "",
       description: "",
-      example: "",
-      wcagCriteria: "",
-      tags: "",
-      code: "",
-      codeLanguage: "html"
+      linkTitles: "",
+      linkUrls: "",
     },
     PatternSchema, // Pass the Zod schema for client-side validation
     actionData
   );
+  
+  // Categories for the dropdown
+  const categories = [
+    "General patterns to follow",
+    "Patterns for good forms",
+    "Patterns for interactions",
+    "Patterns for components",
+  ];
+
+  // Where options for the dropdown
+  const whereOptions = [
+    "all",
+    "web",
+    "mob"
+  ];
   
   return (
     <Layout title="Submit an Accessibile Pattern">
@@ -136,118 +189,112 @@ export default function SubmitPattern() {
               />
               <ErrorMessage id="name-error" error={formErrors.name} />
             </div>
-            
+
             <div className="form-group">
-              <label htmlFor="description" id="description-label">Description</label>
+              <label htmlFor="category" id="category-label">Category</label>
+              <select
+                id="category"
+                name="category"
+                value={formValues.category}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                aria-describedby={formErrors.category ? "category-error" : undefined}
+                aria-invalid={formErrors.category ? "true" : undefined}
+                className={formErrors.category ? "input-error" : ""}
+              >
+                <option value="">Select a category</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+              <ErrorMessage id="category-error" error={formErrors.category} />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="where" id="where-label">Where does this pattern apply?</label>
+              <select
+                id="where"
+                name="where"
+                value={formValues.where}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                aria-describedby={formErrors.where ? "where-error" : undefined}
+                aria-invalid={formErrors.where ? "true" : undefined}
+                className={formErrors.where ? "input-error" : ""}
+              >
+                <option value="">Select where this applies</option>
+                {whereOptions.map(option => (
+                  <option key={option} value={option}>{option === "all" ? "All platforms" : option === "web" ? "Web only" : "Mobile only"}</option>
+                ))}
+              </select>
+              <ErrorMessage id="where-error" error={formErrors.where} />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="description" id="description-label">What, why, how?</label>
               <textarea
                 id="description"
                 name="description"
+                rows={4}
                 value={formValues.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                rows={4}
                 aria-describedby={formErrors.description ? "description-error" : undefined}
                 aria-invalid={formErrors.description ? "true" : undefined}
                 className={formErrors.description ? "input-error" : ""}
               ></textarea>
               <ErrorMessage id="description-error" error={formErrors.description} />
+              <div className="text-sm text-gray-600 mt-1">
+                Describe the pattern, why it matters for accessibility, and how to implement it.
+              </div>
             </div>
             
+            {/* Linky Dinks section */}
             <div className="form-group">
-              <label htmlFor="example" id="example-label">Example Use Case</label>
+              <label htmlFor="linkTitles" id="linkTitles-label">Linky Dinks - Titles</label>
+              <div className="text-sm text-gray-600 mb-2">
+                Add link titles (one per line)
+              </div>
               <textarea
-                id="example"
-                name="example"
-                value={formValues.example}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                id="linkTitles"
+                name="linkTitles"
                 rows={3}
-                placeholder="Describe a real-world example of when to use this pattern"
-                aria-describedby={formErrors.example ? "example-error" : undefined}
-                aria-invalid={formErrors.example ? "true" : undefined}
-                className={formErrors.example ? "input-error" : ""}
+                value={formValues.linkTitles}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                aria-describedby={formErrors.linkTitles ? "linkTitles-error" : undefined}
+                aria-invalid={formErrors.linkTitles ? "true" : undefined}
+                className={formErrors.linkTitles ? "input-error" : ""}
+                placeholder="YouTube: How a blind person uses a website"
               ></textarea>
-              <ErrorMessage id="example-error" error={formErrors.example} />
+              <ErrorMessage id="linkTitles-error" error={formErrors.linkTitles} />
             </div>
             
             <div className="form-group">
-              <label htmlFor="wcagCriteria" id="wcagCriteria-label">WCAG Criteria (comma-separated)</label>
-              <input
-                type="text"
-                id="wcagCriteria"
-                name="wcagCriteria"
-                value={formValues.wcagCriteria}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="1.3.1, 2.4.3, 4.1.2"
-                aria-describedby={formErrors.wcagCriteria ? "wcagCriteria-error" : undefined}
-                aria-invalid={formErrors.wcagCriteria ? "true" : undefined}
-                className={formErrors.wcagCriteria ? "input-error" : ""}
-              />
-              <ErrorMessage id="wcagCriteria-error" error={formErrors.wcagCriteria} />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="tags" id="tags-label">Tags (comma-separated)</label>
-              <input
-                type="text"
-                id="tags"
-                name="tags"
-                value={formValues.tags}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Focus management, Forms, ARIA"
-                aria-describedby={formErrors.tags ? "tags-error" : undefined}
-                aria-invalid={formErrors.tags ? "true" : undefined}
-                className={formErrors.tags ? "input-error" : ""}
-              />
-              <ErrorMessage id="tags-error" error={formErrors.tags} />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="code" id="code-label">Code Sample</label>
+              <label htmlFor="linkUrls" id="linkUrls-label">Linky Dinks - URLs (optional)</label>
+              <div className="text-sm text-gray-600 mb-2">
+                Add corresponding URLs (one per line). If left empty, we&apos;ll create search links from the titles.
+              </div>
               <textarea
-                id="code"
-                name="code"
-                value={formValues.code}
+                id="linkUrls"
+                name="linkUrls"
+                rows={3}
+                value={formValues.linkUrls}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                rows={8}
-                placeholder="Paste your code example here"
-                aria-describedby={formErrors.code ? "code-error" : undefined}
-                aria-invalid={formErrors.code ? "true" : undefined}
-                className={formErrors.code ? "input-error" : ""}
+                aria-describedby={formErrors.linkUrls ? "linkUrls-error" : undefined}
+                aria-invalid={formErrors.linkUrls ? "true" : undefined}
+                className={formErrors.linkUrls ? "input-error" : ""}
+                placeholder="https://www.youtube.com/watch?v=example"
               ></textarea>
-              <ErrorMessage id="code-error" error={formErrors.code} />
+              <ErrorMessage id="linkUrls-error" error={formErrors.linkUrls} />
             </div>
             
-            <div className="form-group">
-              <label htmlFor="codeLanguage" id="codeLanguage-label">Code Language</label>
-              <select
-                id="codeLanguage"
-                name="codeLanguage"
-                value={formValues.codeLanguage}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                aria-describedby={formErrors.codeLanguage ? "codeLanguage-error" : undefined}
-                aria-invalid={formErrors.codeLanguage ? "true" : undefined}
-                className={formErrors.codeLanguage ? "input-error" : ""}
-              >
-                <option value="html">HTML</option>
-                <option value="css">CSS</option>
-                <option value="javascript">JavaScript</option>
-                <option value="typescript">TypeScript</option>
-                <option value="jsx">JSX</option>
-                <option value="tsx">TSX</option>
-              </select>
-              <ErrorMessage id="codeLanguage-error" error={formErrors.codeLanguage} />
-            </div>
-            
-            <div className="form-actions">
-              <button 
-                type="submit" 
-                disabled={isSubmitting}
+            <div className="mt-8">
+              <button
+                type="submit"
                 className="button"
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Submitting..." : "Submit Pattern"}
               </button>

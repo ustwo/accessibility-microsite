@@ -24,59 +24,98 @@ export async function loader() {
 export default function PatternsIndex() {
   const { patterns } = useLoaderData<typeof loader>();
 
+  // Group patterns by category
+  const patternsByCategory = patterns.reduce((acc, pattern) => {
+    const category = pattern.category || 'Uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(pattern);
+    return acc;
+  }, {} as Record<string, typeof patterns>);
+
+  // Get sorted categories
+  const categories = Object.keys(patternsByCategory).sort();
+
   return (
     <Layout title="Accessibility Patterns">
       <section className="content-section">
         <div className="container container-content">
           <p className="mb-6 subtitle">
             Discover reusable accessibility patterns that solve common design
-            challenges. Each pattern includes examples, code, and WCAG success
-            criteria.
+            challenges. Each pattern includes guidance on where and how to apply them.
           </p>
         </div>
       </section>
 
       <section className="content-section">
         <div className="container container-full">
-          <div className="grid grid-cols-1 patterns-grid gap-8">
-            {patterns.map((pattern) => (
-              <div key={pattern.id} className="card">
-                <h3>{pattern.name}</h3>
-                <p>{pattern.description}</p>
+          {categories.map((category) => (
+            <div key={category} className="mb-12">
+              <h2 className="text-2xl font-bold mb-6">{category}</h2>
+              <div className="grid grid-cols-1 patterns-grid gap-8">
+                {patternsByCategory[category].map((pattern) => (
+                  <div key={pattern.id} className="card">
+                    <h3>{pattern.name}</h3>
+                    {pattern.where && (
+                      <div className="mt-2 mb-4">
+                        <span className="px-2 py-1 bg-gray-200 rounded text-sm">
+                          Where: {pattern.where}
+                        </span>
+                      </div>
+                    )}
+                    <p>{pattern.description}</p>
 
-                <div className="mt-4">
-                  <h4>Example:</h4>
-                  <p>{pattern.example}</p>
-                </div>
+                    {/* Display LinkyDinks if available */}
+                    {pattern.linkyDinks && pattern.linkyDinks.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="font-semibold mb-2">Linky Dinks:</h4>
+                        <ul className="list-disc pl-4">
+                          {pattern.linkyDinks.map((link, index) => (
+                            <li key={index} className="mb-1">
+                              <a 
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline text-primary hover:text-secondary"
+                              >
+                                {link.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {/* Fallback to legacy link if no linkyDinks */}
+                    {(!pattern.linkyDinks || pattern.linkyDinks.length === 0) && pattern.link && (
+                      <div className="mt-4">
+                        <h4 className="font-semibold mb-2">Learn more:</h4>
+                        <a 
+                          href={pattern.link.startsWith('http') ? pattern.link : `https://www.google.com/search?q=${encodeURIComponent(pattern.link)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline text-primary hover:text-secondary"
+                        >
+                          {pattern.link}
+                        </a>
+                      </div>
+                    )}
 
-                <div className="mt-4">
-                  <h4>Code Sample:</h4>
-                  <pre className="p-4 bg-dark text-light overflow-x-auto rounded">
-                    <code>{pattern.code}</code>
-                  </pre>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {pattern.wcagCriteria.map((criteria) => (
-                    <span
-                      key={criteria}
-                      className="px-2 py-1 bg-primary text-light rounded text-sm"
-                    >
-                      WCAG {criteria}
-                    </span>
-                  ))}
-                  {pattern.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-1 bg-secondary text-light rounded text-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {pattern.tags.filter(tag => tag !== pattern.category && tag !== pattern.where).map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-1 bg-secondary text-light rounded text-sm"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
     </Layout>
