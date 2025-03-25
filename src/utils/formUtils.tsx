@@ -318,7 +318,7 @@ export function ErrorSummary({
       aria-labelledby="error-summary-title" 
       tabIndex={-1}
     >
-      <h2 id="error-summary-title">There is a problem</h2>
+      <h2 id="error-summary-title">There are errors in the form</h2>
       <ul className="error-summary__list">
         {Object.entries(errors).map(([field, message]) => (
           <li key={field}>

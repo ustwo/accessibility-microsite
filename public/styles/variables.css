@@ -187,8 +187,9 @@
   
     --color-highlight   : #323BFF;
   
-  
-  
+    /* Error colors */
+    --color-error       : #FF515A; /* Same as --color-red for errors */
+    --color-error-rgb   : 255, 81, 90; /* RGB values for --color-error */
   
     /* ustwo brand colors */
     --color-primary: var(--color-orange); 
@@ -208,8 +209,9 @@
     --color-gray-900: #111827;
     
     /* focus styles for keyboard users */
-    --focus-ring-color: var(--color-light);
+    --focus-ring-color: var(--color-blue);
     --focus-ring-width: 3px;
+    --focus-ring-color-rgb: 50, 59, 255; /* RGB values for --color-blue */
     
     /* Spacing units */
     --space-1: 0.25rem;
