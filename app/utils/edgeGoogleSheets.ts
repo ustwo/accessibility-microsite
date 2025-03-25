@@ -47,6 +47,16 @@ const PATTERNS_SHEET_ID = process.env.GOOGLE_PATTERNS_SHEET_ID || '1lxc12mHxlBCu
 const TOOLS_SHEET_ID = process.env.GOOGLE_TOOLS_SHEET_ID || '1vjzCZobdvV1tvLy-k38Tpr6AGJX8fs9wKv6tXg55s7k';
 const SERVICE_ACCOUNT_CREDENTIALS_JSON = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS || '';
 
+// Environment detection that works in Edge functions
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development' || (process.env.NETLIFY_DEV === 'true');
+
+// Ensure crypto is available (Edge environments should have this)
+const cryptoAPI = crypto || (globalThis as unknown as { crypto: Crypto }).crypto;
+
+if (!cryptoAPI || !cryptoAPI.subtle) {
+  console.error('Web Crypto API is not available in this environment');
+}
+
 // Parse the service account credentials
 let serviceAccountCredentials: ServiceAccountCredentials | null = null;
 try {
@@ -58,7 +68,7 @@ try {
 }
 
 // Helper function to check if required API credentials are available
-function hasApiCredentials(): boolean {
+export function hasApiCredentials(): boolean {
   return Boolean(serviceAccountCredentials?.client_email && serviceAccountCredentials?.private_key);
 }
 
@@ -73,7 +83,7 @@ async function generateJWT(): Promise<string | null> {
 
   try {
     // For Edge compatibility, we need to use the Web Crypto API
-    // This is a simplified JWT implementation
+    // This is a proper JWT implementation using Web Crypto API
     const header = {
       alg: "RS256",
       typ: "JWT",
@@ -84,26 +94,78 @@ async function generateJWT(): Promise<string | null> {
     const payload = {
       iss: serviceAccountCredentials.client_email,
       sub: serviceAccountCredentials.client_email,
-      aud: "https://sheets.googleapis.com/",
+      aud: "https://oauth2.googleapis.com/token",
       exp: now + 3600, // 1 hour expiration
       iat: now,
       scope: "https://www.googleapis.com/auth/spreadsheets"
     };
 
-    // In a production environment, you would implement proper RS256 signing here
-    // For Edge environments, you might need to use a JWT library that works in Edge
-    // or implement the crypto operations using Web Crypto API
-    
-    // This is a placeholder for the actual JWT signing logic
-    // Using the variables to prevent linter errors, but in a real implementation
-    // these would be properly processed
     console.log('Preparing JWT with header:', header, 'and payload:', payload);
     
-    // For development/testing, consider using a serverless function or API route
-    // to handle JWT generation with proper libraries
-    
-    console.error('JWT generation not fully implemented in Edge runtime');
-    return null;
+    try {
+      // Convert the private key from PEM format to a CryptoKey
+      // First, clean up the private key by removing the header, footer, and any whitespace
+      const privateKey = serviceAccountCredentials.private_key
+        .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+        .replace(/-----END PRIVATE KEY-----/g, '')
+        .replace(/\s+/g, '');
+      
+      // Base64 decode the private key
+      const binaryKey = Uint8Array.from(atob(privateKey), c => c.charCodeAt(0));
+      
+      // Import the private key
+      const cryptoKey = await cryptoAPI.subtle.importKey(
+        'pkcs8',
+        binaryKey,
+        {
+          name: 'RSASSA-PKCS1-v1_5',
+          hash: 'SHA-256',
+        },
+        false, // not extractable
+        ['sign']
+      );
+      
+      // Create the JWT parts
+      const encodedHeader = btoa(JSON.stringify(header))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+      
+      const encodedPayload = btoa(JSON.stringify(payload))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+      
+      // Create the content to sign
+      const toSign = `${encodedHeader}.${encodedPayload}`;
+      
+      // Sign the JWT
+      const signature = await cryptoAPI.subtle.sign(
+        { name: 'RSASSA-PKCS1-v1_5' },
+        cryptoKey,
+        new TextEncoder().encode(toSign)
+      );
+      
+      // Convert the signature to a proper base64url string
+      const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+      
+      // Combine all parts into the final JWT
+      const jwt = `${toSign}.${encodedSignature}`;
+      
+      return jwt;
+    } catch (cryptoError) {
+      console.error('Error during JWT crypto operations:', cryptoError);
+      
+      // Fallback to returning a mock token for development/testing
+      if (IS_DEVELOPMENT) {
+        console.warn('Running in development mode - providing a mock JWT for testing');
+        return 'mock.jwt.token';
+      }
+      return null;
+    }
   } catch (error) {
     console.error('Error generating JWT:', error);
     return null;
@@ -113,11 +175,22 @@ async function generateJWT(): Promise<string | null> {
 /**
  * Get an OAuth2 access token using service account JWT
  */
-async function getAccessToken(): Promise<string | null> {
+export async function getAccessToken(): Promise<string | null> {
   try {
     const jwt = await generateJWT();
-    if (!jwt) return null;
+    if (!jwt) {
+      console.error('Failed to generate JWT');
+      return null;
+    }
 
+    // For development with mock JWT
+    if (jwt === 'mock.jwt.token' && IS_DEVELOPMENT) {
+      console.warn('Using mock access token for development');
+      return 'mock_access_token';
+    }
+
+    console.log('Attempting to exchange JWT for access token...');
+    
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
@@ -130,11 +203,36 @@ async function getAccessToken(): Promise<string | null> {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
       console.error(`Error getting access token: ${response.status} ${response.statusText}`);
+      console.error(`Error details: ${errorText}`);
+      
+      // Provide more helpful error messages for common issues
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.error === 'invalid_grant') {
+          if (errorData.error_description?.includes('audience')) {
+            console.error('JWT AUDIENCE ERROR: The "aud" field in the JWT is incorrect. It should be "https://oauth2.googleapis.com/token"');
+          } else if (errorData.error_description?.includes('expired')) {
+            console.error('JWT EXPIRATION ERROR: The JWT token has expired or the expiration time is invalid');
+          } else if (errorData.error_description?.includes('signature')) {
+            console.error('JWT SIGNATURE ERROR: The JWT signature is invalid. Check the private key and signing algorithm');
+          }
+        }
+      } catch (parseError) {
+        // Ignore JSON parsing errors in the error response
+      }
+      
       return null;
     }
 
+    console.log('Successfully obtained access token');
     const data = await response.json();
+    if (!data.access_token) {
+      console.error('Access token not found in response:', data);
+      return null;
+    }
+    
     return data.access_token;
   } catch (error) {
     console.error('Error getting access token:', error);
@@ -144,8 +242,13 @@ async function getAccessToken(): Promise<string | null> {
 
 /**
  * Fetch values from a Google Sheet using the Sheets API v4 REST endpoint with OAuth
+ * Includes retry logic for handling transient errors
  */
-async function fetchSheetValues(spreadsheetId: string, range: string): Promise<string[][] | null> {
+export async function fetchSheetValues(
+  spreadsheetId: string, 
+  range: string, 
+  retryCount = 2
+): Promise<string[][] | null> {
   if (!hasApiCredentials()) {
     console.log('Google Sheets API credentials not available');
     return null;
@@ -158,20 +261,67 @@ async function fetchSheetValues(spreadsheetId: string, range: string): Promise<s
       return null;
     }
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`;
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
-    
-    if (!response.ok) {
-      console.error(`Error fetching sheet values: ${response.status} ${response.statusText}`);
+    // For development with mock access token
+    if (accessToken === 'mock_access_token' && IS_DEVELOPMENT) {
+      console.warn('Using mock access token - returning null to fall back to mock data');
       return null;
     }
+
+    console.log(`Fetching data from sheet ${spreadsheetId}, range: ${range}`);
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`;
     
-    const data = await response.json() as GoogleSheetsResponse;
-    return data.values || [];
+    let lastError: Error | null = null;
+    
+    // Try the request up to retryCount + 1 times
+    for (let attempt = 0; attempt <= retryCount; attempt++) {
+      if (attempt > 0) {
+        console.log(`Retry attempt ${attempt}/${retryCount} for fetching sheet data...`);
+        // Add a small delay between retries (increasing with each retry)
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+      
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Error fetching sheet values: ${response.status} ${response.statusText}`);
+          console.error(`Error details: ${errorText}`);
+          
+          // Don't retry on 4xx errors (client errors)
+          if (response.status >= 400 && response.status < 500 && attempt === retryCount) {
+            return null;
+          }
+          
+          // For other errors, continue to retry
+          lastError = new Error(`HTTP error ${response.status}: ${errorText}`);
+          continue;
+        }
+        
+        const data = await response.json() as GoogleSheetsResponse;
+        if (data.error) {
+          console.error('Google Sheets API returned an error:', data.error);
+          lastError = new Error(`API error: ${data.error.message}`);
+          continue;
+        }
+        
+        console.log(`Successfully fetched data from sheet ${spreadsheetId}`);
+        return data.values || [];
+      } catch (fetchError) {
+        console.error(`Fetch error on attempt ${attempt}:`, fetchError);
+        lastError = fetchError instanceof Error ? fetchError : new Error(String(fetchError));
+        
+        // Continue to next retry attempt
+      }
+    }
+    
+    // If we got here, all retries failed
+    console.error(`All ${retryCount + 1} attempts to fetch data failed.`, lastError);
+    return null;
   } catch (error) {
     console.error('Error fetching from Google Sheets API:', error);
     return null;
@@ -471,4 +621,140 @@ export function getPatternsFilterOptions(patterns: AccessibilityPattern[]) {
     categories: Array.from(categories).sort(),
     locations: Array.from(locations).sort(),
   };
+}
+
+/**
+ * Test helper function to check if JWT generation works
+ * This can be called directly from a route to test the JWT generation
+ */
+export async function testJwtGeneration(): Promise<{ success: boolean; message: string; jwt?: string }> {
+  try {
+    // Check if credentials are available
+    if (!serviceAccountCredentials) {
+      return { 
+        success: false, 
+        message: 'Service account credentials not available' 
+      };
+    }
+    
+    // Try to generate JWT
+    const jwt = await generateJWT();
+    if (!jwt) {
+      return { 
+        success: false, 
+        message: 'Failed to generate JWT' 
+      };
+    }
+    
+    return {
+      success: true,
+      message: 'JWT generated successfully',
+      jwt: jwt.substring(0, 20) + '...' // Only return a portion of the JWT for security
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Error testing JWT: ${error}`
+    };
+  }
+}
+
+/**
+ * Check if the service account has access to a Google Sheet
+ * This is useful for diagnosing permission issues
+ */
+export async function checkSheetPermission(spreadsheetId: string): Promise<{
+  hasAccess: boolean;
+  message: string;
+  details?: Record<string, unknown>;
+}> {
+  try {
+    if (!hasApiCredentials()) {
+      return {
+        hasAccess: false,
+        message: 'Google API credentials not available'
+      };
+    }
+
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      return {
+        hasAccess: false,
+        message: 'Failed to get access token'
+      };
+    }
+
+    // First try to get just the sheet metadata (requires less permission than data)
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=properties.title`;
+    
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          hasAccess: true,
+          message: `Access granted to sheet: "${data.properties.title}"`,
+          details: data
+        };
+      } else {
+        const errorText = await response.text();
+        let parsedError;
+        
+        try {
+          parsedError = JSON.parse(errorText);
+        } catch (e) {
+          parsedError = { message: errorText };
+        }
+        
+        if (response.status === 403) {
+          return {
+            hasAccess: false,
+            message: 'Permission denied: The service account does not have access to this sheet',
+            details: {
+              status: response.status,
+              error: parsedError,
+              serviceAccount: serviceAccountCredentials?.client_email,
+              instructions: `Share the sheet with ${serviceAccountCredentials?.client_email} (at least with Viewer permission)`
+            }
+          };
+        } else if (response.status === 404) {
+          return {
+            hasAccess: false,
+            message: 'Sheet not found: The spreadsheet ID may be incorrect',
+            details: {
+              status: response.status,
+              error: parsedError,
+              spreadsheetId
+            }
+          };
+        } else {
+          return {
+            hasAccess: false,
+            message: `API error: ${response.status} ${response.statusText}`,
+            details: {
+              status: response.status,
+              error: parsedError
+            }
+          };
+        }
+      }
+    } catch (error) {
+      return {
+        hasAccess: false,
+        message: `Error checking sheet permissions: ${error}`,
+        details: { error: String(error) }
+      };
+    }
+  } catch (error) {
+    return {
+      hasAccess: false,
+      message: `Error: ${error}`,
+      details: { error: String(error) }
+    };
+  }
 } 
