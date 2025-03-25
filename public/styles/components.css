@@ -244,4 +244,101 @@ a.button {
   text-decoration: none;
   margin: 0;
   padding: var(--space-2) var(--space-5);
-} 
+}
+
+/* Pattern card styling */
+.patterns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.pattern-card {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pattern-card h3 {
+  margin-top: 0;
+  margin-bottom: var(--space-2);
+}
+
+.pattern-card .pattern-description {
+  flex-grow: 1;
+  margin-bottom: var(--space-4);
+}
+
+.pattern-links {
+  margin-bottom: var(--space-4);
+}
+
+.pattern-links h4 {
+  margin-top: 0;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+.pattern-links ul {
+  margin: 0;
+  padding-left: var(--space-4);
+}
+
+.pattern-links li {
+  margin-bottom: var(--space-2);
+}
+
+.pattern-links a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.pattern-links a:hover {
+  color: var(--color-secondary);
+}
+
+.pattern-meta {
+  margin-top: auto;
+  font-size: var(--font-size-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.section-title {
+  color: var(--color-primary);
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-gray-200);
+  padding-bottom: var(--space-2);
+}
+
+/* Ensure card colors cycle within each section */
+.pattern-section:nth-child(1) .pattern-card:nth-child(4n+1) { background-color: var(--color-discover); }
+.pattern-section:nth-child(1) .pattern-card:nth-child(4n+2) { background-color: var(--color-pilot); }
+.pattern-section:nth-child(1) .pattern-card:nth-child(4n+3) { background-color: var(--color-launch); }
+.pattern-section:nth-child(1) .pattern-card:nth-child(4n+4) { background-color: var(--color-boost); }
+
+.pattern-section:nth-child(2) .pattern-card:nth-child(4n+1) { background-color: var(--color-pilot); }
+.pattern-section:nth-child(2) .pattern-card:nth-child(4n+2) { background-color: var(--color-launch); }
+.pattern-section:nth-child(2) .pattern-card:nth-child(4n+3) { background-color: var(--color-boost); }
+.pattern-section:nth-child(2) .pattern-card:nth-child(4n+4) { background-color: var(--color-discover); }
+
+.pattern-section:nth-child(3) .pattern-card:nth-child(4n+1) { background-color: var(--color-launch); }
+.pattern-section:nth-child(3) .pattern-card:nth-child(4n+2) { background-color: var(--color-boost); }
+.pattern-section:nth-child(3) .pattern-card:nth-child(4n+3) { background-color: var(--color-discover); }
+.pattern-section:nth-child(3) .pattern-card:nth-child(4n+4) { background-color: var(--color-pilot); }
+
+.pattern-section:nth-child(4) .pattern-card:nth-child(4n+1) { background-color: var(--color-boost); }
+.pattern-section:nth-child(4) .pattern-card:nth-child(4n+2) { background-color: var(--color-discover); }
+.pattern-section:nth-child(4) .pattern-card:nth-child(4n+3) { background-color: var(--color-pilot); }
+.pattern-section:nth-child(4) .pattern-card:nth-child(4n+4) { background-color: var(--color-launch); }
+
+/* Also ensure filtered view has nice card colors */
+.patterns-grid > .pattern-card:nth-child(4n+1) { background-color: var(--color-discover); }
+.patterns-grid > .pattern-card:nth-child(4n+2) { background-color: var(--color-pilot); }
+.patterns-grid > .pattern-card:nth-child(4n+3) { background-color: var(--color-launch); }
+.patterns-grid > .pattern-card:nth-child(4n+4) { background-color: var(--color-boost); } 

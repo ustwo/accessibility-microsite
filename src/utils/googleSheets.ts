@@ -18,6 +18,8 @@ export interface AccessibilityPattern {
   where: string;
   description: string;
   linkyDinks: Array<{url: string, title: string}>;
+  isSection?: boolean;  // Flag to indicate if this is a section header
+  parentTitle?: string; // Parent section title for grouping
 }
 
 /**
@@ -415,7 +417,7 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
   console.log('Has API credentials:', hasApiCredentials());
   console.log('Tools sheet ID:', TOOLS_SHEET_ID);
   
-  const rows = await fetchSheetValues(TOOLS_SHEET_ID, 'Tools!A2:G');
+  const rows = await fetchSheetValues(TOOLS_SHEET_ID, 'ustwo All Tools!A2:G');
   console.log('Rows fetched from Google Sheets:', rows);
   
   if (!rows) {
@@ -446,68 +448,116 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
  * Process pattern rows from Google Sheets
  */
 function processPatternRows(rows: string[][]): AccessibilityPattern[] {
-  return rows.reduce((patterns, row, index) => {
-    // Skip header rows or empty rows
-    if (row.length < 4 || !row[0]) {
-      return patterns;
+  const patterns: AccessibilityPattern[] = [];
+  let currentParentTitle = "";
+  
+  rows.forEach((row, index) => {
+    // Check if row is a section title (has only one cell with content)
+    if (row.length === 1 && row[0]?.trim()) {
+      currentParentTitle = row[0].trim();
+      // Add as a section header
+      patterns.push({
+        id: `section-${index + 1}`,
+        name: currentParentTitle,
+        category: "",
+        where: "",
+        description: "",
+        linkyDinks: [],
+        isSection: true
+      });
+      return;
+    }
+    
+    // Skip empty rows or invalid rows
+    if (row.length < 2 || !row[0] && !row[1]) {
+      return;
     }
 
     try {
-      const linksText = row[5] || ''; // Links column
+      const name = row[0]?.trim() || "";
+      const where = row[1]?.trim() || "";
+      const description = row[2]?.trim() || "";
+      const linksText = row[3]?.trim() || "";
       
       // Parse links text into array of link objects
-      // Format expected is a semicolon-separated list of "title: url" pairs
       const linkyDinks: Array<{ title: string; url: string }> = [];
       
-      if (linksText.trim()) {
-        const linkPairs = linksText.split(';');
-        
-        for (const pair of linkPairs) {
-          const colonIndex = pair.indexOf(':');
-          if (colonIndex !== -1) {
-            const title = pair.substring(0, colonIndex).trim();
-            let url = pair.substring(colonIndex + 1).trim();
-            
-            // Ensure URL has a scheme
-            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-              url = 'https://' + url;
-            }
-            
-            if (title && url) {
-              linkyDinks.push({ title, url });
-            }
-          } else if (pair.trim()) {
-            // If there's no colon, assume it's just a URL
-            let url = pair.trim();
-            
-            // Ensure URL has a scheme
-            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-              url = 'https://' + url;
-            }
-            
-            if (url) {
-              linkyDinks.push({ title: url, url });
+      if (linksText) {
+        // Just one link without semicolon separator
+        if (!linksText.includes(';')) {
+          let title = linksText;
+          let url = linksText;
+          
+          // If it has a colon, split by it
+          if (linksText.includes(':')) {
+            const colonIndex = linksText.indexOf(':');
+            title = linksText.substring(0, colonIndex).trim();
+            url = linksText.substring(colonIndex + 1).trim();
+          }
+          
+          // Ensure URL has a scheme
+          if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+          }
+          
+          if (url) {
+            linkyDinks.push({ title, url });
+          }
+        } else {
+          // Multiple links separated by semicolons
+          const linkPairs = linksText.split(';');
+          
+          for (const pair of linkPairs) {
+            const colonIndex = pair.indexOf(':');
+            if (colonIndex !== -1) {
+              const title = pair.substring(0, colonIndex).trim();
+              let url = pair.substring(colonIndex + 1).trim();
+              
+              // Ensure URL has a scheme
+              if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+              }
+              
+              if (title && url) {
+                linkyDinks.push({ title, url });
+              }
+            } else if (pair.trim()) {
+              // If there's no colon, assume it's just a URL
+              let url = pair.trim();
+              
+              // Ensure URL has a scheme
+              if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+              }
+              
+              if (url) {
+                linkyDinks.push({ title: url, url });
+              }
             }
           }
         }
       }
       
-      const pattern: AccessibilityPattern = {
-        id: `pattern-${index + 1}`,
-        name: row[0] || '',
-        category: row[1] || '',
-        where: row[2] || '',
-        description: row[3] || '',
-        linkyDinks,
-      };
-      
-      patterns.push(pattern);
+      // Only create a pattern if it has a 'where' value or a name
+      if (where || name) {
+        const pattern: AccessibilityPattern = {
+          id: `pattern-${index + 1}`,
+          name: name,
+          category: where,  // Using 'where' as the category for filtering
+          where: where,     // Keep the original 'where' field for compatibility
+          description: description,
+          linkyDinks,
+          parentTitle: currentParentTitle
+        };
+        
+        patterns.push(pattern);
+      }
     } catch (error) {
       console.error(`Error processing pattern row ${index}:`, error, row);
     }
-    
-    return patterns;
-  }, [] as AccessibilityPattern[]);
+  });
+  
+  return patterns;
 }
 
 /**
@@ -521,7 +571,7 @@ export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern
   }
 
   // Updated sheet range from 'Sheet1!A2:F' to 'Patterns!A2:F' to match the correct sheet name
-  const rows = await fetchSheetValues(PATTERNS_SHEET_ID, 'Patterns!A2:F');
+  const rows = await fetchSheetValues(PATTERNS_SHEET_ID, 'ustwo pattern library!A2:F');
   if (!rows) {
     console.error('Failed to fetch patterns data, falling back to mock data');
     // Fallback to mock data if we can't get real data
@@ -552,7 +602,7 @@ export async function submitNewItem(
     
     if (type === 'tool') {
       spreadsheetId = TOOLS_SHEET_ID;
-      range = 'Tools!A:G';
+      range = 'ustwo All Tools!A:G';
       const toolData = data as Partial<AccessibilityTool>;
       values = [[
         '', // ID (will be assigned by sheet formula)
@@ -565,7 +615,7 @@ export async function submitNewItem(
       ]];
     } else if (type === 'pattern') {
       spreadsheetId = PATTERNS_SHEET_ID;
-      range = 'Patterns!A:F';
+      range = 'ustwo pattern library!A:F';
       const patternData = data as Partial<AccessibilityPattern>;
       // Format links if they exist
       let linksFormatted = '';
@@ -619,15 +669,21 @@ export function getToolsFilterOptions(tools: AccessibilityTool[]) {
 export function getPatternsFilterOptions(patterns: AccessibilityPattern[]) {
   const categories = new Set<string>();
   const wheres = new Set<string>();
+  const parentTitles = new Set<string>();
   
   patterns.forEach(pattern => {
-    if (pattern.category) categories.add(pattern.category);
-    if (pattern.where) wheres.add(pattern.where);
+    // Skip section headers for category and where filters
+    if (!pattern.isSection) {
+      if (pattern.category) categories.add(pattern.category);
+      if (pattern.where) wheres.add(pattern.where);
+      if (pattern.parentTitle) parentTitles.add(pattern.parentTitle);
+    }
   });
   
   return {
     categories: Array.from(categories).sort(),
-    wheres: Array.from(wheres).sort()
+    wheres: Array.from(wheres).sort(),
+    parentTitles: Array.from(parentTitles).sort()
   };
 }
 
