@@ -81,15 +81,8 @@
   padding: var(--space-2);
   font-size: 1rem;
   font-weight: 500;
-  display: inline-block;
-  border-radius: var(--border-radius-sm);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
 }
 
-.site-nav a:hover {
-  text-decoration: underline;
-}
 
 .site-nav a[aria-current="page"] {
   font-weight: 600;
@@ -111,6 +104,7 @@
 .footer-logo {
   font-weight: 800;
   font-size: 1.5rem;
+  margin-right: 3rem;
 }
 
 .footer-logo svg {
@@ -135,14 +129,21 @@
   color: var(--color-light);
 }
 
-.footer-links ul {
+.footer-links ul{
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+
+
 }
+
+.footer-links ul,
+.footer-links ol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
 
 .footer-links li {
   margin-bottom: 0; /* Remove margin bottom since we're using gap */

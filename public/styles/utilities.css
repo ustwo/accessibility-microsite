@@ -92,7 +92,11 @@
 .text-dark { color: var(--color-dark); }
 
 /* Transitions */
-.transition { transition: all 0.2s ease; } 
+.transition { transition: var(--transition); } 
+
+@media (prefers-reduced-motion: reduce) {
+  .transition { transition: none; } 
+}
 
 .fill-current { fill: var(--color-light); }
 .dark .fill-current { fill: var(--color-dark); }

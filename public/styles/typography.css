@@ -13,8 +13,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: var(--font-size-4xl);
+  font-size: calc(1.5rem + 2.31481vw - 7.40741px);
+  font-weight: 300;
+  margin: var(--space-5) 0;
 }
+
+.subtitle {
+  font-weight: 300;
+  margin: .3em 0 1em;
+  font-size: calc(1.2rem + .46296vw - 1.48148px);
+}
+
+
 
 h2 {
   font-size: var(--font-size-3xl);
@@ -47,10 +57,7 @@ p a,
 li:not(.site-nav li) a,
 .regular-link {
   color: var(--color-primary);
-  text-decoration: underline;
-  text-decoration-thickness: 0.1em;
-  text-underline-offset: 0.15em;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition: var(--transition);
   padding: 0.1em 0.2em;
   margin: -0.1em -0.2em;
   border-radius: var(--border-radius-sm);
@@ -65,9 +72,15 @@ li:not(.site-nav li) a:hover,
 
 /* Default link styles that apply to all links */
 a {
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition: var(--transition);
   text-decoration: underline;
-  text-underline-offset: 0.2em;
+  text-underline-offset: 0.1rem;
+  text-decoration-thickness: 0.025rem;
+  text-decoration-color: var(--color-silver);
+}
+
+a:hover {
+  text-decoration-thickness: 0.1rem;
 }
 
 a:focus {

@@ -12,19 +12,18 @@ button,
   cursor: pointer;
   background-color: var(--color-primary);
   color: var(--color-light);
-  border: 2px solid var(--color-primary);
   padding: var(--space-2) var(--space-4);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   border-radius: var(--border-radius-full);
   transition: all 0.2s ease;
   text-decoration: none;
+  align-self: flex-start;
 }
 
 button:hover,
 .button:hover {
   background-color: var(--color-secondary);
-  border-color: var(--color-secondary);
   color: var(--color-light);
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -34,7 +33,6 @@ button:hover,
 .button-outline {
   background-color: transparent;
   color: var(--color-primary);
-  border-color: var(--color-primary);
 }
 
 .button-outline:hover {
@@ -138,19 +136,12 @@ label {
   margin-bottom: var(--space-4);
 }
 
-.principle-card .button {
-  margin-top: var(--space-4);
-  align-self: flex-start;
-  background-color: var(--color-primary);
-  font-weight: 600;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--border-radius-full);
-  font-size: 0.95rem;
-  text-decoration: none;
-  display: inline-block;
+.light-background .button {
+  background-color: var(--color-tertiary);
+  color: var(--color-dark);
 }
 
-.principle-card .button:hover {
+.light-background .button:hover {
   background-color: var(--color-secondary);
 }
 

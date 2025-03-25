@@ -6,7 +6,7 @@
 .hero-section {
   padding-top: var(--space-20);
   padding-bottom: var(--space-20);
-  background-color: var(--color-light);
+
   text-align: center;
 }
 
@@ -30,7 +30,7 @@
   padding-top: var(--space-16);
   padding-bottom: var(--space-16);
   width: 100%;
-  background-color: var(--color-gray-100);
+  background-color: none;
 }
 
 .principles-section h2 {

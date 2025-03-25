@@ -17,6 +17,8 @@ body {
   font-family: var(--font-family-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: url(/img/bg.svg) no-repeat center center fixed;
+  background-size: cover;
 }
 
 *, *::before, *::after {
@@ -40,7 +42,7 @@ body {
   color: var(--color-light);
   padding: var(--space-2) var(--space-4);
   z-index: 100;
-  transition: top 0.2s ease;
+  transition: var(--transition);
 }
 
 .skip-to-content:focus {

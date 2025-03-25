@@ -192,8 +192,8 @@
   
     /* ustwo brand colors */
     --color-primary: var(--color-orange); 
-    --color-secondary: var(--color-lime);  
-    --color-tertiary: var(--color-pilot);
+    --color-secondary: var(--color-pilot);  
+    --color-tertiary: var(--color-lime);
     --color-dark: #14161F; /* ustwo dark */
     --color-light: #FFFFFF; /* white */
     --color-footer-text: #E5E7EB; /* Light gray for footer text */
@@ -208,7 +208,7 @@
     --color-gray-900: #111827;
     
     /* focus styles for keyboard users */
-    --focus-ring-color: var(--color-secondary);
+    --focus-ring-color: var(--color-light);
     --focus-ring-width: 3px;
     
     /* Spacing units */

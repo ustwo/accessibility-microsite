@@ -15,6 +15,7 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "/styles/reset.css" },
   { rel: "stylesheet", href: "/styles/typography.css" },
   { rel: "stylesheet", href: "/styles/layout.css" },
+  { rel: "stylesheet", href: "/styles/grid.css" },
   { rel: "stylesheet", href: "/styles/components.css" },
   { rel: "stylesheet", href: "/styles/theme-dark.css" },
   { rel: "stylesheet", href: "/styles/sections.css" },

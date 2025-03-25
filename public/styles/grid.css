@@ -1,0 +1,57 @@
+/* 
+ * ustwo Accessibility Microsite - Grid Styles
+ */
+
+/* Basic grid styles are in layout.css */
+/* This file adds specific responsive behavior for tools and patterns grids */
+
+/* Tools Grid - Default is 1 column */
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+/* Patterns Grid - Default is 1 column */
+.patterns-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+
+/* 
+ * Responsive breakpoints using the same ones as layout.css
+ */
+
+/* Tablet (min-width: 768px) */
+@media (min-width: 768px) {
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large tablet (min-width: 1024px) */
+@media (min-width: 1024px) {
+  .tools-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Patterns get 2 columns at large tablet size */
+  .patterns-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop (min-width: 1250px) */
+@media (min-width: 1250px) {
+  .tools-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large desktop (min-width: 1550px) */
+@media (min-width: 1550px) {
+  .tools-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+} 

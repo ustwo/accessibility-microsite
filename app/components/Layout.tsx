@@ -34,7 +34,10 @@ export default function Layout({ children, title }: LayoutProps) {
           </div>
         )}
         {children}
-        <section className="content-section contribute-section" aria-labelledby="contribute-heading">
+        <section
+          className="content-section contribute-section"
+          aria-labelledby="contribute-heading"
+        >
           <div className="container container-content">
             <h2 id="contribute-heading" className="mb-6">
               Contribute Your Knowledge
@@ -63,7 +66,27 @@ export default function Layout({ children, title }: LayoutProps) {
           </div>
           <div className="footer-links">
             <div>
-              <h4>Explore</h4>
+              <h4>Principles</h4>
+              <ol>
+                <li>
+                  <Link to="/tools">Level-up your gear</Link>
+                </li>
+                <li>
+                  <Link to="/patterns">Enjoy the patterns</Link>
+                </li>
+                <li>
+                  <Link to="/checklist">Think beyond touch</Link>
+                </li>
+                <li>
+                  <Link to="/screen-reader">Close your eyes</Link>
+                </li>
+                <li>
+                  <Link to="/testing-templates">Party party (test) party</Link>
+                </li>
+              </ol>
+            </div>
+            <div>
+              <h4>Resources</h4>
               <ul>
                 <li>
                   <Link to="/tools">Tools</Link>
@@ -72,7 +95,13 @@ export default function Layout({ children, title }: LayoutProps) {
                   <Link to="/patterns">Patterns</Link>
                 </li>
                 <li>
-                  <Link to="/screen-reader-guide">Screen Reader Guide</Link>
+                  <Link to="/checklist">Checklist</Link>
+                </li>
+                <li>
+                  <Link to="/screen-reader">Screen reader tutorial</Link>
+                </li>
+                <li>
+                  <Link to="/testing-templates">Testing templates</Link>
                 </li>
               </ul>
             </div>
@@ -84,16 +113,6 @@ export default function Layout({ children, title }: LayoutProps) {
                 </li>
                 <li>
                   <Link to="/patterns/submit">Submit a Pattern</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4>About</h4>
-              <ul>
-                <li>
-                  <a href="https://ustwo.com" target="_blank" rel="noreferrer">
-                    ustwo.com
-                  </a>
                 </li>
               </ul>
             </div>

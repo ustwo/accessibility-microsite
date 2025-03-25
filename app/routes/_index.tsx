@@ -38,7 +38,7 @@ export default function Index() {
         aria-labelledby="principles-heading"
       >
         <h2 id="principles-heading">ustwo&apos;s Inclusivity Principles</h2>
-        <div className="principles-row">
+        <div className="principles-row light-background">
           <div className="principle-card">
             <h3>1. Level-up your gear</h3>
             <p>
