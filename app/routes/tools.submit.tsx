@@ -122,7 +122,7 @@ export default function SubmitTool() {
     <Layout title="Submit an Accessibility Tool">
       <section className="content-section">
         <div className="container container-content">
-          <p className="mb-6">
+          <p className="mb-6 subtitle">
             Share an accessibility tool with the community. Your submission will be reviewed before being added to the directory.
           </p>
           

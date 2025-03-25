@@ -108,11 +108,11 @@ export default function SubmitPattern() {
   );
   
   return (
-    <Layout title="Submit an Accessibility Pattern">
+    <Layout title="Submit an Accessibile Pattern">
       <section className="content-section">
         <div className="container container-content">
-          <p className="mb-6">
-            Share an accessibility pattern with the community. Your submission will be reviewed before being added to the library.
+          <p className="mb-6 subtitle">
+            Share an accessibile pattern with the community. Your submission will be reviewed before being added to the library.
           </p>
           
           {/* Show error summary if there are form errors */}
