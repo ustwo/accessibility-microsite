@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ReactNode } from "react";
 import UsTwo from "./UsTwo";
 
@@ -8,11 +8,22 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, title }: LayoutProps) {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  // Helper function to check if a link path matches the current path
+  const isCurrentPage = (linkPath: string) => {
+    // Remove trailing slashes for comparison
+    const cleanCurrentPath = currentPath.replace(/\/$/, '');
+    const cleanLinkPath = linkPath.replace(/\/$/, '');
+    return cleanCurrentPath === cleanLinkPath;
+  };
+
   return (
     <div className="page-wrapper">
       <header className="site-header bg-dark-theme" role="banner">
         <div className="container container-content header-inner">
-          <Link to="/" className="logo" aria-current="page">
+          <Link to="/" className="logo" aria-current={currentPath === "/" ? "page" : undefined}>
             <UsTwo className="fill-current" />
           </Link>
           <nav className="site-nav" aria-label="Main navigation">
@@ -89,19 +100,44 @@ export default function Layout({ children, title }: LayoutProps) {
               <h4>Resources</h4>
               <ul>
                 <li>
-                  <Link to="/tools">Tools</Link>
+                  <Link 
+                    to="/tools" 
+                    aria-current={isCurrentPage("/tools") ? "page" : undefined}
+                  >
+                    Tools
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/patterns">Patterns</Link>
+                  <Link 
+                    to="/patterns" 
+                    aria-current={isCurrentPage("/patterns") ? "page" : undefined}
+                  >
+                    Patterns
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/checklist">Checklist</Link>
+                  <Link 
+                    to="/checklist" 
+                    aria-current={isCurrentPage("/checklist") ? "page" : undefined}
+                  >
+                    Checklist
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/screen-reader">Screen reader tutorial</Link>
+                  <Link 
+                    to="/screen-reader" 
+                    aria-current={isCurrentPage("/screen-reader") ? "page" : undefined}
+                  >
+                    Screen reader tutorial
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/testing-templates">Testing templates</Link>
+                  <Link 
+                    to="/testing-templates" 
+                    aria-current={isCurrentPage("/testing-templates") ? "page" : undefined}
+                  >
+                    Testing templates
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -109,10 +145,20 @@ export default function Layout({ children, title }: LayoutProps) {
               <h4>Contribute</h4>
               <ul>
                 <li>
-                  <Link to="/tools/submit">Submit a Tool</Link>
+                  <Link 
+                    to="/tools/submit" 
+                    aria-current={isCurrentPage("/tools/submit") ? "page" : undefined}
+                  >
+                    Submit a Tool
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/patterns/submit">Submit a Pattern</Link>
+                  <Link 
+                    to="/patterns/submit" 
+                    aria-current={isCurrentPage("/patterns/submit") ? "page" : undefined}
+                  >
+                    Submit a Pattern
+                  </Link>
                 </li>
               </ul>
             </div>

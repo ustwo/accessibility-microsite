@@ -15,6 +15,8 @@ import TestJwt from './routes/TestJwt';
 import TestPermissions from './routes/TestPermissions';
 import SheetsDebug from './routes/SheetsDebug';
 import FormSuccess from './routes/FormSuccess';
+import TestingTemplatesIndex from './routes/testing-templates/Index';
+import ChecklistIndex from './routes/checklist/Index';
 
 export const routes: RouteObject[] = [
   {
@@ -61,11 +63,29 @@ export const routes: RouteObject[] = [
         ]
       },
       {
-        path: 'screen-reader-guide',
+        path: 'screen-reader',
         children: [
           {
             index: true,
             element: <ScreenReaderGuideIndex />
+          }
+        ]
+      },
+      {
+        path: 'checklist',
+        children: [
+          {
+            index: true,
+            element: <ChecklistIndex />
+          }
+        ]
+      },
+      {
+        path: 'testing-templates',
+        children: [
+          {
+            index: true,
+            element: <TestingTemplatesIndex />
           }
         ]
       },

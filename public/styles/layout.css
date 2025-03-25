@@ -155,7 +155,20 @@
   font-weight: 500;
   display: inline-block;
   border-radius: var(--border-radius-sm);
+  text-decoration: underline;
+  text-underline-offset: 0.1rem;
+  text-decoration-thickness: 0.025rem;
+  position: relative;
 }
+
+/* Add styling for active footer links */
+.footer-links a[aria-current="page"] {
+  font-weight: 700; /* Bold font weight */
+  position: relative;
+  text-decoration-thickness: 0.1rem;
+}
+
+
 
 /* Grid system */
 .grid {

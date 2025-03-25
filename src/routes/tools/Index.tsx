@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { Helmet } from "react-helmet";
 import {
   fetchAccessibilityTools,
   type AccessibilityTool,
   getToolsFilterOptions,
-  checkSheetExists,
 } from "../../utils/googleSheets";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
@@ -26,8 +25,6 @@ export default function ToolsIndex() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterDiscipline, setFilterDiscipline] = useState<string | null>(null);
-  const [filterSource, setFilterSource] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string | null>(null);
   const [availableFilters, setAvailableFilters] = useState<{
     disciplines: string[];
     sources: string[];
@@ -57,38 +54,10 @@ export default function ToolsIndex() {
     loadTools();
   }, []);
 
-  // Debug function to check sheet existence
-  const checkSheetExistence = async () => {
-    setDebugInfo("Checking sheet existence...");
-    try {
-      const toolsSheetId = import.meta.env.VITE_GOOGLE_TOOLS_SHEET_ID;
-      // First try to check if 'Tools' sheet exists
-      const toolsResult = await checkSheetExists(toolsSheetId, "Tools");
-      console.log("Tools sheet check result:", toolsResult);
-      setDebugInfo(`${toolsResult.message}`);
-
-      // If 'Tools' sheet doesn't exist, also check if 'Sheet1' exists
-      if (!toolsResult.exists) {
-        const sheet1Result = await checkSheetExists(toolsSheetId, "Sheet1");
-        console.log("Sheet1 check result:", sheet1Result);
-        setDebugInfo((prev) => `${prev}\n${sheet1Result.message}`);
-      }
-    } catch (err) {
-      console.error("Error checking sheet existence:", err);
-      setDebugInfo(
-        `Error checking sheet: ${
-          err instanceof Error ? err.message : String(err)
-        }`
-      );
-    }
-  };
 
   // Apply filters to tools
   const filteredTools = tools.filter((tool) => {
     if (filterDiscipline && !tool.discipline.includes(filterDiscipline)) {
-      return false;
-    }
-    if (filterSource && tool.source !== filterSource) {
       return false;
     }
     return true;
@@ -109,17 +78,10 @@ export default function ToolsIndex() {
           content="A collection of accessibility testing and development tools recommended by ustwo."
         />
       </Helmet>
-
-      <section className="content-section" aria-labelledby="tools-heading">
+      {/* Filters */}
+      <div className="filters-bar">
         <div className="container container-content">
-          <p className="intro-text">
-            These are the tools we recommend for testing and developing
-            accessible digital products.
-          </p>
-
-          {/* Filters */}
-          <div className="filters-container mb-6">
-            <h2 className="filters-heading">Filter Tools</h2>
+          <div className="filters-container">
             <div className="filters-row">
               <div className="filter-group">
                 <label htmlFor="disciplineFilter">Discipline:</label>
@@ -137,93 +99,92 @@ export default function ToolsIndex() {
                 </select>
               </div>
 
-              <div className="filter-group">
-                <label htmlFor="sourceFilter">Source:</label>
-                <select
-                  id="sourceFilter"
-                  value={filterSource || ""}
-                  onChange={(e) => setFilterSource(e.target.value || null)}
-                >
-                  <option value="">All Sources</option>
-                  {availableFilters.sources.map((source) => (
-                    <option key={source} value={source}>
-                      {source}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               <button
                 className="button button-secondary"
                 onClick={() => {
                   setFilterDiscipline(null);
-                  setFilterSource(null);
                 }}
               >
                 Clear Filters
               </button>
             </div>
           </div>
+        </div>
+      </div>
+      <section className="content-section" aria-labelledby="tools-heading">
+        <div className="container container-content">
+          <p className="intro-text">
+            These are the tools we recommend for testing and developing
+            accessible digital products.
+          </p>
 
           {/* Loading and error states */}
           {loading && <LoadingSpinner message="Loading tools..." />}
           {error && <p className="error">{error}</p>}
         </div>
-        <div className="container">
-          {/* Tool listings */}
-          {!loading && !error && (
-            <>
+        
+        {/* Tool listings - now outside the constraining container */}
+        {!loading && !error && (
+          <>
+            <div className="container container-content">
               <div className="tools-count mb-3">
                 <p>
                   Showing {filteredTools.length} of {tools.length} tools
                 </p>
               </div>
+            </div>
+            
+            {/* Use the patterns-by-section class to go full width */}
+            <div className="patterns-by-section">
+              <div className="pattern-section mb-6">
+                <div className="patterns-grid">
+                  {filteredTools.length > 0 ? (
+                    filteredTools.map((tool) => (
+                      <div key={tool.id} className="card pattern-card">
+                        <h3 className="tool-name">{tool.name}</h3>
+                        <p className="tool-description">{tool.description}</p>
 
-              <div className="tools-grid">
-                {filteredTools.length > 0 ? (
-                  filteredTools.map((tool) => (
-                    <div key={tool.id} className="card">
-                      <h3 className="tool-name">{tool.name}</h3>
-                      <p className="tool-description">{tool.description}</p>
+                        {tool.url &&
+                          tool.url !== "Link" &&
+                          tool.url !== "WIP" && (
+                            <a
+                              href={
+                                tool.url.startsWith("http")
+                                  ? tool.url
+                                  : `https://${tool.url}`
+                              }
+                              className="tool-link button"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Visit Tool
+                            </a>
+                          )}
 
-                      {tool.url &&
-                        tool.url !== "Link" &&
-                        tool.url !== "WIP" && (
-                          <a
-                            href={
-                              tool.url.startsWith("http")
-                                ? tool.url
-                                : `https://${tool.url}`
-                            }
-                            className="tool-link button"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Visit Tool
-                          </a>
-                        )}
-
-                      <div className="tool-meta">
-                        {tool.discipline.length > 0 && (
-                          <div className="tool-disciplines">
-                            <strong>For:</strong> {tool.discipline.join(", ")}
-                          </div>
-                        )}
-                        {tool.source && (
-                          <div className="tool-source">
-                            <strong>Source:</strong> {tool.source}
-                          </div>
-                        )}
+                        <div className="tool-meta">
+                          {tool.discipline.length > 0 && (
+                            <div className="tool-disciplines">
+                              <strong>For:</strong> {tool.discipline.join(", ")}
+                            </div>
+                          )}
+                          {tool.source && (
+                            <div className="tool-source">
+                              <strong>Source:</strong> {tool.source}
+                            </div>
+                          )}
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="container container-content">
+                      <p>No tools match the selected filters.</p>
                     </div>
-                  ))
-                ) : (
-                  <p>No tools match the selected filters.</p>
-                )}
+                  )}
+                </div>
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </section>
     </Layout>
   );

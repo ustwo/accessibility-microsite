@@ -39,9 +39,10 @@
 
 .bg-dark-theme .site-nav a[aria-current="page"],
 .bg-dark-theme .footer-links a[aria-current="page"] {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-secondary);
 }
+
 
 /* Regular links in dark areas */
 .bg-dark-theme p a,

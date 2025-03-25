@@ -12,6 +12,13 @@
   gap: var(--space-6);
 }
 
+/* The tools-list class should always be full width */
+.tools-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 /* Patterns Grid - Default is 1 column */
 .patterns-grid {
   display: grid;
@@ -27,6 +34,12 @@
 @media (min-width: 768px) {
   .tools-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Tools list remains full width at all breakpoints */
+  .tools-list {
+    display: flex;
+    flex-direction: column;
   }
 }
 
