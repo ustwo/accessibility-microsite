@@ -1,4 +1,5 @@
 import { mockTools, mockPatterns } from '../data/mockData';
+import { CACHE_KEYS, getFromCache, saveToCache, getCacheVersion } from './cacheUtils';
 
 // Define types based on spreadsheet structure
 export interface AccessibilityTool {
@@ -189,6 +190,13 @@ async function generateJWT(): Promise<string | null> {
  */
 export async function getAccessToken(): Promise<string | null> {
   try {
+    // Check for cached JWT first
+    const cachedJwt = getFromCache<string>(CACHE_KEYS.JWT, getCacheVersion('jwt'));
+    if (cachedJwt) {
+      console.log('Using cached JWT token');
+      return cachedJwt;
+    }
+
     const jwt = await generateJWT();
     if (!jwt) {
       console.error('Failed to generate JWT');
@@ -244,6 +252,9 @@ export async function getAccessToken(): Promise<string | null> {
       console.error('Access token not found in response:', data);
       return null;
     }
+    
+    // Cache the token
+    saveToCache(CACHE_KEYS.JWT, data.access_token, getCacheVersion('jwt'));
     
     return data.access_token;
   } catch (error) {
@@ -405,6 +416,18 @@ async function appendSheetValues(spreadsheetId: string, sheetRange: string, valu
  */
 export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
   console.log('fetchAccessibilityTools called');
+  
+  // Try to get data from cache first
+  const cachedTools = getFromCache<AccessibilityTool[]>(
+    CACHE_KEYS.TOOLS,
+    getCacheVersion('tools')
+  );
+  
+  if (cachedTools) {
+    console.log('Using cached tools data');
+    return cachedTools;
+  }
+  
   // For development without credentials, use mock data
   if (IS_DEVELOPMENT && !hasApiCredentials()) {
     console.log('Development mode detected without API credentials');
@@ -439,6 +462,9 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
     };
     return tool;
   });
+  
+  // Cache the processed data
+  saveToCache(CACHE_KEYS.TOOLS, toolsData, getCacheVersion('tools'));
   
   console.log('Processed tools data:', toolsData);
   return toolsData;
@@ -564,6 +590,17 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
  * Fetch and process accessibility patterns from Google Sheets
  */
 export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern[]> {
+  // Try to get data from cache first
+  const cachedPatterns = getFromCache<AccessibilityPattern[]>(
+    CACHE_KEYS.PATTERNS,
+    getCacheVersion('patterns')
+  );
+  
+  if (cachedPatterns) {
+    console.log('Using cached patterns data');
+    return cachedPatterns;
+  }
+  
   // For development without credentials, use mock data
   if (IS_DEVELOPMENT && !hasApiCredentials()) {
     console.warn('Using mock patterns data for development');
@@ -578,7 +615,12 @@ export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern
     return mockPatterns;
   }
 
-  return processPatternRows(rows);
+  const patterns = processPatternRows(rows);
+  
+  // Cache the processed data
+  saveToCache(CACHE_KEYS.PATTERNS, patterns, getCacheVersion('patterns'));
+  
+  return patterns;
 }
 
 /**

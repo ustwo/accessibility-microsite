@@ -1,8 +1,22 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import Layout from "../components/Layout";
 import { Helmet } from 'react-helmet';
+import { useData } from "../context/DataContext";
 
 export default function Index() {
+  const { refreshData } = useData();
+
+  // Refresh data when homepage loads
+  useEffect(() => {
+    // Add slight delay to not block initial render
+    const timeoutId = setTimeout(() => {
+      refreshData();
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [refreshData]);
+
   return (
     <Layout>
       <Helmet>

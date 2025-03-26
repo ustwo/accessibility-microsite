@@ -55,6 +55,13 @@ netlify serve
 
 Your site will be available at [http://localhost:8888](http://localhost:8888). Note that it will not auto-reload when you make changes.
 
+## Google Sheets Integration
+
+This application uses Google Sheets as a data source for accessibility tools and patterns, with a sophisticated caching strategy for improved performance.
+
+For detailed documentation, see:
+- [Google Sheets Integration & Caching Strategy](./docs/google-sheets-integration.md)
+
 ## Deployment
 
 There are two ways to deploy your app to Netlify, you can either link your app to your git repo and have it auto deploy changes to Netlify, or you can deploy your app manually. If you've followed the setup instructions already, all you need to do is run this:

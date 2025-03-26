@@ -1,58 +1,23 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import Layout from "../../components/Layout";
 import { Helmet } from 'react-helmet';
-import { fetchAccessibilityPatterns, type AccessibilityPattern, getPatternsFilterOptions } from "../../utils/googleSheets";
+import { type AccessibilityPattern, getPatternsFilterOptions } from "../../utils/googleSheets";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { useData } from "../../context/DataContext";
 
-// ScrollToTop component that uses React Router's useLocation
+// ScrollToTop component is no longer needed since we use ScrollRestoration in Root.tsx
 function ScrollToTop() {
-  const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
   return null;
 }
 
 export default function PatternsIndex() {
-  const [patterns, setPatterns] = useState<AccessibilityPattern[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { patterns, isLoadingPatterns, error, refreshData } = useData();
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterWhere, setFilterWhere] = useState<string | null>(null);
   const [filterParentTitle, setFilterParentTitle] = useState<string | null>(null);
-  const [availableFilters, setAvailableFilters] = useState<{
-    categories: string[];
-    wheres: string[];
-    parentTitles: string[];
-  }>({ 
-    categories: [], 
-    wheres: [],
-    parentTitles: []
-  });
-
-  useEffect(() => {
-    async function loadPatterns() {
-      try {
-        setLoading(true);
-        const patternsData = await fetchAccessibilityPatterns();
-        setPatterns(patternsData);
-        
-        // Extract available filter options
-        const filterOptions = getPatternsFilterOptions(patternsData);
-        setAvailableFilters(filterOptions);
-      } catch (err) {
-        console.error("Error loading patterns:", err);
-        setError("Failed to load patterns. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadPatterns();
-  }, []);
+  
+  // Compute filter options directly from the patterns data
+  const availableFilters = getPatternsFilterOptions(patterns);
 
   // Apply filters to patterns
   const filteredPatterns = patterns.filter(pattern => {
@@ -169,6 +134,14 @@ export default function PatternsIndex() {
                 >
                   Clear Filters
                 </button>
+                
+                <button 
+                  className="button button-secondary"
+                  onClick={() => refreshData()}
+                  aria-label="Refresh patterns data"
+                >
+                  ↻ Refresh
+                </button>
               </div>
             </div>
           </div>
@@ -184,7 +157,7 @@ export default function PatternsIndex() {
 
             
         {/* Loading and error states */}
-        {loading && (
+        {isLoadingPatterns && (
           <div className="container container-content">
             <LoadingSpinner message="Loading patterns..." />
           </div>
@@ -196,7 +169,7 @@ export default function PatternsIndex() {
         )}
         
         {/* Pattern listings */}
-        {!loading && !error && (
+        {!isLoadingPatterns && !error && (
           <>
             {/* Show filter count when filtering */}
             {isFiltering && (

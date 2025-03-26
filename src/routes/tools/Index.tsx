@@ -1,59 +1,24 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import Layout from "../../components/Layout";
 import { Helmet } from "react-helmet";
 import {
-  fetchAccessibilityTools,
-  type AccessibilityTool,
   getToolsFilterOptions,
 } from "../../utils/googleSheets";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { useData } from "../../context/DataContext";
 
-// ScrollToTop component that uses React Router's useLocation
+// ScrollToTop component for consistency with other components
 function ScrollToTop() {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
+  // This is handled by ScrollRestoration in Root.tsx now
   return null;
 }
 
 export default function ToolsIndex() {
-  const [tools, setTools] = useState<AccessibilityTool[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { tools, isLoadingTools, error, refreshData } = useData();
   const [filterDiscipline, setFilterDiscipline] = useState<string | null>(null);
-  const [availableFilters, setAvailableFilters] = useState<{
-    disciplines: string[];
-    sources: string[];
-  }>({ disciplines: [], sources: [] });
-
-  useEffect(() => {
-    async function loadTools() {
-      try {
-        console.log("Starting to fetch accessibility tools...");
-        setLoading(true);
-        const toolsData = await fetchAccessibilityTools();
-        console.log("Tools data received:", toolsData);
-        setTools(toolsData);
-
-        // Extract available filter options
-        const filterOptions = getToolsFilterOptions(toolsData);
-        console.log("Filter options:", filterOptions);
-        setAvailableFilters(filterOptions);
-      } catch (err) {
-        console.error("Error loading tools:", err);
-        setError("Failed to load tools. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadTools();
-  }, []);
-
+  
+  // Compute filter options directly from the tools data
+  const availableFilters = getToolsFilterOptions(tools);
 
   // Apply filters to tools
   const filteredTools = tools.filter((tool) => {
@@ -62,11 +27,6 @@ export default function ToolsIndex() {
     }
     return true;
   });
-
-  // Debug output
-  console.log("Current tools state:", tools);
-  console.log("Filtered tools:", filteredTools);
-  console.log("Loading:", loading, "Error:", error);
 
   return (
     <Layout title="Accessibility Tools">
@@ -107,6 +67,14 @@ export default function ToolsIndex() {
               >
                 Clear Filters
               </button>
+              
+              <button 
+                className="button button-secondary"
+                onClick={() => refreshData()}
+                aria-label="Refresh tools data"
+              >
+                ↻ Refresh
+              </button>
             </div>
           </div>
         </div>
@@ -119,12 +87,12 @@ export default function ToolsIndex() {
           </p>
 
           {/* Loading and error states */}
-          {loading && <LoadingSpinner message="Loading tools..." />}
+          {isLoadingTools && <LoadingSpinner message="Loading tools..." />}
           {error && <p className="error">{error}</p>}
         </div>
         
         {/* Tool listings - now outside the constraining container */}
-        {!loading && !error && (
+        {!isLoadingTools && !error && (
           <>
             <div className="container container-content">
               <div className="tools-count mb-3">
