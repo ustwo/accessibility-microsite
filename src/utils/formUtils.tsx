@@ -13,7 +13,17 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
   initialValues: T,
   validationSchema?: z.ZodSchema,
   serverErrors?: Record<string, string>
-) {
+): {
+  formValues: T;
+  formErrors: Record<string, string>;
+  isSubmitted: boolean;
+  hasErrors: boolean;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => boolean;
+  validateForm: () => boolean;
+  errorSummaryRef: React.RefObject<HTMLDivElement>;
+} {
   if (typeof window !== 'undefined') {
     window.console.log("🔍 FORM HOOK INITIALIZED OR RE-RENDERED");
     window.console.log("🔍 serverErrors:", serverErrors);
@@ -36,18 +46,13 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
   
   // Update local errors when serverErrors changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.console.log("⚡ SERVER ERRORS CHANGED", serverErrors);
-    }
-    
     if (serverErrors) {
       setLocalErrors(serverErrors);
       setIsSubmitted(true);
       
-      // Scroll to top and focus error summary after server validation failure
+      // Focus error summary after server validation failure
       setTimeout(() => {
         if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
           const errorSummary = document.getElementById('error-summary');
           if (errorSummary) {
             errorSummary.focus();
@@ -214,11 +219,8 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
       if (!isValid) {
         e.preventDefault(); // Prevent submission if validation fails
         
-        // Scroll to top and focus the error summary
+        // Focus the error summary after a short delay to ensure it's rendered
         if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          
-          // Focus the error summary after a short delay to ensure it's rendered
           setTimeout(() => {
             const errorSummary = document.getElementById('error-summary');
             if (errorSummary) {
@@ -237,23 +239,13 @@ export function useAccessibleForm<T extends Record<string, unknown>>(
             }
           }, 100);
         }
-        
-        return false; // Form is invalid
-      } else if (typeof window !== 'undefined') {
-        // Form is valid - allow the form to submit naturally
-        window.console.log("✅ VALIDATION SUCCESSFUL - SUBMITTING FORM");
-        return true; // Form is valid
+        return false;
       }
-      
-      return isValid; // Return validation result
-    } else {
-      // No validation schema provided, allow form to submit
-      if (typeof window !== 'undefined') {
-        window.console.log("⚠️ NO VALIDATION SCHEMA - SUBMITTING FORM AS IS");
-      }
-      return true; // No validation schema, so form is considered valid
+      return true;
     }
-  }, [validateForm, localErrors, validationSchema]);
+    
+    return true;
+  }, [formValues, validateForm, validationSchema, localErrors]);
   
   // Expose filtered errors and form state
   return {
@@ -290,25 +282,14 @@ export function ErrorSummary({
     return null;
   }
   
-  // Handle error link click to scroll to the field
+  // Handle error link click without adding custom scroll behavior
   const handleErrorLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, fieldId: string) => {
-    // Let the default behavior happen (move focus via href)
-    // But add smooth scrolling
+    // Let the default browser behavior handle this
+    // No need to add custom scrolling
     
-    // Small delay to ensure the focus happens first
-    setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        const field = document.getElementById(fieldId);
-        if (field) {
-          // Scroll the field into view with smooth behavior
-          field.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-          });
-          window.console.log(`🔍 Scrolling to field: ${fieldId}`);
-        }
-      }
-    }, 10);
+    if (typeof window !== 'undefined') {
+      window.console.log(`🔍 Link clicked for field: ${fieldId}`);
+    }
   };
   
   return (

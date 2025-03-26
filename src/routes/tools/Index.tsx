@@ -7,12 +7,6 @@ import {
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useData } from "../../context/DataContext";
 
-// ScrollToTop component for consistency with other components
-function ScrollToTop() {
-  // This is handled by ScrollRestoration in Root.tsx now
-  return null;
-}
-
 export default function ToolsIndex() {
   const { tools, isLoadingTools, error, refreshData } = useData();
   const [filterDiscipline, setFilterDiscipline] = useState<string | null>(null);
@@ -30,7 +24,6 @@ export default function ToolsIndex() {
 
   return (
     <Layout title="Accessibility Tools">
-      <ScrollToTop />
       <Helmet>
         <title>Accessibility Tools - ustwo Accessibility Microsite</title>
         <meta

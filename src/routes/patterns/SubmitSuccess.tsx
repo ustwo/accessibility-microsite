@@ -1,28 +1,15 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { Helmet } from 'react-helmet';
-import { useEffect } from "react";
-
-// ScrollToTop component that uses React Router's useLocation
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
-  return null;
-}
 
 export default function PatternsSubmitSuccess() {
   return (
-    <Layout title="Thank You for Your Submission">
-      <ScrollToTop />
+    <Layout title="Thank You!">
       <Helmet>
-        <title>Submission Successful - ustwo Accessibility Microsite</title>
+        <title>Thank You for Your Submission - ustwo Accessibility Microsite</title>
         <meta
           name="description"
-          content="Your pattern submission has been received successfully."
+          content="Thank you for submitting a pattern to our accessibility resources."
         />
       </Helmet>
 

@@ -1,21 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Layout from "../../components/Layout";
 import { Helmet } from 'react-helmet';
 import { useFormSubmission, PatternSchema } from "../../utils/formSubmission";
 import { useAccessibleForm, ErrorSummary, ErrorMessage } from "../../utils/formUtils";
-import { useLocation } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
-
-// ScrollToTop component that uses React Router's useLocation
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
-  return null;
-}
 
 export default function PatternsSubmit() {
   const { handlePatternSubmit, patternErrors, isSubmittingPattern, statusMessage } = useFormSubmission();
@@ -53,7 +41,6 @@ export default function PatternsSubmit() {
 
   return (
     <Layout title="Submit a Pattern">
-      <ScrollToTop />
       <Helmet>
         <title>Submit a Pattern - ustwo Accessibility Microsite</title>
         <meta

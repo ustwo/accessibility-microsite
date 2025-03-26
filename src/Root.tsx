@@ -7,10 +7,7 @@ export default function Root() {
     <DataProvider>
       <DataPreloader />
       <Outlet />
-      <ScrollRestoration getKey={(location) => {
-        // Always scroll to top on navigation
-        return location.pathname;
-      }} />
+      <ScrollRestoration />
     </DataProvider>
   );
 }

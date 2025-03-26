@@ -23,13 +23,19 @@ export default function Layout({ children, title }: LayoutProps) {
     <div className="page-wrapper">
       <header className="site-header bg-dark-theme" role="banner">
         <div className="container container-content header-inner">
-          <Link to="/" className="logo" aria-current={currentPath === "/" ? "page" : undefined}>
+          <Link 
+            to="/" 
+            className="logo" 
+            aria-current={currentPath === "/" ? "page" : undefined}
+          >
             <UsTwo className="fill-current" />
           </Link>
           <nav className="site-nav" aria-label="Main navigation">
             <ul>
               <li>
-                <Link to="/#principles">Accessibility Principles</Link>
+                <Link to="/#principles">
+                  Accessibility Principles
+                </Link>
               </li>
             </ul>
           </nav>

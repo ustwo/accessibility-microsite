@@ -223,10 +223,7 @@ export function useFormSubmission() {
         // Set errors for the form to display
         setToolErrors(result.errors);
         
-        // Scroll to top for error summary
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        // Focus error summary after a short delay
+        // No scroll behavior, just focus the error summary
         setTimeout(() => {
           const errorSummary = document.getElementById('error-summary');
           if (errorSummary) {
@@ -294,10 +291,7 @@ export function useFormSubmission() {
         // Set errors for the form to display
         setPatternErrors(result.errors);
         
-        // Scroll to top for error summary
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        // Focus error summary after a short delay
+        // No scroll behavior, just focus the error summary
         setTimeout(() => {
           const errorSummary = document.getElementById('error-summary');
           if (errorSummary) {

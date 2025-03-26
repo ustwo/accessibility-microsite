@@ -1,21 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Layout from "../../components/Layout";
 import { Helmet } from 'react-helmet';
 import { useFormSubmission, ToolSchema } from "../../utils/formSubmission";
 import { useAccessibleForm, ErrorSummary, ErrorMessage } from "../../utils/formUtils";
-import { useLocation } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
-
-// ScrollToTop component that uses React Router's useLocation
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
-  return null;
-}
 
 export default function ToolsSubmit() {
   const { handleToolSubmit, toolErrors, isSubmittingTool, statusMessage } = useFormSubmission();
@@ -47,7 +35,6 @@ export default function ToolsSubmit() {
 
   return (
     <Layout title="Submit a Tool">
-      <ScrollToTop />
       <Helmet>
         <title>Submit a Tool - ustwo Accessibility Microsite</title>
         <meta

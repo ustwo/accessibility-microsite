@@ -5,11 +5,6 @@ import { type AccessibilityPattern, getPatternsFilterOptions } from "../../utils
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useData } from "../../context/DataContext";
 
-// ScrollToTop component is no longer needed since we use ScrollRestoration in Root.tsx
-function ScrollToTop() {
-  return null;
-}
-
 export default function PatternsIndex() {
   const { patterns, isLoadingPatterns, error, refreshData } = useData();
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
@@ -83,7 +78,6 @@ export default function PatternsIndex() {
 
   return (
     <Layout title="Accessibility Patterns">
-      <ScrollToTop />
       <Helmet>
         <title>Accessibility Patterns - ustwo Accessibility Microsite</title>
         <meta
