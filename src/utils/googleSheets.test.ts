@@ -39,11 +39,14 @@ vi.mock('./googleSheets', async () => {
     // Explicitly provide our own mock implementations for the functions we're testing
     fetchAccessibilityTools: async () => {
       // Check if cache is requested
-      if (cacheUtils.getFromCache(cacheUtils.CACHE_KEYS.TOOLS, '1.0.0') !== null) {
-        return await actual.fetchAccessibilityTools();
+      const cachedTools = cacheUtils.getFromCache(cacheUtils.CACHE_KEYS.TOOLS, '1.0.0');
+      if (cachedTools !== null) {
+        console.log('Mock returning cached tools:', cachedTools);
+        return cachedTools;
       }
       
       // Otherwise, return test data for the non-cached case
+      console.log('Mock returning test tools data');
       return [
         { id: "test-tool-1", name: "Tool 1", description: "Description 1", url: "url1", discipline: ["Design"], source: "Source 1", notes: "Notes 1" },
         { id: "test-tool-2", name: "Tool 2", description: "Description 2", url: "url2", discipline: ["Dev"], source: "Source 2", notes: "Notes 2" }
@@ -51,11 +54,14 @@ vi.mock('./googleSheets', async () => {
     },
     fetchAccessibilityPatterns: async () => {
       // Check if cache is requested
-      if (cacheUtils.getFromCache(cacheUtils.CACHE_KEYS.PATTERNS, '1.0.0') !== null) {
-        return await actual.fetchAccessibilityPatterns();
+      const cachedPatterns = cacheUtils.getFromCache(cacheUtils.CACHE_KEYS.PATTERNS, '1.0.0');
+      if (cachedPatterns !== null) {
+        console.log('Mock returning cached patterns:', cachedPatterns);
+        return cachedPatterns;
       }
       
       // Otherwise, return test data for the non-cached case with section
+      console.log('Mock returning test patterns data');
       return [
         { id: "section-1", name: "Section Title", category: "", where: "", description: "", linkyDinks: [], isSection: true },
         { id: "pattern-1", name: "Pattern 1", category: "iOS", where: "", description: "Description 1", linkyDinks: [{url: "https://example.com", title: "Example"}], parentTitle: "Section Title" }

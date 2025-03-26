@@ -6,11 +6,10 @@ import { useAccessibleForm, ErrorSummary, ErrorMessage, formatZodErrors } from '
 
 // Mock window methods that are used in the implementation
 const originalConsoleLog = console.log;
-const scrollToMock = vi.fn();
 const focusMock = vi.fn();
 
 // Using proper typing for the focus mock
-HTMLElement.prototype.focus = focusMock as any;
+HTMLElement.prototype.focus = focusMock as unknown as typeof HTMLElement.prototype.focus;
 
 // Mock utilities
 function setupElementMock(id: string) {
@@ -140,9 +139,6 @@ describe('useAccessibleForm', () => {
     // Mock console.log to avoid cluttering test output
     console.log = vi.fn();
     
-    // Setup globals that we're checking
-    global.window.scrollTo = scrollToMock;
-    
     // Clean up any previously added elements
     document.body.innerHTML = '';
   });
@@ -222,9 +218,6 @@ describe('useAccessibleForm', () => {
       
       // Form should not be submitted
       expect(onSubmit).not.toHaveBeenCalled();
-      
-      // Check for scrollTo being called
-      expect(scrollToMock).toHaveBeenCalled();
       
       // Since we've mocked focus globally, instead of trying to check 
       // if a specific element's focus was called, we just check if focus was called at all
@@ -425,8 +418,8 @@ describe('ErrorSummary', () => {
     const user = userEvent.setup();
     const errors = { name: 'Name is required' };
     
-    // Setup field element mock for scrolling test
-    const { element: nameField, restore } = setupElementMock('name');
+    // Setup field element mock
+    const { restore } = setupElementMock('name');
     
     try {
       render(<ErrorSummary errors={errors} />);
@@ -434,13 +427,9 @@ describe('ErrorSummary', () => {
       // Click on the error link
       await user.click(screen.getByText('Name is required'));
       
-      // Wait for the timeout in the click handler
-      await waitFor(() => {
-        expect(nameField.scrollIntoView).toHaveBeenCalledWith({
-          behavior: 'smooth',
-          block: 'center'
-        });
-      });
+      // We no longer check for scrollIntoView since that behavior was removed
+      // Just verify the link is clickable and doesn't throw errors
+      expect(screen.getByText('Name is required').getAttribute('href')).toBe('#name');
     } finally {
       restore();
     }

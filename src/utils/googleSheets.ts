@@ -1,6 +1,79 @@
 import { mockTools, mockPatterns } from '../data/mockData';
 import { CACHE_KEYS, getFromCache, saveToCache, getCacheVersion } from './cacheUtils';
 
+/**
+ * API Rate Limiting Implementation
+ * 
+ * Google Sheets API has a quota of 60 read requests per minute per user
+ * This implementation adds:
+ * 1. A simple rate limiter to ensure we don't exceed quotas
+ * 2. Enhanced caching to reduce API calls
+ */
+
+// API Rate Limiting Configuration
+const API_CONFIG = {
+  MAX_REQUESTS_PER_MINUTE: 50, // Keep below 60 to be safe
+  REQUEST_INTERVAL_MS: 1200,    // Spread requests (~50/minute)
+  SHEETS_CACHE_DURATION: 60 * 5 * 1000, // 5 minutes
+}
+
+// State tracking for rate limiting
+let lastRequestTime = 0;
+const requestTimestamps: number[] = [];
+
+/**
+ * Execute a request with rate limiting
+ * This ensures we don't exceed Google Sheets API quotas
+ */
+async function executeWithRateLimit<T>(requestId: string, fn: () => Promise<T>): Promise<T> {
+  // Apply rate limiting before executing
+  await applyRateLimit();
+  
+  console.log(`Executing rate-limited request: ${requestId}`);
+  
+  // Track this request
+  const timestamp = Date.now();
+  requestTimestamps.push(timestamp);
+  lastRequestTime = timestamp;
+
+  // Execute the actual request
+  return fn();
+}
+
+/**
+ * Wait if necessary to ensure we don't exceed rate limits
+ */
+async function applyRateLimit(): Promise<void> {
+  const now = Date.now();
+  
+  // Remove timestamps older than 1 minute
+  const oneMinuteAgo = now - 60000;
+  while (requestTimestamps.length > 0 && requestTimestamps[0] < oneMinuteAgo) {
+    requestTimestamps.shift();
+  }
+  
+  // Check if we need to wait between requests
+  const timeSinceLastRequest = lastRequestTime ? now - lastRequestTime : Infinity;
+  if (timeSinceLastRequest < API_CONFIG.REQUEST_INTERVAL_MS) {
+    const waitTime = API_CONFIG.REQUEST_INTERVAL_MS - timeSinceLastRequest;
+    console.log(`Rate limiting: waiting ${waitTime}ms between requests`);
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+  }
+  
+  // Check if we've reached the max requests per minute
+  if (requestTimestamps.length >= API_CONFIG.MAX_REQUESTS_PER_MINUTE) {
+    // Need to wait until the oldest request is more than a minute old
+    const oldestTimestamp = requestTimestamps[0];
+    const timeToWait = 60000 - (now - oldestTimestamp) + 100; // add a small buffer
+    
+    console.log(`Rate limit reached (${requestTimestamps.length} requests this minute). Waiting ${timeToWait}ms...`);
+    await new Promise(resolve => setTimeout(resolve, timeToWait));
+    
+    // Recursive call to check again after waiting
+    return applyRateLimit();
+  }
+}
+
 // Define types based on spreadsheet structure
 export interface AccessibilityTool {
   id: string;
@@ -291,73 +364,120 @@ export async function fetchSheetValues(
     ];
   }
 
-  // Make sure we have a valid access token
-  console.log('Getting access token...');
-  const accessToken = await getAccessToken();
-  if (!accessToken) {
-    console.error('No access token available to fetch sheet data');
-    return null;
-  }
-  console.log('Access token obtained successfully');
-
-  // We'll make up to retryCount + 1 attempts to fetch the data
-  for (let attempt = 0; attempt <= retryCount; attempt++) {
+  // Create a cache key specific to this request
+  const cacheKey = `sheets_data_${spreadsheetId}_${range.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  
+  // First check if we have cached data for this specific request
+  const cachedData = localStorage.getItem(cacheKey);
+  if (cachedData) {
     try {
-      console.log(`Fetch attempt ${attempt + 1} of ${retryCount + 1}`);
-      const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueRenderOption=FORMATTED_VALUE&majorDimension=ROWS`;
-      console.log('Fetching from URL:', apiUrl);
+      const { data, timestamp } = JSON.parse(cachedData);
+      const cacheAge = Date.now() - timestamp;
       
-      // Fetch the data from Google Sheets API
-      const response = await fetch(
-        apiUrl,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      console.log('Response status:', response.status, response.statusText);
-      
-      if (response.ok) {
-        const data = await response.json() as GoogleSheetsResponse;
-        console.log('Response data received:', data);
-        
-        if (data.values && data.values.length > 0) {
-          console.log(`Found ${data.values.length} rows of data`);
-          return data.values;
-        } else {
-          console.warn('No values found in sheet response:', data);
-          return [];
-        }
+      // Use cached data if it's less than the configured cache duration
+      if (cacheAge < API_CONFIG.SHEETS_CACHE_DURATION) {
+        console.log(`Using cached sheet data for ${range}, age: ${Math.round(cacheAge / 1000)}s`);
+        return data;
       } else {
-        const errorText = await response.text();
-        console.error(`Error fetching sheet data (attempt ${attempt + 1}): ${response.status} ${response.statusText}`);
-        console.error(`Error details: ${errorText}`);
-
-        if (attempt < retryCount) {
-          // Wait a bit longer before each retry (exponential backoff)
-          const waitTime = Math.pow(2, attempt) * 1000;  // 1s, 2s, 4s, etc.
-          console.log(`Retrying in ${waitTime}ms...`);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-        }
+        console.log(`Cache expired for ${range}, age: ${Math.round(cacheAge / 1000)}s`);
+        localStorage.removeItem(cacheKey);
       }
-    } catch (error) {
-      console.error(`Error in fetch attempt ${attempt + 1}:`, error);
-      
-      if (attempt < retryCount) {
-        // Wait before retrying
-        const waitTime = Math.pow(2, attempt) * 1000;
-        console.log(`Retrying in ${waitTime}ms...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-      }
+    } catch (err) {
+      console.error('Error parsing cached sheet data:', err);
+      localStorage.removeItem(cacheKey);
     }
   }
 
-  console.error(`Failed to fetch sheet data after ${retryCount + 1} attempts`);
-  return null;
+  // Queue the actual API request to respect rate limits
+  return executeWithRateLimit<string[][] | null>(
+    `fetch_sheet_${spreadsheetId}_${range}`,
+    async () => {
+      // Make sure we have a valid access token
+      console.log('Getting access token...');
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        console.error('No access token available to fetch sheet data');
+        return null;
+      }
+      console.log('Access token obtained successfully');
+
+      // We'll make up to retryCount + 1 attempts to fetch the data
+      for (let attempt = 0; attempt <= retryCount; attempt++) {
+        try {
+          console.log(`Fetch attempt ${attempt + 1} of ${retryCount + 1}`);
+          const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueRenderOption=FORMATTED_VALUE&majorDimension=ROWS`;
+          console.log('Fetching from URL:', apiUrl);
+          
+          // Fetch the data from Google Sheets API
+          const response = await fetch(
+            apiUrl,
+            {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          console.log('Response status:', response.status, response.statusText);
+          
+          if (response.ok) {
+            const responseData = await response.json() as GoogleSheetsResponse;
+            console.log('Response data received:', responseData);
+            
+            if (responseData.values && responseData.values.length > 0) {
+              console.log(`Found ${responseData.values.length} rows of data`);
+              
+              // Cache the successful response
+              try {
+                localStorage.setItem(cacheKey, JSON.stringify({
+                  data: responseData.values,
+                  timestamp: Date.now()
+                }));
+                console.log(`Sheet data cached with key: ${cacheKey}`);
+              } catch (cacheError) {
+                console.error('Error caching sheet data:', cacheError);
+              }
+              
+              return responseData.values;
+            } else {
+              console.warn('No values found in sheet response:', responseData);
+              return [];
+            }
+          } else {
+            const errorText = await response.text();
+            console.error(`Error fetching sheet data (attempt ${attempt + 1}): ${response.status} ${response.statusText}`);
+            console.error(`Error details: ${errorText}`);
+            
+            // Check if we hit a quota limit (429)
+            if (response.status === 429) {
+              console.warn('Quota exceeded - need to wait longer before retrying');
+              // Wait significantly longer for quota errors
+              await new Promise(resolve => setTimeout(resolve, 5000 + Math.pow(2, attempt) * 1000));
+            } else if (attempt < retryCount) {
+              // Wait a bit longer before each retry (exponential backoff)
+              const waitTime = Math.pow(2, attempt) * 1000;  // 1s, 2s, 4s, etc.
+              console.log(`Retrying in ${waitTime}ms...`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+            }
+          }
+        } catch (error) {
+          console.error(`Error in fetch attempt ${attempt + 1}:`, error);
+          
+          if (attempt < retryCount) {
+            // Wait before retrying
+            const waitTime = Math.pow(2, attempt) * 1000;
+            console.log(`Retrying in ${waitTime}ms...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+          }
+        }
+      }
+
+      console.error(`Failed to fetch sheet data after ${retryCount + 1} attempts`);
+      return null;
+    }
+  );
 }
 
 /**
@@ -381,34 +501,40 @@ async function appendSheetValues(spreadsheetId: string, sheetRange: string, valu
     return false;
   }
 
-  try {
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetRange}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          values,
-        }),
-      }
-    );
+  // Execute with rate limiting
+  return executeWithRateLimit<boolean>(
+    `append_sheet_${spreadsheetId}_${sheetRange}`,
+    async () => {
+      try {
+        const response = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetRange}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              values,
+            }),
+          }
+        );
 
-    if (response.ok) {
-      console.log('Successfully appended data to sheet');
-      return true;
-    } else {
-      const errorText = await response.text();
-      console.error(`Error appending to sheet: ${response.status} ${response.statusText}`);
-      console.error(`Error details: ${errorText}`);
-      return false;
+        if (response.ok) {
+          console.log('Successfully appended data to sheet');
+          return true;
+        } else {
+          const errorText = await response.text();
+          console.error(`Error appending to sheet: ${response.status} ${response.statusText}`);
+          console.error(`Error details: ${errorText}`);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error appending to sheet:', error);
+        return false;
+      }
     }
-  } catch (error) {
-    console.error('Error appending to sheet:', error);
-    return false;
-  }
+  );
 }
 
 /**
@@ -805,33 +931,39 @@ export async function checkSheetPermission(spreadsheetId: string): Promise<{
       };
     }
     
-    // Try to get just the spreadsheet metadata
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=properties.title`,
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
+    // Execute with rate limiting
+    return executeWithRateLimit(
+      `check_permission_${spreadsheetId}`,
+      async () => {
+        // Try to get just the spreadsheet metadata
+        const response = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=properties.title`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            hasAccess: true,
+            message: `Successfully accessed spreadsheet: ${data.properties?.title || 'Unnamed'}`,
+            details: data
+          };
+        } else {
+          const errorDetails = await response.json().catch(() => null);
+          return {
+            hasAccess: false,
+            message: `Access denied: ${response.status} ${response.statusText}`,
+            details: errorDetails
+          };
+        }
       }
     );
-    
-    if (response.ok) {
-      const data = await response.json();
-      return {
-        hasAccess: true,
-        message: `Successfully accessed spreadsheet: ${data.properties?.title || 'Unnamed'}`,
-        details: data
-      };
-    } else {
-      const errorDetails = await response.json().catch(() => null);
-      return {
-        hasAccess: false,
-        message: `Access denied: ${response.status} ${response.statusText}`,
-        details: errorDetails
-      };
-    }
   } catch (error) {
     console.error('Error checking permissions:', error);
     return {
@@ -872,57 +1004,63 @@ export async function checkSheetExists(spreadsheetId: string, sheetName: string)
       };
     }
     
-    // Get the spreadsheet metadata including sheet names
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties.title,properties.title`,
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
+    // Execute with rate limiting
+    return executeWithRateLimit(
+      `check_sheet_exists_${spreadsheetId}_${sheetName}`,
+      async () => {
+        // Get the spreadsheet metadata including sheet names
+        const response = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties.title,properties.title`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Spreadsheet metadata:', data);
+          
+          if (!data.sheets || !Array.isArray(data.sheets)) {
+            return {
+              exists: false,
+              message: 'Spreadsheet exists but no sheets were found',
+              details: data
+            };
+          }
+          
+          // Check if the requested sheet exists
+          const sheetExists = data.sheets.some((sheet: SheetProperties) => 
+            sheet.properties?.title === sheetName
+          );
+          
+          if (sheetExists) {
+            return {
+              exists: true,
+              message: `Sheet '${sheetName}' found in spreadsheet: ${data.properties?.title || 'Unnamed'}`,
+              details: data
+            };
+          } else {
+            const availableSheets = data.sheets.map((sheet: SheetProperties) => sheet.properties?.title).join(', ');
+            return {
+              exists: false,
+              message: `Sheet '${sheetName}' not found. Available sheets: ${availableSheets}`,
+              details: data
+            };
+          }
+        } else {
+          const errorDetails = await response.json().catch(() => null);
+          return {
+            exists: false,
+            message: `Failed to access spreadsheet: ${response.status} ${response.statusText}`,
+            details: errorDetails
+          };
+        }
       }
     );
-    
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Spreadsheet metadata:', data);
-      
-      if (!data.sheets || !Array.isArray(data.sheets)) {
-        return {
-          exists: false,
-          message: 'Spreadsheet exists but no sheets were found',
-          details: data
-        };
-      }
-      
-      // Check if the requested sheet exists
-      const sheetExists = data.sheets.some((sheet: SheetProperties) => 
-        sheet.properties?.title === sheetName
-      );
-      
-      if (sheetExists) {
-        return {
-          exists: true,
-          message: `Sheet '${sheetName}' found in spreadsheet: ${data.properties?.title || 'Unnamed'}`,
-          details: data
-        };
-      } else {
-        const availableSheets = data.sheets.map((sheet: SheetProperties) => sheet.properties?.title).join(', ');
-        return {
-          exists: false,
-          message: `Sheet '${sheetName}' not found. Available sheets: ${availableSheets}`,
-          details: data
-        };
-      }
-    } else {
-      const errorDetails = await response.json().catch(() => null);
-      return {
-        exists: false,
-        message: `Failed to access spreadsheet: ${response.status} ${response.statusText}`,
-        details: errorDetails
-      };
-    }
   } catch (error) {
     console.error('Error checking sheet existence:', error);
     return {
