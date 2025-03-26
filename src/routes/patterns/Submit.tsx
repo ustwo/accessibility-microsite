@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useFormSubmission, PatternSchema } from "../../utils/formSubmission";
 import { useAccessibleForm, ErrorSummary, ErrorMessage } from "../../utils/formUtils";
 import { useLocation } from "react-router-dom";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 // ScrollToTop component that uses React Router's useLocation
 function ScrollToTop() {
@@ -17,7 +18,7 @@ function ScrollToTop() {
 }
 
 export default function PatternsSubmit() {
-  const { handlePatternSubmit, patternErrors } = useFormSubmission();
+  const { handlePatternSubmit, patternErrors, isSubmittingPattern, statusMessage } = useFormSubmission();
   const [categoryOptions] = useState([
     "General patterns to follow", 
     "Patterns for good forms", 
@@ -61,6 +62,16 @@ export default function PatternsSubmit() {
         />
       </Helmet>
 
+      {/* Live region for screen reader announcements */}
+      <div 
+        className="sr-only" 
+        aria-live="assertive" 
+        role="status"
+        id="form-submission-status"
+      >
+        {statusMessage}
+      </div>
+
       <section className="content-section" aria-labelledby="submit-heading">
         <div className="container container-content">
           <p className="intro-text mb-8">
@@ -73,18 +84,33 @@ export default function PatternsSubmit() {
               <ErrorSummary errors={formErrors} />
             )}
             
-            <form onSubmit={(e) => {
-              // Prevent default form submission
-              e.preventDefault();
-              
-              // Run client-side validation
-              const isValid = handleSubmit(e);
-              
-              // If the form is valid according to client-side validation, submit to server
-              if (isValid) {
-                handlePatternSubmit(e);
-              }
-            }} className="submission-form" noValidate>
+            {/* Show loading spinner during submission */}
+            {isSubmittingPattern && (
+              <div 
+                className="form-loading-overlay"
+                aria-labelledby="form-submission-status"
+              >
+                <LoadingSpinner message="Submitting your pattern..." />
+              </div>
+            )}
+            
+            <form 
+              onSubmit={(e) => {
+                // Prevent default form submission
+                e.preventDefault();
+                
+                // Run client-side validation
+                const isValid = handleSubmit(e);
+                
+                // If the form is valid according to client-side validation, submit to server
+                if (isValid) {
+                  handlePatternSubmit(e);
+                }
+              }} 
+              className="submission-form" 
+              noValidate
+              aria-busy={isSubmittingPattern}
+            >
               <div className="form-group">
                 <label htmlFor="name">
                   Pattern Name <span className="required">*</span>
@@ -101,6 +127,7 @@ export default function PatternsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.name ? "name-error" : undefined}
                   aria-invalid={formErrors.name ? "true" : undefined}
+                  disabled={isSubmittingPattern}
                 />
                 <ErrorMessage id="name-error" error={formErrors.name} />
               </div>
@@ -119,6 +146,7 @@ export default function PatternsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.category ? "category-error" : undefined}
                   aria-invalid={formErrors.category ? "true" : undefined}
+                  disabled={isSubmittingPattern}
                 >
                   <option value="">Select a category</option>
                   {categoryOptions.map(option => (
@@ -139,6 +167,7 @@ export default function PatternsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.where ? "where-error" : undefined}
                   aria-invalid={formErrors.where ? "true" : undefined}
+                  disabled={isSubmittingPattern}
                 >
                   <option value="">Select where this pattern applies</option>
                   {whereOptions.map(option => (
@@ -165,6 +194,7 @@ export default function PatternsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.description ? "description-error" : undefined}
                   aria-invalid={formErrors.description ? "true" : undefined}
+                  disabled={isSubmittingPattern}
                 ></textarea>
                 <ErrorMessage id="description-error" error={formErrors.description} />
               </div>
@@ -182,6 +212,7 @@ export default function PatternsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.links ? "links-error" : undefined}
                   aria-invalid={formErrors.links ? "true" : undefined}
+                  disabled={isSubmittingPattern}
                 ></textarea>
                 <ErrorMessage id="links-error" error={formErrors.links} />
                 <p className="form-help">
@@ -191,8 +222,8 @@ export default function PatternsSubmit() {
               </div>
               
               <div className="form-actions">
-                <button type="submit" className="button">
-                  Submit Pattern
+                <button type="submit" className="button" disabled={isSubmittingPattern}>
+                  {isSubmittingPattern ? "Submitting..." : "Submit Pattern"}
                 </button>
               </div>
             </form>

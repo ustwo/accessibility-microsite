@@ -20,7 +20,7 @@ export default function ToolsIndex() {
   // Compute filter options directly from the tools data
   const availableFilters = getToolsFilterOptions(tools);
 
-  // Apply filters to tools
+  // Apply discipline filter to tools
   const filteredTools = tools.filter((tool) => {
     if (filterDiscipline && !tool.discipline.includes(filterDiscipline)) {
       return false;
@@ -112,32 +112,25 @@ export default function ToolsIndex() {
                         <h3 className="tool-name">{tool.name}</h3>
                         <p className="tool-description">{tool.description}</p>
 
-                        {tool.url &&
-                          tool.url !== "Link" &&
-                          tool.url !== "WIP" && (
-                            <a
-                              href={
-                                tool.url.startsWith("http")
-                                  ? tool.url
-                                  : `https://${tool.url}`
-                              }
-                              className="tool-link button"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              Visit Tool
-                            </a>
-                          )}
+                        {tool.url && (
+                          <a
+                            href={
+                              tool.url.startsWith("http")
+                                ? tool.url
+                                : `https://${tool.url}`
+                            }
+                            className="tool-link button"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Visit tool
+                          </a>
+                        )}
 
                         <div className="tool-meta">
                           {tool.discipline.length > 0 && (
                             <div className="tool-disciplines">
                               <strong>For:</strong> {tool.discipline.join(", ")}
-                            </div>
-                          )}
-                          {tool.source && (
-                            <div className="tool-source">
-                              <strong>Source:</strong> {tool.source}
                             </div>
                           )}
                         </div>

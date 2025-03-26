@@ -45,10 +45,17 @@ export function DataProvider({ children }: DataProviderProps) {
   const [error, setError] = useState<string | null>(null);
 
   // Function to load tools data
-  const loadTools = async () => {
+  const loadTools = async (forceRefresh = false) => {
     try {
       setIsLoadingTools(true);
+      // Clear cache if forceRefresh is true
+      if (forceRefresh) {
+        console.log('Forcing refresh of tools data - clearing cache');
+        clearAllCaches();
+      }
+      
       const data = await fetchAccessibilityTools();
+      console.log('Loaded tools:', data);
       setTools(data);
     } catch (err) {
       console.error('Error loading tools:', err);
@@ -75,7 +82,7 @@ export function DataProvider({ children }: DataProviderProps) {
   // Function to refresh all data (used after form submissions or manual refresh)
   const refreshData = async () => {
     setError(null);
-    await Promise.all([loadTools(), loadPatterns()]);
+    await Promise.all([loadTools(true), loadPatterns()]);
   };
 
   // Function to clear the cache and reload data
@@ -84,9 +91,9 @@ export function DataProvider({ children }: DataProviderProps) {
     refreshData();
   };
 
-  // Load data on initial mount
+  // Load data on initial mount, with forced refresh to clear any cached data
   useEffect(() => {
-    loadTools();
+    loadTools(true);
     loadPatterns();
   }, []);
 

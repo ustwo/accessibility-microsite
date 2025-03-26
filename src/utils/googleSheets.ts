@@ -415,59 +415,79 @@ async function appendSheetValues(spreadsheetId: string, sheetRange: string, valu
  * Fetch and process accessibility tools from Google Sheets
  */
 export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
-  console.log('fetchAccessibilityTools called');
-  
-  // Try to get data from cache first
-  const cachedTools = getFromCache<AccessibilityTool[]>(
-    CACHE_KEYS.TOOLS,
-    getCacheVersion('tools')
-  );
-  
-  if (cachedTools) {
-    console.log('Using cached tools data');
-    return cachedTools;
+  try {
+    console.log('Fetching accessibility tools...');
+    
+    // Check for cached tools first
+    const cachedTools = getFromCache<AccessibilityTool[]>(CACHE_KEYS.TOOLS, getCacheVersion('tools'));
+    if (cachedTools) {
+      console.log('Using cached tools');
+      return cachedTools;
+    }
+    
+    // For development without API access
+    if (IS_DEVELOPMENT && !hasApiCredentials()) {
+      console.log('Using mock tools data in development mode');
+      return mockTools;
+    }
+    
+    const rows = await fetchSheetValues(TOOLS_SHEET_ID, 'ustwo All Tools!A:G');
+    if (!rows || rows.length <= 1) {
+      return [];
+    }
+    
+    // Skip header row and any empty rows that might be at the top
+    const dataRows = rows.slice(1).filter(row => row.some(cell => cell && cell.trim() !== ''));
+    
+    // Map sheet data to AccessibilityTool objects and filter to only include external tools
+    const tools: AccessibilityTool[] = dataRows
+      // Only include rows with enough data to be useful
+      .filter(row => row.length >= 4)
+      // Only include external tools - column [1] is Source
+      .filter(row => row[1]?.toLowerCase() === 'external')
+      .map((row, index) => {
+        // Extract and clean up disciplines - split on commas and handle variations
+        const disciplineStr = row[0] || ''; // Discipline is in column 0
+        const disciplines = disciplineStr
+          .split(',')
+          .map(d => d.trim())
+          .filter(Boolean);
+        
+        // Determine URL - column [3] is URL
+        let url = row[3] || '';
+        // If URL doesn't start with http:// or https://, add https://
+        if (url && !url.toLowerCase().startsWith('http')) {
+          url = `https://${url}`;
+        }
+        
+        return {
+          id: `tool-${index}`,
+          name: row[2] || '', // Name is in column 2
+          description: row[4] || '', // Description is in column 4
+          url: url,
+          discipline: disciplines,
+          source: 'external', // Hardcode to external since we filtered for it
+          notes: row[5] || '' // Notes is in column 5
+        };
+      });
+    
+    console.log(`Fetched ${tools.length} external tools`);
+    
+    // Cache the result
+    saveToCache(CACHE_KEYS.TOOLS, tools, getCacheVersion('tools'));
+    
+    return tools;
+  } catch (error) {
+    console.error('Error fetching accessibility tools:', error);
+    
+    // Return mock data in case of error during development
+    if (IS_DEVELOPMENT) {
+      console.log('Using mock tools data due to error');
+      return mockTools;
+    }
+    
+    return [];
   }
-  
-  // For development without credentials, use mock data
-  if (IS_DEVELOPMENT && !hasApiCredentials()) {
-    console.log('Development mode detected without API credentials');
-    console.warn('Using mock tools data for development');
-    console.log('Mock tools data:', mockTools);
-    return mockTools;
-  }
-
-  console.log('Fetching real data from sheets, development mode:', IS_DEVELOPMENT);
-  console.log('Has API credentials:', hasApiCredentials());
-  console.log('Tools sheet ID:', TOOLS_SHEET_ID);
-  
-  const rows = await fetchSheetValues(TOOLS_SHEET_ID, 'ustwo All Tools!A2:G');
-  console.log('Rows fetched from Google Sheets:', rows);
-  
-  if (!rows) {
-    console.error('Failed to fetch tools data, falling back to mock data');
-    // Fallback to mock data if we can't get real data, for better user experience
-    return mockTools;
-  }
-
-  // Process the rows into AccessibilityTool objects
-  const toolsData = rows.map((row, index) => {
-    const tool: AccessibilityTool = {
-      id: `tool-${index + 1}`,
-      name: row[0] || '',
-      description: row[1] || '',
-      url: row[2] || '',
-      discipline: (row[3] || '').split(',').map(s => s.trim()).filter(Boolean),
-      source: row[4] || '',
-      notes: row[5] || '',
-    };
-    return tool;
-  });
-  
-  // Cache the processed data
-  saveToCache(CACHE_KEYS.TOOLS, toolsData, getCacheVersion('tools'));
-  
-  console.log('Processed tools data:', toolsData);
-  return toolsData;
 }
 
 /**
@@ -631,58 +651,56 @@ export async function submitNewItem(
   data: Partial<AccessibilityTool | AccessibilityPattern>
 ): Promise<boolean> {
   try {
-    // For development without API access
-    if (IS_DEVELOPMENT && !hasApiCredentials()) {
-      console.log(`MOCK: Would submit ${type} data:`, data);
-      return true;
-    }
-    
-    // Determine which sheet to use based on type
-    let spreadsheetId = '';
-    let range = '';
-    let values: string[][] = [];
+    // Determine which spreadsheet and sheet range to use
+    let spreadsheetId: string;
+    let sheetRange: string;
+    let values: string[][];
     
     if (type === 'tool') {
       spreadsheetId = TOOLS_SHEET_ID;
-      range = 'ustwo All Tools!A:G';
+      // Change destination sheet to "microsite submitted Tools"
+      sheetRange = 'microsite submitted Tools!A:G';
+      
+      // Format the tool data
       const toolData = data as Partial<AccessibilityTool>;
+      const disciplines = Array.isArray(toolData.discipline) 
+        ? toolData.discipline.join(', ') 
+        : (toolData.discipline || '');
+      
       values = [[
-        '', // ID (will be assigned by sheet formula)
         toolData.name || '',
         toolData.description || '',
         toolData.url || '',
-        Array.isArray(toolData.discipline) ? toolData.discipline.join(', ') : '',
-        toolData.source || '',
-        toolData.notes || ''
+        disciplines,
+        toolData.source || 'external', // Default to external if not provided
+        toolData.notes || '',
+        new Date().toISOString() // Add timestamp
       ]];
-    } else if (type === 'pattern') {
+    } else {
+      // Pattern submission
       spreadsheetId = PATTERNS_SHEET_ID;
-      range = 'ustwo pattern library!A:F';
+      sheetRange = 'Patterns!A:F';
+      
+      // Format the pattern data
       const patternData = data as Partial<AccessibilityPattern>;
-      // Format links if they exist
-      let linksFormatted = '';
-      if (patternData.linkyDinks && patternData.linkyDinks.length > 0) {
-        linksFormatted = patternData.linkyDinks.map(link => 
-          `${link.title}:${link.url}`
-        ).join('\n');
-      }
+      const links = Array.isArray(patternData.linkyDinks) 
+        ? patternData.linkyDinks.map(link => `${link.title}: ${link.url}`).join('\n') 
+        : '';
       
       values = [[
-        '', // ID (will be assigned by sheet formula)
         patternData.name || '',
         patternData.category || '',
         patternData.where || '',
         patternData.description || '',
-        linksFormatted
+        links,
+        new Date().toISOString() // Add timestamp
       ]];
-    } else {
-      throw new Error(`Invalid item type: ${type}`);
     }
     
-    // Append data to sheet
-    return await appendSheetValues(spreadsheetId, range, values);
+    // Let's use the append values API to add a new row
+    return await appendSheetValues(spreadsheetId, sheetRange, values);
   } catch (error) {
-    console.error(`Error submitting ${type}:`, error);
+    console.error(`Error submitting new ${type}:`, error);
     return false;
   }
 }

@@ -3,13 +3,16 @@ import { submitNewItem } from "./googleSheets";
 import { z } from "zod";
 import { useState } from "react";
 
+// Define the valid discipline values
+const validDisciplines = ["Tech", "Design", "All", "Delivery", "Client", "QA", "Strategy", "Product"];
+
 // Define validation schemas using Zod
 export const ToolSchema = z.object({
   name: z.string().min(1, "Please enter a tool name"),
   description: z.string().min(1, "Please provide a description"),
-  url: z.string().min(1, "Please enter a URL"),
-  discipline: z.array(z.string()).min(1, "Please specify which disciplines this tool is for"),
-  source: z.string().min(1, "Please specify the source of the tool"),
+  url: z.string().min(1, "Please enter a URL").url("Please enter a valid URL"),
+  discipline: z.array(z.enum(validDisciplines as [string, ...string[]])).min(1, "Please specify which disciplines this tool is for"),
+  source: z.string().min(1, "Please specify the source of the tool").default("external"),
   notes: z.string().optional(),
 });
 
@@ -180,66 +183,162 @@ export function useFormSubmission() {
   const [toolErrors, setToolErrors] = useState<Record<string, string>>({});
   const [patternErrors, setPatternErrors] = useState<Record<string, string>>({});
   
+  // Add loading states for each form type
+  const [isSubmittingTool, setIsSubmittingTool] = useState<boolean>(false);
+  const [isSubmittingPattern, setIsSubmittingPattern] = useState<boolean>(false);
+  
+  // Status message for screen readers (live region)
+  const [statusMessage, setStatusMessage] = useState<string>("");
+  
   const handleToolSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    // Note: preventDefault is already called in the form component
-    const form = event.currentTarget;
-    const formData = new FormData(form);
+    // Start loading state and announce to screen readers
+    setIsSubmittingTool(true);
+    setStatusMessage("Submitting your tool. Please wait...");
     
-    // Clear any previous server errors only if explicitly needed
-    // We're not clearing errors here, as they'll only clear on blur
-    
-    const result = await submitToolForm(formData);
-    if (result.success) {
-      navigate('/tools/submit/success');
-    } else if (result.errors) {
-      // Set errors for the form to display
-      setToolErrors(result.errors);
+    try {
+      // Note: preventDefault is already called in the form component
+      const form = event.currentTarget;
+      const formData = new FormData(form);
       
-      // Scroll to top for error summary
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Submit the form data
+      const result = await submitToolForm(formData);
       
-      // Focus error summary after a short delay
+      if (result.success) {
+        // Update status for screen readers
+        setStatusMessage("Tool submitted successfully! Redirecting to success page.");
+        
+        // Navigate after a short delay to ensure screen readers announce success
+        // Keep the loading state active until navigation
+        setTimeout(() => {
+          navigate('/tools/submit/success');
+          // We don't set isSubmittingTool to false here because we're navigating away
+        }, 500);
+        
+        // Don't set isSubmittingTool to false since we're navigating away
+        return;
+      } else if (result.errors) {
+        // Update status for screen readers
+        setStatusMessage("There were errors in your submission. Please correct them and try again.");
+        
+        // Set errors for the form to display
+        setToolErrors(result.errors);
+        
+        // Scroll to top for error summary
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Focus error summary after a short delay
+        setTimeout(() => {
+          const errorSummary = document.getElementById('error-summary');
+          if (errorSummary) {
+            errorSummary.focus();
+          }
+          
+          // Only disable the loading state after errors are displayed and focus is set
+          setIsSubmittingTool(false);
+        }, 100);
+        
+        // Don't set isSubmittingTool to false here, it's set in the timeout above
+        return;
+      }
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      setStatusMessage("An unexpected error occurred. Please try again.");
+      
+      setToolErrors({
+        _form: "An unexpected error occurred. Please try again."
+      });
+      
+      // For unexpected errors, we'll disable the loading state after a short delay
       setTimeout(() => {
-        const errorSummary = document.getElementById('error-summary');
-        if (errorSummary) {
-          errorSummary.focus();
-        }
+        setIsSubmittingTool(false);
       }, 100);
+      
+      return;
     }
+    
+    // This will only run if none of the above return statements execute
+    // (i.e., if there's some unhandled condition)
+    setIsSubmittingTool(false);
   };
   
   const handlePatternSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    // Note: preventDefault is already called in the form component
-    const form = event.currentTarget;
-    const formData = new FormData(form);
+    // Start loading state and announce to screen readers
+    setIsSubmittingPattern(true);
+    setStatusMessage("Submitting your pattern. Please wait...");
     
-    // Clear any previous server errors only if explicitly needed
-    // We're not clearing errors here, as they'll only clear on blur
-    
-    const result = await submitPatternForm(formData);
-    if (result.success) {
-      navigate('/patterns/submit/success');
-    } else if (result.errors) {
-      // Set errors for the form to display
-      setPatternErrors(result.errors);
+    try {
+      // Note: preventDefault is already called in the form component
+      const form = event.currentTarget;
+      const formData = new FormData(form);
       
-      // Scroll to top for error summary
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Submit the form data
+      const result = await submitPatternForm(formData);
       
-      // Focus error summary after a short delay
+      if (result.success) {
+        // Update status for screen readers
+        setStatusMessage("Pattern submitted successfully! Redirecting to success page.");
+        
+        // Navigate after a short delay to ensure screen readers announce success
+        // Keep the loading state active until navigation
+        setTimeout(() => {
+          navigate('/patterns/submit/success');
+          // We don't set isSubmittingPattern to false here because we're navigating away
+        }, 500);
+        
+        // Don't set isSubmittingPattern to false since we're navigating away
+        return;
+      } else if (result.errors) {
+        // Update status for screen readers
+        setStatusMessage("There were errors in your submission. Please correct them and try again.");
+        
+        // Set errors for the form to display
+        setPatternErrors(result.errors);
+        
+        // Scroll to top for error summary
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Focus error summary after a short delay
+        setTimeout(() => {
+          const errorSummary = document.getElementById('error-summary');
+          if (errorSummary) {
+            errorSummary.focus();
+          }
+          
+          // Only disable the loading state after errors are displayed and focus is set
+          setIsSubmittingPattern(false);
+        }, 100);
+        
+        // Don't set isSubmittingPattern to false here, it's set in the timeout above
+        return;
+      }
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      setStatusMessage("An unexpected error occurred. Please try again.");
+      
+      setPatternErrors({
+        _form: "An unexpected error occurred. Please try again."
+      });
+      
+      // For unexpected errors, we'll disable the loading state after a short delay
       setTimeout(() => {
-        const errorSummary = document.getElementById('error-summary');
-        if (errorSummary) {
-          errorSummary.focus();
-        }
+        setIsSubmittingPattern(false);
       }, 100);
+      
+      return;
     }
+    
+    // This will only run if none of the above return statements execute
+    // (i.e., if there's some unhandled condition)
+    setIsSubmittingPattern(false);
   };
   
   return { 
     handleToolSubmit, 
     handlePatternSubmit,
     toolErrors,
-    patternErrors
+    patternErrors,
+    isSubmittingTool,
+    isSubmittingPattern,
+    statusMessage
   };
 } 

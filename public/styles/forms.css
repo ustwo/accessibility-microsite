@@ -10,6 +10,53 @@
   background-color: var(--color-white);
   border-radius: var(--border-radius-md);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative; /* For positioning the loading overlay */
+}
+
+/* Form loading overlay */
+.form-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: var(--border-radius-md);
+  backdrop-filter: blur(2px);
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Ensure form inputs transition smoothly when disabled/enabled */
+.form-control,
+button,
+input,
+textarea,
+select,
+fieldset {
+  transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Disable form inputs when loading */
+.form-control:disabled,
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled,
+fieldset:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: var(--color-gray-100);
 }
 
 /* Form group */
@@ -32,6 +79,19 @@
   margin-left: var(--space-1);
 }
 
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Form controls */
 .form-control {
   display: block;
@@ -41,7 +101,7 @@
   border: 2px solid var(--color-gray-300);
   border-radius: var(--border-radius-sm);
   font-size: var(--font-size-base);
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s ease, background-color 0.3s ease;
 }
 
 .form-control:focus {
@@ -79,6 +139,18 @@
   background-color: rgba(var(--color-error-rgb), 0.05);
   border-radius: var(--border-radius-sm);
   width: 100%;
+  animation: slideDown 0.3s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .error-summary h2 {
@@ -162,6 +234,17 @@ button:focus,
 .button:focus {
   outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
+}
+
+/* Submit button state transitions */
+button[type="submit"],
+.button[type="submit"] {
+  transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
+}
+
+button[type="submit"]:disabled,
+.button[type="submit"]:disabled {
+  opacity: 0.7;
 }
 
 /* Validation cues - checkmark for valid fields */

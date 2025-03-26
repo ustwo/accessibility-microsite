@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useFormSubmission, ToolSchema } from "../../utils/formSubmission";
 import { useAccessibleForm, ErrorSummary, ErrorMessage } from "../../utils/formUtils";
 import { useLocation } from "react-router-dom";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 // ScrollToTop component that uses React Router's useLocation
 function ScrollToTop() {
@@ -17,7 +18,7 @@ function ScrollToTop() {
 }
 
 export default function ToolsSubmit() {
-  const { handleToolSubmit, toolErrors } = useFormSubmission();
+  const { handleToolSubmit, toolErrors, isSubmittingTool, statusMessage } = useFormSubmission();
   const [disciplineOptions] = useState([
     "All", "Design", "Tech", "Product", "QA", "Delivery", "Strategy", "Client"
   ]);
@@ -37,7 +38,7 @@ export default function ToolsSubmit() {
       description: "",
       url: "",
       discipline: [],
-      source: "",
+      source: "external",
       notes: ""
     },
     ToolSchema, // Pass the Zod schema for client-side validation
@@ -55,6 +56,16 @@ export default function ToolsSubmit() {
         />
       </Helmet>
 
+      {/* Live region for screen reader announcements */}
+      <div 
+        className="sr-only" 
+        aria-live="assertive" 
+        role="status"
+        id="form-submission-status"
+      >
+        {statusMessage}
+      </div>
+
       <section className="content-section" aria-labelledby="submit-heading">
         <div className="container container-content">
           <p className="intro-text mb-8">
@@ -67,18 +78,33 @@ export default function ToolsSubmit() {
               <ErrorSummary errors={formErrors} />
             )}
             
-            <form onSubmit={(e) => {
-              // Prevent default form submission
-              e.preventDefault();
-              
-              // Run client-side validation
-              const isValid = handleSubmit(e);
-              
-              // If the form is valid according to client-side validation, submit to server
-              if (isValid) {
-                handleToolSubmit(e);
-              }
-            }} className="submission-form" noValidate>
+            {/* Show loading spinner during submission */}
+            {isSubmittingTool && (
+              <div 
+                className="form-loading-overlay" 
+                aria-labelledby="form-submission-status"
+              >
+                <LoadingSpinner message="Submitting your tool..." />
+              </div>
+            )}
+            
+            <form 
+              onSubmit={(e) => {
+                // Prevent default form submission
+                e.preventDefault();
+                
+                // Run client-side validation
+                const isValid = handleSubmit(e);
+                
+                // If the form is valid according to client-side validation, submit to server
+                if (isValid) {
+                  handleToolSubmit(e);
+                }
+              }} 
+              className="submission-form" 
+              noValidate
+              aria-busy={isSubmittingTool}
+            >
               <div className="form-group">
                 <label htmlFor="name">
                   Tool Name <span className="required">*</span>
@@ -95,6 +121,7 @@ export default function ToolsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.name ? "name-error" : undefined}
                   aria-invalid={formErrors.name ? "true" : undefined}
+                  disabled={isSubmittingTool}
                 />
                 <ErrorMessage id="name-error" error={formErrors.name} />
               </div>
@@ -115,6 +142,7 @@ export default function ToolsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.description ? "description-error" : undefined}
                   aria-invalid={formErrors.description ? "true" : undefined}
+                  disabled={isSubmittingTool}
                 ></textarea>
                 <ErrorMessage id="description-error" error={formErrors.description} />
               </div>
@@ -135,13 +163,14 @@ export default function ToolsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.url ? "url-error" : undefined}
                   aria-invalid={formErrors.url ? "true" : undefined}
+                  disabled={isSubmittingTool}
                 />
                 <ErrorMessage id="url-error" error={formErrors.url} />
                 <p className="form-help">Enter the URL where this tool can be found</p>
               </div>
               
               <div className="form-group">
-                <fieldset>
+                <fieldset disabled={isSubmittingTool}>
                   <legend>
                     Which disciplines is this tool for? <span className="required">*</span>
                   </legend>
@@ -160,6 +189,7 @@ export default function ToolsSubmit() {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           aria-describedby={formErrors.discipline ? "discipline-error" : undefined}
+                          disabled={isSubmittingTool}
                         />
                         <label htmlFor={`discipline-${option.toLowerCase()}`}>{option}</label>
                       </div>
@@ -179,6 +209,7 @@ export default function ToolsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.source ? "source-error" : undefined}
                   aria-invalid={formErrors.source ? "true" : undefined}
+                  disabled={isSubmittingTool}
                 >
                   <option value="">Select a source</option>
                   {sourceOptions.map(option => (
@@ -202,13 +233,14 @@ export default function ToolsSubmit() {
                   onBlur={handleBlur}
                   aria-describedby={formErrors.notes ? "notes-error" : undefined}
                   aria-invalid={formErrors.notes ? "true" : undefined}
+                  disabled={isSubmittingTool}
                 ></textarea>
                 <ErrorMessage id="notes-error" error={formErrors.notes} />
               </div>
               
               <div className="form-actions">
-                <button type="submit" className="button">
-                  Submit Tool
+                <button type="submit" className="button" disabled={isSubmittingTool}>
+                  {isSubmittingTool ? "Submitting..." : "Submit Tool"}
                 </button>
               </div>
             </form>
