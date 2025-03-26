@@ -11,7 +11,7 @@
 }
 
 .hero-section h1 {
-  font-size: var(--font-size-hero);
+  font-size: calc(2.4rem + 1vw - 7.40741px);
   font-weight: 700;
   max-width: 20ch;
   margin-left: auto;
