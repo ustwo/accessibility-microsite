@@ -81,7 +81,7 @@ export interface AccessibilityTool {
   description: string;
   url: string;
   discipline: string[];
-  source: string;
+  source?: string;
   notes: string;
 }
 
@@ -670,6 +670,9 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
           // Ensure URL has a scheme
           if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
             url = 'https://' + url;
+          } else if (url && url.startsWith('http://')) {
+            // Convert http:// to https://
+            url = 'https://' + url.substring(7);
           }
           
           if (url) {
@@ -688,6 +691,9 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
               // Ensure URL has a scheme
               if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
                 url = 'https://' + url;
+              } else if (url && url.startsWith('http://')) {
+                // Convert http:// to https://
+                url = 'https://' + url.substring(7);
               }
               
               if (title && url) {
@@ -700,6 +706,9 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
               // Ensure URL has a scheme
               if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
                 url = 'https://' + url;
+              } else if (url && url.startsWith('http://')) {
+                // Convert http:// to https://
+                url = 'https://' + url.substring(7);
               }
               
               if (url) {
@@ -785,7 +794,7 @@ export async function submitNewItem(
     if (type === 'tool') {
       spreadsheetId = TOOLS_SHEET_ID;
       // Change destination sheet to "microsite submitted Tools"
-      sheetRange = 'microsite submitted Tools!A:G';
+      sheetRange = 'microsite submitted Tools!A:F'; // Updated column range to skip source field
       
       // Format the tool data
       const toolData = data as Partial<AccessibilityTool>;
@@ -798,7 +807,6 @@ export async function submitNewItem(
         toolData.description || '',
         toolData.url || '',
         disciplines,
-        toolData.source || 'external', // Default to external if not provided
         toolData.notes || '',
         new Date().toISOString() // Add timestamp
       ]];

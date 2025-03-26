@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { 
   fetchAccessibilityTools, 
   fetchAccessibilityPatterns,
-  getAccessToken
+  getAccessToken,
+  fetchSheetValues
 } from './googleSheets';
 import * as cacheUtils from './cacheUtils';
 import { mockTools, mockPatterns } from '../data/mockData';
@@ -20,13 +21,38 @@ vi.mock('./cacheUtils', () => ({
   clearAllCaches: vi.fn()
 }));
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value.toString();
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    key: vi.fn((index: number) => Object.keys(store)[index] || null),
+    length: 0, // Will be updated dynamically in tests that need it
+    // For test inspection
+    _getStore: () => ({ ...store })
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
 // Define type for the actual module
 interface GoogleSheetsModule {
   fetchAccessibilityTools: typeof fetchAccessibilityTools;
   fetchAccessibilityPatterns: typeof fetchAccessibilityPatterns;
   getAccessToken: typeof getAccessToken;
+  fetchSheetValues: typeof fetchSheetValues;
   hasApiCredentials: () => boolean;
-  fetchSheetValues: (spreadsheetId: string, range: string, retryCount?: number) => Promise<string[][] | null>;
 }
 
 // Mock the googleSheets module
@@ -35,7 +61,6 @@ vi.mock('./googleSheets', async () => {
   return {
     ...actual,
     hasApiCredentials: vi.fn().mockReturnValue(true),
-    fetchSheetValues: vi.fn(),
     // Explicitly provide our own mock implementations for the functions we're testing
     fetchAccessibilityTools: async () => {
       // Check if cache is requested
@@ -91,6 +116,16 @@ describe('Google Sheets Integration', () => {
     vi.mocked(fetch).mockReset();
     vi.mocked(cacheUtils.getFromCache).mockReset();
     vi.mocked(cacheUtils.saveToCache).mockReset();
+    
+    // Reset localStorage mock
+    localStorageMock.clear();
+    
+    // Mock timers for rate limiting tests
+    vi.useFakeTimers();
+  });
+  
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('Token handling', () => {
@@ -184,6 +219,179 @@ describe('Google Sheets Integration', () => {
       expect(patterns[0].isSection).toBe(true);
       expect(patterns[0].name).toBe('Section Title');
       expect(patterns[1].name).toBe('Pattern 1');
+    });
+  });
+  
+  describe('Rate Limiting and Enhanced Caching', () => {
+    beforeEach(() => {
+      // Import the real fetchSheetValues function for testing
+      vi.doMock('./googleSheets', async () => {
+        const actual = await vi.importActual('./googleSheets');
+        return {
+          ...actual,
+          hasApiCredentials: vi.fn().mockReturnValue(true)
+        };
+      });
+      
+      // Mock fetch to return a success response for the actual implementations
+      vi.mocked(fetch).mockImplementation(async (url) => {
+        if (url.toString().includes('oauth2.googleapis.com/token')) {
+          return {
+            ok: true,
+            json: () => Promise.resolve({ access_token: 'test-token' }),
+          } as Response;
+        } else if (url.toString().includes('sheets.googleapis.com')) {
+          return {
+            ok: true,
+            json: () => Promise.resolve({ values: [['A1', 'B1'], ['A2', 'B2']] }),
+          } as Response;
+        }
+        return { ok: false } as Response;
+      });
+      
+      // Make sure cacheUtils.getFromCache always returns null for fresh tests
+      vi.mocked(cacheUtils.getFromCache).mockReturnValue(null);
+    });
+    
+    it('should use specific sheet cache when available', async () => {
+      // Setup - mock localStorage for sheet-specific cache
+      const cacheKey = 'sheets_data_test-sheet-id_TestRange_A_G';
+      const cachedData = {
+        data: [['Cached1', 'Cached2'], ['CachedA', 'CachedB']],
+        timestamp: Date.now() // Current timestamp (within cache duration)
+      };
+      
+      localStorageMock.setItem(cacheKey, JSON.stringify(cachedData));
+      
+      // Get the real fetchSheetValues
+      const { fetchSheetValues } = await vi.importActual<GoogleSheetsModule>('./googleSheets');
+      
+      // Token for the API call
+      vi.mocked(cacheUtils.getFromCache).mockReturnValueOnce('test-token');
+      
+      // Test
+      const result = await fetchSheetValues('test-sheet-id', 'TestRange!A:G');
+      
+      // Verify cache was used instead of making API call
+      expect(result).toEqual(cachedData.data);
+      expect(localStorageMock.getItem).toHaveBeenCalledWith(cacheKey);
+      // The fetch should not have been called because we used cache
+      expect(fetch).not.toHaveBeenCalledWith(expect.stringContaining('sheets.googleapis.com'));
+    });
+    
+    it('should respect rate limits when making multiple requests', async () => {
+      // Get the real fetchSheetValues
+      const { fetchSheetValues } = await vi.importActual<GoogleSheetsModule>('./googleSheets');
+      
+      // Token for API calls
+      vi.mocked(cacheUtils.getFromCache).mockReturnValue('test-token');
+      
+      // Setup fetch counter to track calls
+      let fetchCounter = 0;
+      vi.mocked(fetch).mockImplementation(async (url) => {
+        if (url.toString().includes('sheets.googleapis.com')) {
+          fetchCounter++;
+          return {
+            ok: true,
+            json: () => Promise.resolve({ values: [['Call', fetchCounter.toString()]] }),
+          } as Response;
+        }
+        return {
+          ok: true,
+          json: () => Promise.resolve({ access_token: 'test-token' }),
+        } as Response;
+      });
+      
+      // Make first request
+      const firstPromise = fetchSheetValues('test-sheet-id', 'Range1!A:B');
+      
+      // Try to make second request immediately (should be delayed by rate limiting)
+      const secondPromise = fetchSheetValues('test-sheet-id', 'Range2!A:B');
+      
+      // Advance timers by enough time to process both requests
+      await vi.advanceTimersByTimeAsync(2000);
+      
+      // Get the results
+      const result1 = await firstPromise;
+      const result2 = await secondPromise;
+      
+      // Verify that both requests were successful but properly rate limited
+      expect(fetchCounter).toBe(2); // Both requests were made
+      expect(result1).toEqual([['Call', '1']]);
+      expect(result2).toEqual([['Call', '2']]);
+    }, 10000);
+    
+    it('should handle 429 rate limit errors with special backoff', async () => {
+      // Get the real fetchSheetValues
+      const { fetchSheetValues } = await vi.importActual<GoogleSheetsModule>('./googleSheets');
+      
+      // Token for API calls
+      vi.mocked(cacheUtils.getFromCache).mockReturnValue('test-token');
+      
+      // First call gets a 429, then succeeds on retry
+      let callCount = 0;
+      vi.mocked(fetch).mockImplementation(async () => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            ok: false,
+            status: 429,
+            statusText: 'Too Many Requests',
+            json: () => Promise.resolve({ error: { code: 429, message: 'Quota exceeded' } }),
+            text: () => Promise.resolve(JSON.stringify({
+              error: { code: 429, message: 'Quota exceeded' }
+            }))
+          } as Response;
+        } else {
+          return {
+            ok: true,
+            json: () => Promise.resolve({ values: [['Retry', 'Success']] }),
+          } as Response;
+        }
+      });
+      
+      // Start the request (will initially fail with 429)
+      const requestPromise = fetchSheetValues('test-sheet-id', 'Range1!A:B');
+      
+      // Advance time in smaller increments to avoid timeout issues
+      for (let i = 0; i < 30; i++) {
+        await vi.advanceTimersByTimeAsync(200);
+      }
+      
+      // Get the result after retry
+      const result = await requestPromise;
+      
+      // Verify that the retry succeeded
+      expect(callCount).toBe(2);
+      expect(result).toEqual([['Retry', 'Success']]);
+    }, 20000);
+    
+    it('should cache successful sheet responses', async () => {
+      // Get the real fetchSheetValues
+      const { fetchSheetValues } = await vi.importActual<GoogleSheetsModule>('./googleSheets');
+      
+      // Token for API calls
+      vi.mocked(cacheUtils.getFromCache).mockReturnValue('test-token');
+      
+      // Make a successful request
+      await fetchSheetValues('test-sheet-id', 'TestRange!A:G');
+      
+      // Check that it was cached
+      const cacheKey = 'sheets_data_test-sheet-id_TestRange_A_G';
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        cacheKey,
+        expect.stringContaining('timestamp')
+      );
+      
+      // The localStorage should contain our cache entry
+      const storedValue = localStorageMock._getStore()[cacheKey];
+      expect(storedValue).toBeDefined();
+      
+      // Parse the cached data
+      const cachedData = JSON.parse(storedValue);
+      expect(cachedData).toHaveProperty('data');
+      expect(cachedData).toHaveProperty('timestamp');
+      expect(Array.isArray(cachedData.data)).toBe(true);
     });
   });
 }); 

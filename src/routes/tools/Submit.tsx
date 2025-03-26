@@ -10,7 +10,6 @@ export default function ToolsSubmit() {
   const [disciplineOptions] = useState([
     "All", "Design", "Tech", "Product", "QA", "Delivery", "Strategy", "Client"
   ]);
-  const [sourceOptions] = useState(["ustwo", "external"]);
 
   // Use the accessible form hook with client-side validation
   const {
@@ -26,7 +25,6 @@ export default function ToolsSubmit() {
       description: "",
       url: "",
       discipline: [],
-      source: "external",
       notes: ""
     },
     ToolSchema, // Pass the Zod schema for client-side validation
@@ -183,28 +181,6 @@ export default function ToolsSubmit() {
                     ))}
                   </div>
                 </fieldset>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="source">Source</label>
-                <select
-                  id="source"
-                  name="source"
-                  className={`form-control ${formErrors.source ? "input-error" : ""}`}
-                  value={formValues.source}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  aria-describedby={formErrors.source ? "source-error" : undefined}
-                  aria-invalid={formErrors.source ? "true" : undefined}
-                  disabled={isSubmittingTool}
-                >
-                  <option value="">Select a source</option>
-                  {sourceOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-                <ErrorMessage id="source-error" error={formErrors.source} />
-                <p className="form-help">Is this tool from ustwo or external?</p>
               </div>
               
               <div className="form-group">

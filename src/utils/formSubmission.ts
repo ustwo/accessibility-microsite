@@ -10,9 +10,14 @@ const validDisciplines = ["Tech", "Design", "All", "Delivery", "Client", "QA", "
 export const ToolSchema = z.object({
   name: z.string().min(1, "Please enter a tool name"),
   description: z.string().min(1, "Please provide a description"),
-  url: z.string().min(1, "Please enter a URL").url("Please enter a valid URL"),
+  url: z.string()
+    .min(1, "Please enter a URL")
+    .url("Please enter a valid URL")
+    .refine(
+      (url) => url.startsWith('https://'),
+      { message: "URL must start with https://" }
+    ),
   discipline: z.array(z.enum(validDisciplines as [string, ...string[]])).min(1, "Please specify which disciplines this tool is for"),
-  source: z.string().min(1, "Please specify the source of the tool").default("external"),
   notes: z.string().optional(),
 });
 
@@ -64,7 +69,6 @@ export async function submitToolForm(formData: FormData): Promise<{success: bool
       description: result.data.description,
       url: result.data.url,
       discipline: result.data.discipline,
-      source: result.data.source,
       notes: result.data.notes || '',
     };
 
@@ -129,7 +133,17 @@ export async function submitPatternForm(formData: FormData): Promise<{success: b
         const [title, url] = part.split(':').map(s => s.trim());
         
         if (title && url) {
-          linkyDinks.push({ title, url });
+          // Ensure URL has https scheme
+          let processedUrl = url;
+          if (!processedUrl.startsWith('https://')) {
+            if (processedUrl.startsWith('http://')) {
+              processedUrl = 'https://' + processedUrl.substring(7);
+            } else {
+              processedUrl = 'https://' + processedUrl;
+            }
+          }
+          
+          linkyDinks.push({ title, url: processedUrl });
         } else if (part.trim()) {
           // If only one part, treat it as both title and URL
           linkyDinks.push({ 
