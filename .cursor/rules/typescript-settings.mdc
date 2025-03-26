@@ -1,9 +1,0 @@
----
-description: Writing typescript
-globs: 
-alwaysApply: false
----
-
-# Your rule content
-
-Please prefer interfaces over types. Please make sure to use named consts where possible. Frontend should reflect backend. Types should be generated from schema where possible

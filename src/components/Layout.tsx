@@ -44,7 +44,7 @@ export default function Layout({ children, title }: LayoutProps) {
 
       <main id="main-content" className="site-main">
         {title && (
-          <div className="page-header bg-primary py-6">
+          <div className="page-header py-6">
             <div className="container container-content">
               <h1 className="text-light">{title}</h1>
             </div>
@@ -95,7 +95,7 @@ export default function Layout({ children, title }: LayoutProps) {
                   <Link to="/checklist">Think beyond touch</Link>
                 </li>
                 <li>
-                  <Link to="/screen-reader">Close your eyes</Link>
+                  <Link to="/screen-reader-guide">Close your eyes</Link>
                 </li>
                 <li>
                   <Link to="/testing-templates">Party party (test) party</Link>
@@ -131,10 +131,10 @@ export default function Layout({ children, title }: LayoutProps) {
                 </li>
                 <li>
                   <Link 
-                    to="/screen-reader" 
-                    aria-current={isCurrentPage("/screen-reader") ? "page" : undefined}
+                    to="/screen-reader-guide" 
+                    aria-current={isCurrentPage("/screen-reader-guide") ? "page" : undefined}
                   >
-                    Screen reader tutorial
+                    Screen reader guide
                   </Link>
                 </li>
                 <li>

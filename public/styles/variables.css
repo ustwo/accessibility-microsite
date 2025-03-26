@@ -177,7 +177,8 @@
     
     /* The rest */
     --color-darkRed     : #980039;
-    --color-orange      : #FF6736;
+    --color-orange      : #ff6736;
+    --color-orange-with-white-text      : #f16131;
     --color-lime        : #C2F741;
     --color-darkBlue    : #1D2677;
     --color-pink        : #F7A5FF;

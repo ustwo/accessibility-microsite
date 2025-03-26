@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+### 1. Accessibility and Testing Standards
+
+Please ensure
+- Unit testing for all components
+- Keyboard accessibility for all interactive elements
+- Proper semantic HTML
+- Correct ARIA attribute usage
+- No inline styles
+- Use of CSS instead of Tailwind
+- Proper image alt text
+- Form label associations
+- Correct React Router 7 usage
+- Focus management for client-side routing
+
+
+### 2. CSS Guidelines
+
+Ensure:
+- Descriptive class names
+- Visible keyboard focus styles
+- Use of relative units over pixels
+- Accessible color contrast guidelines
+- Support for reduced motion preferences
+- Logical tab order (no positive tabindex values)
+- Mobile-first responsive design
+- Limited use of !important
+
+
+### 3. Keyboard Accessibility
+
+All interactive elements must be:
+1. Focusable with the keyboard
+2. Operable with the keyboard (Enter for links/buttons, Space for buttons/checkboxes)
+3. Have a visible focus indicator
+4. Follow a logical tab order
+
+### 4. Screen Reader Accessibility
+
+Ensure that:
+1. All images have meaningful alt text (or empty alt for decorative images)
+2. Form controls have proper labels
+3. ARIA attributes are used correctly
+4. Semantic HTML is used wherever possible 

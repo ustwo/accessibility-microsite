@@ -63,7 +63,7 @@ export const routes: RouteObject[] = [
         ]
       },
       {
-        path: 'screen-reader',
+        path: 'screen-reader-guide',
         children: [
           {
             index: true,

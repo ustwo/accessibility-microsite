@@ -1,16 +1,14 @@
 import { useState } from "react";
 import Layout from "../../components/Layout";
 import { Helmet } from "react-helmet";
-import {
-  getToolsFilterOptions,
-} from "../../utils/googleSheets";
+import { getToolsFilterOptions } from "../../utils/googleSheets";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useData } from "../../context/DataContext";
 
 export default function ToolsIndex() {
-  const { tools, isLoadingTools, error, refreshData } = useData();
+  const { tools, isLoadingTools, error } = useData();
   const [filterDiscipline, setFilterDiscipline] = useState<string | null>(null);
-  
+
   // Compute filter options directly from the tools data
   const availableFilters = getToolsFilterOptions(tools);
 
@@ -32,16 +30,24 @@ export default function ToolsIndex() {
         />
       </Helmet>
       {/* Filters */}
-      <div className="filters-bar">
+      <div
+        className="filters-bar"
+        role="region"
+        aria-labelledby="filters-heading"
+      >
         <div className="container container-content">
           <div className="filters-container">
+            <h2 id="filters-heading" className="sr-only">
+              Filter tools
+            </h2>
             <div className="filters-row">
               <div className="filter-group">
-                <label htmlFor="disciplineFilter">Discipline:</label>
+                <label htmlFor="disciplineFilter">Filter by discipline:</label>
                 <select
                   id="disciplineFilter"
                   value={filterDiscipline || ""}
                   onChange={(e) => setFilterDiscipline(e.target.value || null)}
+                  aria-label="Select a discipline to filter tools"
                 >
                   <option value="">All Disciplines</option>
                   {availableFilters.disciplines.map((discipline) => (
@@ -52,21 +58,18 @@ export default function ToolsIndex() {
                 </select>
               </div>
 
+              <span>
+                Showing {filteredTools.length} of {tools.length} tools
+              </span>
+
               <button
                 className="button button-secondary"
                 onClick={() => {
                   setFilterDiscipline(null);
                 }}
+                aria-label="Clear discipline filter"
               >
                 Clear Filters
-              </button>
-              
-              <button 
-                className="button button-secondary"
-                onClick={() => refreshData()}
-                aria-label="Refresh tools data"
-              >
-                ↻ Refresh
               </button>
             </div>
           </div>
@@ -75,26 +78,17 @@ export default function ToolsIndex() {
       <section className="content-section" aria-labelledby="tools-heading">
         <div className="container container-content">
           <p className="intro-text">
-            These are the tools we recommend for testing and developing
+            Our first principle is to level-up your gear. These are the tools we recommend for testing and developing
             accessible digital products.
           </p>
-
           {/* Loading and error states */}
           {isLoadingTools && <LoadingSpinner message="Loading tools..." />}
           {error && <p className="error">{error}</p>}
         </div>
-        
+
         {/* Tool listings - now outside the constraining container */}
         {!isLoadingTools && !error && (
           <>
-            <div className="container container-content">
-              <div className="tools-count mb-3">
-                <p>
-                  Showing {filteredTools.length} of {tools.length} tools
-                </p>
-              </div>
-            </div>
-            
             {/* Use the patterns-by-section class to go full width */}
             <div className="patterns-by-section">
               <div className="pattern-section mb-6">
@@ -104,7 +98,16 @@ export default function ToolsIndex() {
                       <div key={tool.id} className="card pattern-card">
                         <h3 className="tool-name">{tool.name}</h3>
                         <p className="tool-description">{tool.description}</p>
-
+                        <div className="tool-meta">
+                          {tool.discipline.length > 0 && (
+                            <div className="tool-disciplines">
+                              <strong>For:</strong>{" "}
+                              {tool.discipline.map((d) => (
+                                <span key={d}>{d}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                         {tool.url && (
                           <a
                             href={
@@ -115,18 +118,11 @@ export default function ToolsIndex() {
                             className="tool-link button"
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label={`Visit ${tool.name}`}
                           >
                             Visit tool
                           </a>
                         )}
-
-                        <div className="tool-meta">
-                          {tool.discipline.length > 0 && (
-                            <div className="tool-disciplines">
-                              <strong>For:</strong> {tool.discipline.join(", ")}
-                            </div>
-                          )}
-                        </div>
                       </div>
                     ))
                   ) : (

@@ -11,6 +11,10 @@
   padding-right: var(--space-4);
 }
 
+.page-header {
+  background-color: var(--color-orange-with-white-text);
+}
+
 /* Container width variants */
 .container,
 .container-content {

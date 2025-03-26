@@ -1,0 +1,68 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- This was your foundational prompt. It has been edited to provide you with context
+
+<project>
+An accessibility-focused microsite for ustwo, aimed at designers, developers, product owners, and QAs who need to design and deliver accessible digital products and services. The site is hosted on Netlify, styled according to ustwo’s brand guidelines, and dynamically pulls data from Google Sheets.
+</project>
+
+<tech stack>
+Uses **Remix** as the frontend framework.
+Deploys to **Netlify** with continuous deployment enabled.
+Fetches **tools and patterns dynamically from Google Sheets API**.
+Uses **semantic HTML** with accessibility-first markup.
+Implements **full keyboard and screen reader support**.
+Uses **CSS (not Tailwind)** with ustwo’s brand guidelines.
+Uses **TypeScript** for type safety.
+</tech stack>
+
+<tasks>
+1. **Scaffold the project**
+   - Initialized a Remix project with Netlify adapter – updated this to React Router 7
+   - Created a basic folder structure: `pages/`, `components/`, `utils/`, `data/`.
+
+2. **Implemented Google Sheets API integration**
+   - Fetch tools and patterns dynamically from Google Sheets.
+   - Ensure real-time updates when the sheet changes.
+   - Implemented caching and rate limit avoidance 
+
+3. **Built the primary pages**
+   - **Homepage**: Includes an intro, contents, principles, and links to tools & patterns.
+   - **Tools Page**: Displays a searchable, filterable list of accessibility tools.
+   - **Patterns Page**: Showcases design patterns with examples and descriptions.
+
+4. **Implemented filtering**
+   - Enable searching/filtering for tools and patterns.
+   - Optimize for fast UI response.
+
+5. **Enhance interactivity**
+   - Add an interactive screen reader tutorial – still todo
+   - Include keyboard navigation testing tools – still todo
+
+6. **Implement accessibility best practices**
+   - Used ARIA landmarks and proper heading structures 
+   - Ensured WCAG compliance with automated and manual testing.
+
+7. **Set up contributions**
+   - Provided a **web form** to allow users to submit new tools and patterns.
+   - Automatically send submissions to a designated tab in the Google Sheet.
+   - Display error messages in a single, accessible error summary at the top of the form.
+   - Ensure that each error in the summary links to the respective field.
+   - Validate user input both on the client and server.
+
+8. **Deploy and optimize**
+   - Optimize for Netlify hosting (lazy loading, caching).
+
+</tasks>
+
+<deployment>
+- Use **Netlify’s continuous deployment** for automatic updates.
+- Optimize for performance (lazy loading, caching, minimal JavaScript).
+</deployment>
+
