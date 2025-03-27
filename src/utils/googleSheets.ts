@@ -337,6 +337,20 @@ export async function getAccessToken(): Promise<string | null> {
 }
 
 /**
+ * Parse a HYPERLINK formula to extract URL and display text
+ */
+export function parseHyperlinkFormula(formula: string): { url: string; title: string } | null {
+  const match = formula.match(/^=HYPERLINK\("([^"]+)",\s*"([^"]+)"\)$/);
+  if (!match) {
+    return null;
+  }
+  return {
+    url: match[1],
+    title: match[2]
+  };
+}
+
+/**
  * Fetch values from a Google Sheet using the Sheets API v4 REST endpoint with OAuth
  * Includes retry logic for handling transient errors
  */
@@ -405,7 +419,7 @@ export async function fetchSheetValues(
       for (let attempt = 0; attempt <= retryCount; attempt++) {
         try {
           console.log(`Fetch attempt ${attempt + 1} of ${retryCount + 1}`);
-          const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueRenderOption=FORMATTED_VALUE&majorDimension=ROWS`;
+          const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueRenderOption=FORMULA&majorDimension=ROWS`;
           console.log('Fetching from URL:', apiUrl);
           
           // Fetch the data from Google Sheets API
@@ -429,10 +443,23 @@ export async function fetchSheetValues(
             if (responseData.values && responseData.values.length > 0) {
               console.log(`Found ${responseData.values.length} rows of data`);
               
+              // Process any HYPERLINK formulas in the data
+              const processedData = responseData.values.map(row => 
+                row.map(cell => {
+                  if (typeof cell === 'string' && cell.startsWith('=HYPERLINK(')) {
+                    const parsed = parseHyperlinkFormula(cell);
+                    if (parsed) {
+                      return JSON.stringify(parsed); // Convert to string to maintain array structure
+                    }
+                  }
+                  return cell;
+                })
+              );
+              
               // Cache the successful response
               try {
                 localStorage.setItem(cacheKey, JSON.stringify({
-                  data: responseData.values,
+                  data: processedData,
                   timestamp: Date.now()
                 }));
                 console.log(`Sheet data cached with key: ${cacheKey}`);
@@ -440,7 +467,7 @@ export async function fetchSheetValues(
                 console.error('Error caching sheet data:', cacheError);
               }
               
-              return responseData.values;
+              return processedData;
             } else {
               console.warn('No values found in sheet response:', responseData);
               return [];
@@ -655,67 +682,10 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
       const linkyDinks: Array<{ title: string; url: string }> = [];
       
       if (linksText) {
-        // Just one link without semicolon separator
-        if (!linksText.includes(';')) {
-          let title = linksText;
-          let url = linksText;
-          
-          // If it has a colon, split by it
-          if (linksText.includes(':')) {
-            const colonIndex = linksText.indexOf(':');
-            title = linksText.substring(0, colonIndex).trim();
-            url = linksText.substring(colonIndex + 1).trim();
-          }
-          
-          // Ensure URL has a scheme
-          if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-          } else if (url && url.startsWith('http://')) {
-            // Convert http:// to https://
-            url = 'https://' + url.substring(7);
-          }
-          
-          if (url) {
-            linkyDinks.push({ title, url });
-          }
-        } else {
-          // Multiple links separated by semicolons
-          const linkPairs = linksText.split(';');
-          
-          for (const pair of linkPairs) {
-            const colonIndex = pair.indexOf(':');
-            if (colonIndex !== -1) {
-              const title = pair.substring(0, colonIndex).trim();
-              let url = pair.substring(colonIndex + 1).trim();
-              
-              // Ensure URL has a scheme
-              if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
-              } else if (url && url.startsWith('http://')) {
-                // Convert http:// to https://
-                url = 'https://' + url.substring(7);
-              }
-              
-              if (title && url) {
-                linkyDinks.push({ title, url });
-              }
-            } else if (pair.trim()) {
-              // If there's no colon, assume it's just a URL
-              let url = pair.trim();
-              
-              // Ensure URL has a scheme
-              if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
-              } else if (url && url.startsWith('http://')) {
-                // Convert http:// to https://
-                url = 'https://' + url.substring(7);
-              }
-              
-              if (url) {
-                linkyDinks.push({ title: url, url });
-              }
-            }
-          }
+        // Parse HYPERLINK formula
+        const parsed = parseHyperlinkFormula(linksText);
+        if (parsed) {
+          linkyDinks.push(parsed);
         }
       }
       
@@ -793,8 +763,7 @@ export async function submitNewItem(
     
     if (type === 'tool') {
       spreadsheetId = TOOLS_SHEET_ID;
-      // Change destination sheet to "microsite submitted Tools"
-      sheetRange = 'microsite submitted Tools!A:F'; // Updated column range to skip source field
+      sheetRange = 'microsite submitted Tools!A:F';
       
       // Format the tool data
       const toolData = data as Partial<AccessibilityTool>;
@@ -808,26 +777,36 @@ export async function submitNewItem(
         toolData.url || '',
         disciplines,
         toolData.notes || '',
-        new Date().toISOString() // Add timestamp
+        new Date().toISOString()
       ]];
     } else {
       // Pattern submission
       spreadsheetId = PATTERNS_SHEET_ID;
-      sheetRange = 'Patterns!A:F';
+      sheetRange = 'pattern submissions!A:J'; // Extended range to accommodate multiple link columns
       
       // Format the pattern data
       const patternData = data as Partial<AccessibilityPattern>;
-      const links = Array.isArray(patternData.linkyDinks) 
-        ? patternData.linkyDinks.map(link => `${link.title}: ${link.url}`).join('\n') 
-        : '';
+      
+      // Format links as HYPERLINK formulas, one per cell
+      const linkyDinks = Array.isArray(patternData.linkyDinks) ? patternData.linkyDinks : [];
+      const linkFormulas = linkyDinks.map(link => 
+        `=HYPERLINK("${link.url}", "${link.title}")`
+      );
+      
+      // Pad the link formulas array to ensure we have exactly 3 cells
+      while (linkFormulas.length < 3) {
+        linkFormulas.push('');
+      }
       
       values = [[
-        patternData.name || '',
-        patternData.category || '',
-        patternData.where || '',
-        patternData.description || '',
-        links,
-        new Date().toISOString() // Add timestamp
+        patternData.name || '',           // Column A: Name
+        patternData.category || '',       // Column B: Category
+        patternData.where || '',          // Column C: Where
+        patternData.description || '',    // Column D: Description
+        linkFormulas[0],                  // Column E: Link 1
+        linkFormulas[1],                  // Column F: Link 2
+        linkFormulas[2],                  // Column G: Link 3
+        new Date().toISOString()          // Column H: Timestamp
       ]];
     }
     

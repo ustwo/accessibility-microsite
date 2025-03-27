@@ -152,7 +152,7 @@ export default function PatternsIndex() {
       <section className="content-section">
         <div className="container container-content">
           <p className="intro-text">
-            These are the design patterns we recommend for creating accessible
+            Our second principle is to enjoy the patterns. These are the design patterns we recommend for creating accessible
             digital products.
           </p>
         </div>

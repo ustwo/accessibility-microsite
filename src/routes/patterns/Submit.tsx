@@ -5,15 +5,39 @@ import { useFormSubmission, PatternSchema } from "../../utils/formSubmission";
 import { useAccessibleForm, ErrorSummary, ErrorMessage } from "../../utils/formUtils";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
+interface FormValues {
+  name: string;
+  category: string;
+  where: string;
+  description: string;
+  link1Title: string;
+  link1Url: string;
+  link2Title: string;
+  link2Url: string;
+  link3Title: string;
+  link3Url: string;
+}
+
+const initialFormValues: FormValues = {
+  name: '',
+  category: '',
+  where: '',
+  description: '',
+  link1Title: '',
+  link1Url: '',
+  link2Title: '',
+  link2Url: '',
+  link3Title: '',
+  link3Url: ''
+};
+
 export default function PatternsSubmit() {
   const { handlePatternSubmit, patternErrors, isSubmittingPattern, statusMessage } = useFormSubmission();
   const [categoryOptions] = useState([
     "General patterns to follow", 
     "Patterns for good forms", 
-    "Navigation patterns", 
-    "Color & contrast patterns",
-    "Patterns for complex interactions",
-    "Other"
+    "Patterns for interactions",
+    "Patterns for components"
   ]);
   const [whereOptions] = useState([
     "all", "web", "mobile", "desktop"
@@ -28,13 +52,7 @@ export default function PatternsSubmit() {
     handleBlur,
     handleSubmit
   } = useAccessibleForm(
-    {
-      name: "",
-      category: "",
-      where: "",
-      description: "",
-      links: "",
-    },
+    initialFormValues,
     PatternSchema, // Pass the Zod schema for client-side validation
     patternErrors // Pass server errors from form submission
   );
@@ -187,25 +205,47 @@ export default function PatternsSubmit() {
               </div>
               
               <div className="form-group">
-                <label htmlFor="links">Resources & Links</label>
-                <textarea
-                  id="links"
-                  name="links"
-                  className={`form-control ${formErrors.links ? "input-error" : ""}`}
-                  placeholder="Add links to examples or resources (one per line, format: Title: URL)"
-                  rows={3}
-                  value={formValues.links}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  aria-describedby={formErrors.links ? "links-error" : undefined}
-                  aria-invalid={formErrors.links ? "true" : undefined}
-                  disabled={isSubmittingPattern}
-                ></textarea>
-                <ErrorMessage id="links-error" error={formErrors.links} />
-                <p className="form-help">
-                  Add links to examples or resources for this pattern. Format each link as &quot;Title: URL&quot; 
-                  with one link per line or separated by semicolons.
-                </p>
+                <h3 className="form-section-title">Resources & Links (Optional)</h3>
+                {[1, 2, 3].map((num) => (
+                  <div key={num} className="link-group">
+                    <div className="form-row">
+                      <div className="form-col">
+                        <label htmlFor={`link${num}Title`}>Link {num} Title</label>
+                        <input
+                          type="text"
+                          id={`link${num}Title`}
+                          name={`link${num}Title`}
+                          className={`form-control ${formErrors[`link${num}Title`] ? "input-error" : ""}`}
+                          placeholder="Enter link title"
+                          value={formValues[`link${num}Title`] || ""}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          aria-describedby={formErrors[`link${num}Title`] ? `link${num}Title-error` : undefined}
+                          aria-invalid={formErrors[`link${num}Title`] ? "true" : undefined}
+                          disabled={isSubmittingPattern}
+                        />
+                        <ErrorMessage id={`link${num}Title-error`} error={formErrors[`link${num}Title`]} />
+                      </div>
+                      <div className="form-col">
+                        <label htmlFor={`link${num}Url`}>Link {num} URL</label>
+                        <input
+                          type="url"
+                          id={`link${num}Url`}
+                          name={`link${num}Url`}
+                          className={`form-control ${formErrors[`link${num}Url`] ? "input-error" : ""}`}
+                          placeholder="Enter URL"
+                          value={formValues[`link${num}Url`] || ""}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          aria-describedby={formErrors[`link${num}Url`] ? `link${num}Url-error` : undefined}
+                          aria-invalid={formErrors[`link${num}Url`] ? "true" : undefined}
+                          disabled={isSubmittingPattern}
+                        />
+                        <ErrorMessage id={`link${num}Url-error`} error={formErrors[`link${num}Url`]} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
               
               <div className="form-actions">

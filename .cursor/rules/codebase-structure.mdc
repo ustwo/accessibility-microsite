@@ -1,0 +1,77 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ # Codebase Structure Documentation
+
+This document provides an overview of the accessibility microsite's codebase structure and purpose.
+
+## Project Overview
+An accessibility-focused microsite for ustwo, built with React Router 7, TypeScript, and CSS. The site dynamically pulls data from Google Sheets and is deployed on Netlify.
+
+## Root Directory Structure
+
+### Configuration Files
+- `package.json`: Project dependencies and scripts
+- `tsconfig.json`: TypeScript configuration
+- `vite.config.ts`: Vite build configuration
+- `netlify.toml`: Netlify deployment configuration
+- `.env`: Environment variables (not committed)
+- `.eslintrc.cjs`: ESLint configuration
+- `.prettierrc`: Prettier configuration
+
+### Build and Development
+- `dist/`: Production build output
+- `node_modules/`: Project dependencies
+- `public/`: Static assets
+- `vitest.config.ts`: Test configuration
+- `vitest.setup.ts`: Test setup utilities
+
+## Source Code (`src/`)
+
+### Core Application Files
+- `main.tsx`: Application entry point
+- `Root.tsx`: Root component wrapper
+- `Error.tsx`: Global error boundary
+- `routes.tsx`: Route configuration
+
+### Application Structure
+- `components/`: Reusable UI components
+  - `Layout.tsx`: Main layout wrapper
+  - `LoadingSpinner.tsx`: Loading indicator
+  - `DataPreloader.tsx`: Data preloading component
+  - `UsTwo.tsx`: ustwo branding component
+
+### Routes
+- `routes/`: Page components and route-specific logic
+  - `Index.tsx`: Homepage
+  - `FormSuccess.tsx`: Form submission success page
+  - `tools/`: Tools listing and detail pages
+  - `patterns/`: Design patterns pages
+  - `checklist/`: Accessibility checklist
+  - `testing-templates/`: Testing templates for QAs and testers
+  - `screen-reader-guide/`: Screen reader tutorial
+  - Debug/Test routes:
+    - `SheetsDebug.tsx`: Google Sheets debugging
+    - `TestJwt.tsx`: JWT testing
+    - `TestPermissions.tsx`: Permission testing
+    - `TestSheets.tsx`: Sheets API testing
+    - `TestSteps.tsx`: Step-by-step testing
+
+### Utilities
+- `utils/`: Helper functions and utilities
+  - `googleSheets.ts`: Google Sheets API integration
+  - `formSubmission.ts`: Form handling logic
+  - `formUtils.tsx`: Form-related utilities
+  - `cacheUtils.ts`: Caching mechanisms
+  - Test files:
+    - `googleSheets.test.ts`: Sheets API tests
+    - `__tests__/`: Additional test suites
+
+### Data Management
+- `data/`: Mock data for fallback and testing
+- `context/DataContext.tsx`: google sheets caching and rate limiting
+
+## Testing and Documentation
+- `docs/`: Project documentation

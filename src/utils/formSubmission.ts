@@ -26,7 +26,12 @@ export const PatternSchema = z.object({
   category: z.string().min(1, "Category is required"),
   where: z.string().min(1, "Please specify where this pattern applies"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  links: z.string().optional(),
+  link1Title: z.string().optional(),
+  link1Url: z.string().url("Please enter a valid URL").optional(),
+  link2Title: z.string().optional(),
+  link2Url: z.string().url("Please enter a valid URL").optional(),
+  link3Title: z.string().optional(),
+  link3Url: z.string().url("Please enter a valid URL").optional(),
 });
 
 /**
@@ -122,35 +127,25 @@ export async function submitPatternForm(formData: FormData): Promise<{success: b
     }
     
     // Process links from the form data
-    const linksText = result.data.links;
     const linkyDinks: Array<{title: string; url: string}> = [];
     
-    if (linksText) {
-      // Split by lines or semicolons
-      const linkParts = linksText.split(/[;\n]/).filter(Boolean);
+    // Process up to 3 links
+    for (let i = 1; i <= 3; i++) {
+      const title = formValues[`link${i}Title`] as string;
+      const url = formValues[`link${i}Url`] as string;
       
-      for (const part of linkParts) {
-        const [title, url] = part.split(':').map(s => s.trim());
-        
-        if (title && url) {
-          // Ensure URL has https scheme
-          let processedUrl = url;
-          if (!processedUrl.startsWith('https://')) {
-            if (processedUrl.startsWith('http://')) {
-              processedUrl = 'https://' + processedUrl.substring(7);
-            } else {
-              processedUrl = 'https://' + processedUrl;
-            }
+      if (title && url) {
+        // Ensure URL has https scheme
+        let processedUrl = url;
+        if (!processedUrl.startsWith('https://')) {
+          if (processedUrl.startsWith('http://')) {
+            processedUrl = 'https://' + processedUrl.substring(7);
+          } else {
+            processedUrl = 'https://' + processedUrl;
           }
-          
-          linkyDinks.push({ title, url: processedUrl });
-        } else if (part.trim()) {
-          // If only one part, treat it as both title and URL
-          linkyDinks.push({ 
-            title: part.trim(), 
-            url: `https://www.google.com/search?q=${encodeURIComponent(part.trim())}` 
-          });
         }
+        
+        linkyDinks.push({ title, url: processedUrl });
       }
     }
     

@@ -96,7 +96,7 @@
 /* Footer layout */
 .site-footer {
   padding-top: var(--space-16);
-  padding-bottom: var(--space-16);
+  padding-bottom: var(--space-5);
 }
 
 .footer-inner {
@@ -137,8 +137,6 @@
   list-style: none;
   padding: 0;
   margin: 0;
-
-
 }
 
 .footer-links ul,
@@ -148,12 +146,11 @@
     gap: var(--space-1);
 }
 
-
 .footer-links li {
   margin-bottom: 0; /* Remove margin bottom since we're using gap */
 }
 
-.footer-links a {
+.footer-links a, .company-links a {
   padding: var(--space-2);
   font-size: var(--font-size-base);
   font-weight: 500;
@@ -166,13 +163,82 @@
 }
 
 /* Add styling for active footer links */
-.footer-links a[aria-current="page"] {
+.footer-links a[aria-current="page"],
+.company-links a[aria-current="page"]  {
   font-weight: 700; /* Bold font weight */
   position: relative;
   text-decoration-thickness: 0.1rem;
 }
 
+.company-links a[aria-current="page"] {
+  color: var(--color-secondary);
+}
 
+/* Footer divider */
+.footer-divider {
+  border: none;
+  border-top: 1px solid var(--color-gray-800);
+  margin: var(--space-8) 0 var(--space-4);
+}
+
+/* Company footer */
+.company-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.company-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+ 
+ 
+.social-icons {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.social-icons a {
+  color: var(--color-footer-text);
+  padding: var(--space-2);
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.2s ease;
+}
+
+.social-icons a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.social-icons .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-icons svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* Hide text on tiny screens */
+.hideOnTinyScreens {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .hideOnTinyScreens {
+    display: inline;
+  }
+}
 
 /* Grid system */
 .grid {

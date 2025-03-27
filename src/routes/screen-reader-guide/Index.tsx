@@ -65,7 +65,7 @@ export default function ScreenReaderGuideIndex() {
                   aria-label="Mark VoiceOver toggle practice as complete"
                   disabled={isCompleted(2)}
                 >
-                  {isCompleted(2) ? "Completed! ✓" : "I've mastered this!"}
+                  {isCompleted(2) ? "Completed! ✓" : "I've got this!"}
                 </button>
               </div>
             </section>

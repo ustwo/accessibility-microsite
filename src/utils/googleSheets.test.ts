@@ -3,7 +3,8 @@ import {
   fetchAccessibilityTools, 
   fetchAccessibilityPatterns,
   getAccessToken,
-  fetchSheetValues
+  fetchSheetValues,
+  parseHyperlinkFormula
 } from './googleSheets';
 import * as cacheUtils from './cacheUtils';
 import { mockTools, mockPatterns } from '../data/mockData';
@@ -392,6 +393,102 @@ describe('Google Sheets Integration', () => {
       expect(cachedData).toHaveProperty('data');
       expect(cachedData).toHaveProperty('timestamp');
       expect(Array.isArray(cachedData.data)).toBe(true);
+    });
+  });
+
+  describe('HYPERLINK Formula Processing', () => {
+    it('should parse valid HYPERLINK formulas correctly', () => {
+      const validFormulas = [
+        '=HYPERLINK("https://example.com", "Example Link")',
+        '=HYPERLINK("https://test.com", "Test Link")',
+      ];
+
+      validFormulas.forEach(formula => {
+        const result = parseHyperlinkFormula(formula);
+        expect(result).toBeDefined();
+        expect(result?.url).toBeDefined();
+        expect(result?.title).toBeDefined();
+      });
+    });
+
+    it('should handle invalid HYPERLINK formulas gracefully', () => {
+      const invalidFormulas = [
+        '=HYPERLINK("https://example.com")', // Missing title
+        '=HYPERLINK(, "Example Link")', // Missing URL
+        '=HYPERLINK("https://example.com", "Example Link", "Extra")', // Extra argument
+        'Not a HYPERLINK formula',
+      ];
+
+      invalidFormulas.forEach(formula => {
+        const result = parseHyperlinkFormula(formula);
+        expect(result).toBeNull();
+      });
+    });
+
+    it('should process patterns with HYPERLINK formulas correctly', async () => {
+      const mockResponse = {
+        values: [
+          ['Name', 'Category', 'Where', 'Description', 'Links'],
+          [
+            'Test Pattern',
+            'Test Category',
+            'all',
+            'Test Description',
+            '=HYPERLINK("https://example.com", "Example Link")'
+          ]
+        ]
+      };
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      });
+
+      const values = await fetchSheetValues('test-sheet-id', 'Test Sheet');
+      
+      expect(values).toBeDefined();
+      expect(values).not.toBeNull();
+      if (values) {
+        expect(values.length).toBe(2); // Header + 1 row
+        expect(values[1][4]).toBe('=HYPERLINK("https://example.com", "Example Link")');
+      }
+    });
+  });
+
+  describe('fetchSheetValues', () => {
+    it('should fetch and cache sheet values', async () => {
+      const mockResponse = {
+        values: [
+          ['Header 1', 'Header 2'],
+          ['Value 1', 'Value 2']
+        ]
+      };
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      });
+
+      const values = await fetchSheetValues('test-sheet-id', 'Test Sheet');
+      
+      expect(values).toEqual(mockResponse.values);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      
+      // Second call should use cached data
+      const cachedValues = await fetchSheetValues('test-sheet-id', 'Test Sheet');
+      expect(cachedValues).toEqual(mockResponse.values);
+      expect(global.fetch).toHaveBeenCalledTimes(1); // Still only called once
+    });
+
+    it('should handle API errors gracefully', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status: 404
+      });
+
+      await expect(fetchSheetValues('test-sheet-id', 'Test Sheet'))
+        .rejects
+        .toThrow('Failed to fetch sheet values');
     });
   });
 }); 

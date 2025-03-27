@@ -17,6 +17,7 @@ import SheetsDebug from './routes/SheetsDebug';
 import FormSuccess from './routes/FormSuccess';
 import TestingTemplatesIndex from './routes/testing-templates/Index';
 import ChecklistIndex from './routes/checklist/Index';
+import About from './routes/About';
 
 export const routes: RouteObject[] = [
   {
@@ -27,6 +28,10 @@ export const routes: RouteObject[] = [
       {
         index: true,
         element: <Index />
+      },
+      {
+        path: 'about',
+        element: <About />
       },
       {
         path: 'tools',

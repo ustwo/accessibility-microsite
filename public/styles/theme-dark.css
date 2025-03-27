@@ -46,7 +46,7 @@
 
 /* Regular links in dark areas */
 .bg-dark-theme p a,
-.bg-dark-theme li:not(.site-nav li, .footer-links li) a,
+.bg-dark-theme li:not(.site-nav li, .footer-links li, .company-links li) a,
 .bg-dark-theme .regular-link {
   color: var(--color-secondary);
 }
@@ -78,7 +78,6 @@
 }
 
 /* Dark sections styling */
-footer,
 .section-dark,
 .bg-dark {
   padding: var(--space-12) var(--space-4);
