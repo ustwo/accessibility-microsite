@@ -27,7 +27,9 @@ body {
   background-size: cover;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -39,20 +41,23 @@ body {
   outline-offset: 2px;
 }
 
-/* Skip link */
 .skip-to-content {
+  position: relative;
+}
+
+/* Skip link */
+.skip-to-content a.button {
   position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--color-secondary);
-  color: var(--color-light);
-  padding: var(--space-2) var(--space-4);
+  top: -3rem;
+  left: 8rem;
+   padding: var(--space-2) var(--space-4);
   z-index: 100;
   transition: var(--transition);
 }
 
-.skip-to-content:focus {
-  top: 0;
+.skip-to-content a:focus-visible {
+  top: 0.9rem;
+  left: 9rem;
 }
 
 /* Allow users to reduce animations if they prefer */
@@ -63,4 +68,4 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-} 
+}
