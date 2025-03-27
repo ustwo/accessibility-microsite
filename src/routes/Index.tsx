@@ -77,14 +77,9 @@ export default function Index() {
               Try navigating your product using only a keyboard—it&apos;s a great
               way to test for perceivability, operability, and robustness.
             </p>
-            <a
-              href="https://www.w3.org/WAI/WCAG21/quickref/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="button"
-            >
+            <Link to="/checklist" className="button">
               accessibility checklist
-            </a>
+            </Link>
           </div>
 
           <div className="principle-card">
