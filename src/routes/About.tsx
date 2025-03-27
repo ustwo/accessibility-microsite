@@ -27,7 +27,7 @@ export default function About() {
 
       <section className="content-section" aria-labelledby="about-principles">
         <div className="container container-content">
-          <h2 id="about-principles">Our accessibility principles</h2>
+          <h2 id="about-principles">Our inclusivity principles</h2>
           <p>
             We&apos;ve developed a set of guiding principles to help teams create accessible digital experiences. These principles are designed to be practical, engaging, and effective:
           </p>

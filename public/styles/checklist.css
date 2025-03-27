@@ -1,0 +1,26 @@
+.checklist-iframe-container {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  min-height: 600px;
+  margin: 2rem 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.checklist-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .checklist-iframe-container {
+    height: 80vh;
+    min-height: 400px;
+  }
+} 

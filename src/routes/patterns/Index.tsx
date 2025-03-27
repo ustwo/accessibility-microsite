@@ -10,11 +10,14 @@ import { useData } from "../../context/DataContext";
 
 export default function PatternsIndex() {
   const { patterns, isLoadingPatterns, error, clearCache } = useData();
-  
+
   // Add debug logging
-  console.log('Patterns data in component:', patterns);
-  console.log('Patterns with links:', patterns.filter(p => p.linkyDinks && p.linkyDinks.length > 0));
-  
+  console.log("Patterns data in component:", patterns);
+  console.log(
+    "Patterns with links:",
+    patterns.filter((p) => p.linkyDinks && p.linkyDinks.length > 0)
+  );
+
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterWhere, setFilterWhere] = useState<string | null>(null);
   const [filterParentTitle, setFilterParentTitle] = useState<string | null>(
@@ -158,8 +161,8 @@ export default function PatternsIndex() {
       <section className="content-section">
         <div className="container container-content">
           <p className="intro-text">
-            Our second principle is to enjoy the patterns. These are the design patterns we recommend for creating accessible
-            digital products.
+            Our second principle is to enjoy the patterns. These are the design
+            patterns we recommend for creating accessible digital products.
           </p>
         </div>
 
@@ -194,7 +197,7 @@ export default function PatternsIndex() {
                           <h4>Resources:</h4>
                           <ul>
                             {pattern.linkyDinks
-                              .filter(link => link.url && link.title) // Only show links that have both URL and title
+                              .filter((link) => link.url && link.title) // Only show links that have both URL and title
                               .map((link, index) => (
                                 <li key={index}>
                                   <a
@@ -290,10 +293,11 @@ export default function PatternsIndex() {
                                 {pattern.linkyDinks &&
                                   pattern.linkyDinks.length > 0 && (
                                     <div className="pattern-links">
-                                      <h4>Resources:</h4>
                                       <ul>
                                         {pattern.linkyDinks
-                                          .filter(link => link.url && link.title) // Only show links that have both URL and title
+                                          .filter(
+                                            (link) => link.url && link.title
+                                          ) // Only show links that have both URL and title
                                           .map((link, index) => (
                                             <li key={index}>
                                               <a

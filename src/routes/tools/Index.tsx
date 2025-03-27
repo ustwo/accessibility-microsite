@@ -101,7 +101,7 @@ export default function ToolsIndex() {
                         <div className="tool-meta">
                           {tool.discipline.length > 0 && (
                             <div className="tool-disciplines">
-                              <strong>For:</strong>{" "}
+                              <strong className="sr-only">For:</strong>{" "}
                               {tool.discipline.map((d) => (
                                 <span key={d}>{d}</span>
                               ))}

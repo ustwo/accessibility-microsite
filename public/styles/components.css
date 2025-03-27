@@ -431,12 +431,11 @@ a.button {
 }
 
 .pattern-links a {
-  color: var(--color-primary);
-  text-decoration: underline;
+  color: var(--color-dark);
 }
 
 .pattern-links a:hover {
-  color: var(--color-secondary);
+  color: var(--color-dark);
 }
 
 .tool-meta {
@@ -456,10 +455,6 @@ a.button {
   gap: var(--space-2);
   flex: 1;
   margin-right: var(--space-4);
-}
-
-.tool-disciplines strong {
-  display: none;
 }
 
 .tool-disciplines span {

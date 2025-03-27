@@ -34,7 +34,7 @@ export default function Layout({ children, title }: LayoutProps) {
             <ul>
               <li>
                 <Link to="/#principles">
-                  Accessibility Principles
+                  Inclusivity Principles
                 </Link>
               </li>
             </ul>
@@ -46,7 +46,7 @@ export default function Layout({ children, title }: LayoutProps) {
         {title && (
           <div className="page-header py-6">
             <div className="container container-content">
-              <h1 className="text-light">{title}</h1>
+              <h1 className="text-light" id="page-header">{title}</h1>
             </div>
           </div>
         )}
