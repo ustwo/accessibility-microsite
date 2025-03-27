@@ -684,28 +684,31 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
       
       console.log(`Processing pattern: ${name} (${where})`);
       
-      // Parse links from column 4 (index 3)
+      // Parse links from columns 4, 5, and 6 (indices 3, 4, and 5)
       const linkyDinks: Array<{ title: string; url: string }> = [];
-      const linkFormula = row[3]?.trim() || "";
       
-      if (linkFormula) {
-        console.log(`Found link formula:`, linkFormula);
-        
-        // Try to parse as JSON first (in case it's already parsed)
-        try {
-          const parsedJson = JSON.parse(linkFormula);
-          if (parsedJson.url && parsedJson.title) {
-            console.log(`Successfully parsed JSON link:`, parsedJson);
-            linkyDinks.push(parsedJson);
-          }
-        } catch (jsonError) {
-          // If not JSON, try parsing as HYPERLINK formula
-          const parsed = parseHyperlinkFormula(linkFormula);
-          if (parsed) {
-            console.log(`Successfully parsed HYPERLINK formula:`, parsed);
-            linkyDinks.push(parsed);
-          } else {
-            console.log(`Failed to parse link formula:`, linkFormula);
+      // Process each link column
+      for (let i = 3; i <= 5; i++) {
+        const linkFormula = row[i]?.trim() || "";
+        if (linkFormula) {
+          console.log(`Found link formula in column ${i}:`, linkFormula);
+          
+          // Try to parse as JSON first (in case it's already parsed)
+          try {
+            const parsedJson = JSON.parse(linkFormula);
+            if (parsedJson.url && parsedJson.title) {
+              console.log(`Successfully parsed JSON link:`, parsedJson);
+              linkyDinks.push(parsedJson);
+            }
+          } catch (jsonError) {
+            // If not JSON, try parsing as HYPERLINK formula
+            const parsed = parseHyperlinkFormula(linkFormula);
+            if (parsed) {
+              console.log(`Successfully parsed HYPERLINK formula:`, parsed);
+              linkyDinks.push(parsed);
+            } else {
+              console.log(`Failed to parse link formula:`, linkFormula);
+            }
           }
         }
       }
