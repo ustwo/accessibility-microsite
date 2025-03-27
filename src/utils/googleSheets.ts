@@ -29,7 +29,6 @@ async function executeWithRateLimit<T>(requestId: string, fn: () => Promise<T>):
   // Apply rate limiting before executing
   await applyRateLimit();
   
-  console.log(`Executing rate-limited request: ${requestId}`);
   
   // Track this request
   const timestamp = Date.now();
@@ -650,10 +649,15 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
   const patterns: AccessibilityPattern[] = [];
   let currentParentTitle = "";
   
+  console.log('Starting to process pattern rows...');
+  
   rows.forEach((row, index) => {
+    console.log(`Processing row ${index}:`, row);
+    
     // Check if row is a section title (has only one cell with content)
     if (row.length === 1 && row[0]?.trim()) {
       currentParentTitle = row[0].trim();
+      console.log(`Found section title: ${currentParentTitle}`);
       // Add as a section header
       patterns.push({
         id: `section-${index + 1}`,
@@ -669,6 +673,7 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
     
     // Skip empty rows or invalid rows
     if (row.length < 2 || !row[0] && !row[1]) {
+      console.log(`Skipping invalid row ${index}`);
       return;
     }
 
@@ -676,16 +681,32 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
       const name = row[0]?.trim() || "";
       const where = row[1]?.trim() || "";
       const description = row[2]?.trim() || "";
-      const linksText = row[3]?.trim() || "";
       
-      // Parse links text into array of link objects
+      console.log(`Processing pattern: ${name} (${where})`);
+      
+      // Parse links from column 4 (index 3)
       const linkyDinks: Array<{ title: string; url: string }> = [];
+      const linkFormula = row[3]?.trim() || "";
       
-      if (linksText) {
-        // Parse HYPERLINK formula
-        const parsed = parseHyperlinkFormula(linksText);
-        if (parsed) {
-          linkyDinks.push(parsed);
+      if (linkFormula) {
+        console.log(`Found link formula:`, linkFormula);
+        
+        // Try to parse as JSON first (in case it's already parsed)
+        try {
+          const parsedJson = JSON.parse(linkFormula);
+          if (parsedJson.url && parsedJson.title) {
+            console.log(`Successfully parsed JSON link:`, parsedJson);
+            linkyDinks.push(parsedJson);
+          }
+        } catch (jsonError) {
+          // If not JSON, try parsing as HYPERLINK formula
+          const parsed = parseHyperlinkFormula(linkFormula);
+          if (parsed) {
+            console.log(`Successfully parsed HYPERLINK formula:`, parsed);
+            linkyDinks.push(parsed);
+          } else {
+            console.log(`Failed to parse link formula:`, linkFormula);
+          }
         }
       }
       
@@ -701,6 +722,7 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
           parentTitle: currentParentTitle
         };
         
+        console.log(`Created pattern with ${linkyDinks.length} links:`, pattern);
         patterns.push(pattern);
       }
     } catch (error) {
@@ -708,6 +730,7 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
     }
   });
   
+  console.log('Finished processing all rows. Total patterns:', patterns.length);
   return patterns;
 }
 
@@ -715,32 +738,35 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
  * Fetch and process accessibility patterns from Google Sheets
  */
 export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern[]> {
-  // Try to get data from cache first
-  const cachedPatterns = getFromCache<AccessibilityPattern[]>(
-    CACHE_KEYS.PATTERNS,
-    getCacheVersion('patterns')
-  );
-  
-  if (cachedPatterns) {
-    console.log('Using cached patterns data');
-    return cachedPatterns;
-  }
-  
   // For development without credentials, use mock data
   if (IS_DEVELOPMENT && !hasApiCredentials()) {
     console.warn('Using mock patterns data for development');
     return mockPatterns;
   }
 
-  // Updated sheet range from 'Sheet1!A2:F' to 'Patterns!A2:F' to match the correct sheet name
-  const rows = await fetchSheetValues(PATTERNS_SHEET_ID, 'ustwo pattern library!A2:F');
+  console.log('Fetching fresh patterns data from spreadsheet...');
+  const rows = await fetchSheetValues(PATTERNS_SHEET_ID, 'ustwo pattern library!A:H');
+  
   if (!rows) {
     console.error('Failed to fetch patterns data, falling back to mock data');
-    // Fallback to mock data if we can't get real data
     return mockPatterns;
   }
 
+  console.log('Raw spreadsheet data:', rows);
+  console.log('Number of rows:', rows.length);
+  console.log('First row (headers):', rows[0]);
+  
+  // Log the link columns (E, F, G) from the first few rows
+  rows.slice(0, 5).forEach((row, index) => {
+    console.log(`Row ${index} link columns:`, {
+      columnE: row[4],
+      columnF: row[5],
+      columnG: row[6]
+    });
+  });
+
   const patterns = processPatternRows(rows);
+  console.log('Processed patterns:', patterns);
   
   // Cache the processed data
   saveToCache(CACHE_KEYS.PATTERNS, patterns, getCacheVersion('patterns'));

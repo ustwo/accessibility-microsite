@@ -48,7 +48,6 @@ describe('DataContext with Caching Backoff Strategy', () => {
     
     // Default mock implementations
     vi.mocked(googleSheets.fetchAccessibilityTools).mockImplementation(async () => {
-      console.log('Mock fetchAccessibilityTools called');
       return mockTools;
     });
     

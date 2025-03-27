@@ -9,7 +9,12 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import { useData } from "../../context/DataContext";
 
 export default function PatternsIndex() {
-  const { patterns, isLoadingPatterns, error, refreshData } = useData();
+  const { patterns, isLoadingPatterns, error, clearCache } = useData();
+  
+  // Add debug logging
+  console.log('Patterns data in component:', patterns);
+  console.log('Patterns with links:', patterns.filter(p => p.linkyDinks && p.linkyDinks.length > 0));
+  
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterWhere, setFilterWhere] = useState<string | null>(null);
   const [filterParentTitle, setFilterParentTitle] = useState<string | null>(
@@ -93,6 +98,7 @@ export default function PatternsIndex() {
           content="A collection of accessible design patterns recommended by ustwo."
         />
       </Helmet>
+
       {/* Filters */}
       <div className="filters-bar">
         <div className="container container-content">
@@ -187,17 +193,19 @@ export default function PatternsIndex() {
                         <div className="pattern-links">
                           <h4>Resources:</h4>
                           <ul>
-                            {pattern.linkyDinks.map((link, index) => (
-                              <li key={index}>
-                                <a
-                                  href={link.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {link.title}
-                                </a>
-                              </li>
-                            ))}
+                            {pattern.linkyDinks
+                              .filter(link => link.url && link.title) // Only show links that have both URL and title
+                              .map((link, index) => (
+                                <li key={index}>
+                                  <a
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {link.title}
+                                  </a>
+                                </li>
+                              ))}
                           </ul>
                         </div>
                       )}
@@ -284,8 +292,9 @@ export default function PatternsIndex() {
                                     <div className="pattern-links">
                                       <h4>Resources:</h4>
                                       <ul>
-                                        {pattern.linkyDinks.map(
-                                          (link, index) => (
+                                        {pattern.linkyDinks
+                                          .filter(link => link.url && link.title) // Only show links that have both URL and title
+                                          .map((link, index) => (
                                             <li key={index}>
                                               <a
                                                 href={link.url}
@@ -295,8 +304,7 @@ export default function PatternsIndex() {
                                                 {link.title}
                                               </a>
                                             </li>
-                                          )
-                                        )}
+                                          ))}
                                       </ul>
                                     </div>
                                   )}
