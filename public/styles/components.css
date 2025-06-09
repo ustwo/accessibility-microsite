@@ -81,24 +81,32 @@
 /* Clean card styling */
 .card, .pattern-card {
   background: white;
-  border: 1px solid var(--color-gray-150);
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.2s ease;
   background-color: transparent;
+  border: 1px solid var(--color-gray-250);
+  /* background: var(--color-gray-50); */
 }
+
 
 .pattern-card.tool-card-link,
 .pattern-card .pattern-link-card {
-  background-color: var(--color-gray-50);
+  /* background-color: var(--color-gray-50); */
 }
 
 .card:hover {
-  border-color: var(--color-gray-250);
+
 }
 
 .pattern-card.tool-card-link:hover {
-  border-color: var(--color-gray-450); /* Keep original border color */
+
+}
+
+.section-title {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+  font-size: calc(1.3rem + (((2.8 - 1.3) * ((100vw - 320px) / (2048 - 320))) * 10));
 }
 
 .card p, .pattern-card p, .principle-card p {
@@ -124,6 +132,7 @@
   border-bottom: 1px solid var(--color-gray-150);
   padding-bottom: 2.5rem;
   margin-bottom: 1rem;
+  padding-right: 20px;
   /* display: flex;
   flex-direction: column; */
 }
@@ -139,12 +148,20 @@
 /* Principle emoji styling */
 .principle-emoji {
   line-height: 1;
+  font-size: calc(1.5rem + (((5.5 - 1.5) * ((100vw - 320px) / (2048 - 320))) * 10));
+  display: inline-block;
+  margin-right: 10px;
+  transform: translateY(0.4rem);
 }
 
 /* Tools and patterns grid */
 .patterns-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2.5rem;
+}
+
+.tools-grid {
   gap: 1.5rem;
 }
 
@@ -221,29 +238,50 @@
   font-size: 0.75rem;
 }
 
+/* Pattern items - informational, no card styling */
+.pattern-item {
+  margin-bottom: 2rem;
+  padding: 0;
+}
+
+.pattern-item h3 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+  color: var(--color-text-primary);
+}
+
+.pattern-item .pattern-meta {
+  margin: 1rem 0 0.5rem 0;
+}
+
 /* Pattern link cards */
 .pattern-links {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin: 1rem 0;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1rem 0;
 }
 
 .pattern-link-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-gray-50);
   border: 1px solid var(--color-gray-150);
   border-radius: 6px;
   text-decoration: none;
   color: var(--color-text-primary);
-  transition: border-color 0.2s ease;
-  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .pattern-link-card:hover {
-  border-color: var(--color-gray-450);
+  background: var(--color-white);
+  border-color: var(--color-gray-250);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
   text-decoration: none;
 }
 
@@ -258,7 +296,6 @@
 /* Filter components */
 .filters-bar {
   background: var(--color-gray-50);
-  border: 1px solid var(--color-gray-150);
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 2rem;

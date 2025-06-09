@@ -96,7 +96,7 @@ export default function ToolsIndex() {
                 {/* Use the patterns-by-section class to go full width */}
                 <div className="patterns-by-section">
                   <div className="pattern-section mb-6">
-                    <div className="patterns-grid">
+                    <div className="patterns-grid tools-grid">
                       {filteredTools.length > 0 ? (
                         filteredTools.map((tool) => (
                           tool.url ? (

@@ -195,7 +195,7 @@ export default function PatternsIndex() {
                   <div className="patterns-grid">
                     {filteredPatterns.length > 0 ? (
                       filteredPatterns.map((pattern) => (
-                        <div key={pattern.id} className="card pattern-card">
+                        <div key={pattern.id} className="pattern-item">
                           <h3>{pattern.name}</h3>
                           <p className="smallBodyText">
                             {pattern.description}
@@ -225,7 +225,7 @@ export default function PatternsIndex() {
                                     href={link.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="pattern-link-card"
+                                    className="pattern-link-card smallBodyText"
                                   >
                                     {link.title}
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -256,7 +256,7 @@ export default function PatternsIndex() {
                         className="pattern-section mb-6"
                       >
                         <h2
-                          id={`section-${sectionIndex}`}
+                          id={`section-${sectionIndex} h2Bigger`}
                           className="section-title"
                         >
                           {section.sectionTitle}
@@ -280,7 +280,7 @@ export default function PatternsIndex() {
                                 return (
                                   <div
                                     key={pattern.id}
-                                    className="card pattern-card"
+                                    className="pattern-item"
                                   >
                                     {/* Always show the pattern name */}
                                     <h3 className="pattern-name">{pattern.name}</h3>
@@ -332,7 +332,7 @@ export default function PatternsIndex() {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="pattern-link-card"
+                                                className="pattern-link-card smallBodyText"
                                               >
                                                 {link.title}
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

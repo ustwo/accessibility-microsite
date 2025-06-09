@@ -58,14 +58,17 @@
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 2px solid var(--color-gray-150);
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-150);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .tool-card-link.pattern-card:hover {
   text-decoration: none;
-  /* border: 2px solid var(--color-gray-350); */
-  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */
-  /* transform: translateY(-2px); */
+  background: var(--color-white);
+  border-color: var(--color-gray-250);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
 .tool-card-link.pattern-card:focus {

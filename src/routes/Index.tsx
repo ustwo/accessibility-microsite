@@ -40,7 +40,7 @@ export default function Index() {
         <Grid>
           <Col span={6} start={1}>
             <p className="introText">
-              Resources and tools for designers, developers, product managers and QAs built around ustwo’s five inclusivity principles.
+              Resources and tools for designers, developers, product managers and QAs built around <strong>ustwo’s five inclusivity principles</strong>.
             </p>
           </Col>
         </Grid>
@@ -51,8 +51,8 @@ export default function Index() {
           <div className="principle-card">
             <h2><span className="principle-emoji">⭐</span> Level-up your gear</h2>
             <p className="smallBodyText">
-              Just use the tools. There is a wealth of accessibility testing
-              tools—contrast checkers, checklists, simulators. Use them to
+              Use accessibility testing
+              tools (contrast checkers, checklists, simulators) to
               ensure your work meets basic accessibility standards.
             </p>
             <Link to="/tools" className="callToAction">
@@ -64,8 +64,7 @@ export default function Index() {
             <h2><span className="principle-emoji">🎨</span> Enjoy the patterns</h2>
             <p className="smallBodyText">
               An accessible design pattern is a repeatable solution that
-              solves a common accessibility problem. Even the most original
-              designers don&apos;t need to reinvent the tooltip.
+              solves a common accessibility problem.
             </p>
             <Link to="/patterns" className="callToAction callToAction--red">
               Pattern library
@@ -75,7 +74,7 @@ export default function Index() {
           <div className="principle-card">
             <h2><span className="principle-emoji">⌨️</span> Think beyond touch</h2>
             <p className="smallBodyText">
-              Try navigating your product using only a keyboard—it&apos;s a great
+              Try navigating your product using only a keyboard — it's a great
               way to test for perceivability, operability, and robustness.
             </p>
             <Link to="/checklist" className="callToAction callToAction--blue">
@@ -86,7 +85,7 @@ export default function Index() {
           <div className="principle-card">
             <h2><span className="principle-emoji">🙈</span> Close your eyes</h2>
             <p className="smallBodyText">
-              Everyone should learn and regularly test using at least one
+              Learn and regularly test using at least one
               screen reader. If it works with a keyboard, there&apos;s a good
               chance it&apos;ll work with assistive tech.
             </p>
@@ -98,7 +97,7 @@ export default function Index() {
           <div className="principle-card">
             <h2><span className="principle-emoji">🎉</span> Party party (test) party!</h2>
             <p className="smallBodyText">
-              Accessibility testing isn&apos;t just for QA. Get the team together,
+              Not just for QA. Get the team together,
               test on different devices, and wherever possible, test with real
               users with access needs.
             </p>
