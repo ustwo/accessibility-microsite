@@ -1,5 +1,7 @@
 import Layout from "../components/Layout";
 import { Helmet } from 'react-helmet';
+import Section from "../components/Section";
+import Grid, { Col } from "../components/Grid";
 
 export default function TestSteps() {
   return (
@@ -12,19 +14,21 @@ export default function TestSteps() {
         />
       </Helmet>
 
-      <section className="content-section" aria-labelledby="test-steps-heading">
-        <div className="container container-content">
-          <h2 id="test-steps-heading">Accessibility Testing Steps</h2>
-          <p className="intro-text">
-            Follow these steps to conduct thorough accessibility testing.
-          </p>
-          
-          {/* Test steps content would go here */}
-          <div className="test-steps-content">
-            <p>Test steps content will be here</p>
-          </div>
-        </div>
-      </section>
+      <Section>
+        <Grid>
+          <Col start={1} span={12}>
+            <h2 id="test-steps-heading">Accessibility Testing Steps</h2>
+            <p className="intro-text">
+              Follow these steps to conduct thorough accessibility testing.
+            </p>
+            
+            {/* Test steps content would go here */}
+            <div className="test-steps-content">
+              <p>Test steps content will be here</p>
+            </div>
+          </Col>
+        </Grid>
+      </Section>
     </Layout>
   );
 } 

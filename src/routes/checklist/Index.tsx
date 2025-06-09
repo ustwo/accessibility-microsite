@@ -1,9 +1,15 @@
 import Layout from "../../components/Layout";
 import { Helmet } from 'react-helmet';
+import Section from "../../components/Section";
+import Grid, { Col } from "../../components/Grid";
 
 export default function ChecklistIndex() {
   return (
-    <Layout title="Accessibility Checklist">
+    <Layout
+      title="Accessibility Checklist"
+      introText="Our comprehensive accessibility checklist helps you ensure your digital products 
+      meet accessibility standards. Use this interactive guide to review and track your progress."
+    >
       <Helmet>
         <title>Accessibility Checklist - ustwo Accessibility Microsite</title>
         <meta
@@ -12,37 +18,34 @@ export default function ChecklistIndex() {
         />
       </Helmet>
 
-      <section className="content-section" aria-labelledby="page-header">
-        <div className="container container-content">
-          <p className="intro-text">
-            Our comprehensive accessibility checklist helps you ensure your digital products 
-            meet accessibility standards. Use this interactive guide to review and track your progress.
-          </p>
+      <Section aria-labelledby="page-header">
+        <Grid>
+          <Col start={3} span={8}>
+            <div 
+              className="checklist-iframe-container"
+              role="region" 
+              aria-label="Interactive Accessibility Checklist"
+            >
+              <iframe
+                className="checklist-iframe"
+                src="https://embed.figma.com/design/fIdhHFVcBYnXAvD5xdXgf5/Accessibility-Tools?node-id=41-1062&embed-host=share"
+                title="Accessibility Checklist Figma"
+                aria-label="Interactive accessibility checklist embedded from Figma"
+                allowFullScreen
+              />
+            </div>
 
-          <div 
-            className="checklist-iframe-container"
-            role="region" 
-            aria-label="Interactive Accessibility Checklist"
-          >
-            <iframe
-              className="checklist-iframe"
-              src="https://embed.figma.com/design/fIdhHFVcBYnXAvD5xdXgf5/Accessibility-Tools?node-id=41-1062&embed-host=share"
-              title="Accessibility Checklist Figma"
-              aria-label="Interactive accessibility checklist embedded from Figma"
-              allowFullScreen
-            />
-          </div>
-
-          <a 
-            href="https://www.figma.com/design/fIdhHFVcBYnXAvD5xdXgf5/Accessibility-Tools?node-id=41-1062"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open accessibility checklist in Figma (opens in new tab)"
-          >
-            View checklist directly in Figma
-          </a>
-        </div>
-      </section>
+            <a 
+              href="https://www.figma.com/design/fIdhHFVcBYnXAvD5xdXgf5/Accessibility-Tools?node-id=41-1062"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open accessibility checklist in Figma (opens in new tab)"
+            >
+              View checklist directly in Figma
+            </a>
+          </Col>
+        </Grid>
+      </Section>
     </Layout>
   );
 } 

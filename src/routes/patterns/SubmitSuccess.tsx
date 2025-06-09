@@ -1,34 +1,33 @@
 import { Link } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { Helmet } from 'react-helmet';
+import Section from "../../components/Section";
+import Grid, { Col } from "../../components/Grid";
 
 export default function PatternsSubmitSuccess() {
   return (
-    <Layout title="Thank You!">
+    <Layout title="Pattern Submitted Successfully">
       <Helmet>
-        <title>Thank You for Your Submission - ustwo Accessibility Microsite</title>
+        <title>Pattern Success - ustwo Accessibility Microsite</title>
         <meta
           name="description"
-          content="Thank you for submitting a pattern to our accessibility resources."
+          content="Your pattern submission has been received successfully."
         />
       </Helmet>
 
-      <section className="content-section" aria-labelledby="success-heading">
-        <div className="container container-content text-center">
-          <h2 id="success-heading">Your submission has been received!</h2>
-          <p className="mb-6">
-            Thank you for contributing to the accessibility community. We&apos;ll review your submission shortly.
-          </p>
-          <div className="button-group">
+      <Section>
+        <Grid>
+          <Col start={1} span={12}>
+            <h2 id="success-heading">Your pattern has been submitted successfully!</h2>
+            <p className="mb-6">
+              Thank you for your submission. We&apos;ll review it shortly.
+            </p>
             <Link to="/patterns" className="button">
               Back to Patterns
             </Link>
-            <Link to="/" className="button button-secondary">
-              Return Home
-            </Link>
-          </div>
-        </div>
-      </section>
+          </Col>
+        </Grid>
+      </Section>
     </Layout>
   );
 } 

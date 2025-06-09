@@ -1,12 +1,14 @@
 import { useState } from "react";
 import Layout from "../../components/Layout";
 import { Helmet } from "react-helmet";
+import Section from "../../components/Section";
 import {
   type AccessibilityPattern,
   getPatternsFilterOptions,
 } from "../../utils/googleSheets";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useData } from "../../context/DataContext";
+import Grid, { Col } from "../../components/Grid";  
 
 export default function PatternsIndex() {
   const { patterns, isLoadingPatterns, error, clearCache } = useData();
@@ -93,7 +95,11 @@ export default function PatternsIndex() {
     filterParentTitle !== null;
 
   return (
-    <Layout title="Accessibility Patterns">
+    <Layout
+      title="Accessibility Patterns"
+      introText="Our second principle is to enjoy the patterns. These are the design
+      patterns we recommend for creating accessible digital products."
+    > 
       <Helmet>
         <title>Accessibility Patterns - ustwo Accessibility Microsite</title>
         <meta
@@ -103,237 +109,247 @@ export default function PatternsIndex() {
       </Helmet>
 
       {/* Filters */}
-      <div className="filters-bar">
-        <div className="container container-content">
-          <div className="filters-container">
-            <div className="filters-row">
-              <div className="filter-group">
-                <label htmlFor="categoryFilter">Platform:</label>
-                <select
-                  id="categoryFilter"
-                  value={filterCategory || ""}
-                  onChange={(e) => setFilterCategory(e.target.value || null)}
-                >
-                  <option value="">All Platforms</option>
-                  {availableFilters.categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <Section>
+        <Grid>
+          <Col start={1} span={12}>
+            <div className="filters-bar">
+                <div className="filters-container">
+                  <div className="filters-row">
+                    <div className="filter-group">
+                      <label htmlFor="categoryFilter">Platform:</label>
+                      <select
+                        id="categoryFilter"
+                        value={filterCategory || ""}
+                        onChange={(e) => setFilterCategory(e.target.value || null)}
+                      >
+                        <option value="">All Platforms</option>
+                        {availableFilters.categories.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-              <div className="filter-group">
-                <label htmlFor="parentTitleFilter">Section:</label>
-                <select
-                  id="parentTitleFilter"
-                  value={filterParentTitle || ""}
-                  onChange={(e) => setFilterParentTitle(e.target.value || null)}
-                >
-                  <option value="">All Sections</option>
-                  {availableFilters.parentTitles.map((title) => (
-                    <option key={title} value={title}>
-                      {title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {isFiltering && (
-                <span>
-                  Showing {filteredPatterns.length} of{" "}
-                  {patterns.filter((p) => !p.isSection).length} patterns
-                </span>
-              )}
-              <button
-                className="button button-secondary"
-                onClick={() => {
-                  setFilterCategory(null);
-                  setFilterWhere(null);
-                  setFilterParentTitle(null);
-                }}
-              >
-                Clear Filters
-              </button>
+                    <div className="filter-group">
+                      <label htmlFor="parentTitleFilter">Section:</label>
+                      <select
+                        id="parentTitleFilter"
+                        value={filterParentTitle || ""}
+                        onChange={(e) => setFilterParentTitle(e.target.value || null)}
+                      >
+                        <option value="">All Sections</option>
+                        {availableFilters.parentTitles.map((title) => (
+                          <option key={title} value={title}>
+                            {title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {isFiltering && (
+                      <span>
+                        Showing {filteredPatterns.length} of{" "}
+                        {patterns.filter((p) => !p.isSection).length} patterns
+                      </span>
+                    )}
+                    <button
+                      className="button"
+                      onClick={() => {
+                        setFilterCategory(null);
+                        setFilterWhere(null);
+                        setFilterParentTitle(null);
+                      }}
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <section className="content-section">
-        <div className="container container-content">
-          <p className="intro-text">
-            Our second principle is to enjoy the patterns. These are the design
-            patterns we recommend for creating accessible digital products.
-          </p>
-        </div>
+          </Col>
+        </Grid>
+      </Section>
 
+
+      <Section>
         {/* Loading and error states */}
         {isLoadingPatterns && (
-          <div className="container container-content">
-            <LoadingSpinner message="Loading patterns..." />
-          </div>
+          <Grid>
+            <Col start={1} span={12}>
+              <LoadingSpinner message="Loading patterns..." />
+            </Col>
+          </Grid>
         )}
         {error && (
-          <div className="container container-content">
-            <p className="error">{error}</p>
-          </div>
+          <Grid>
+            <Col start={1} span={12}>
+              <p className="error">{error}</p>
+            </Col>
+          </Grid>
         )}
+      </Section>
+      <Section>
+        <Grid>
+          <Col start={1} span={12}>
+            {/* Pattern listings */}
+            {!isLoadingPatterns && !error && (
+              <>
+                {/* Filtered view - display as a flat grid */}
+                {isFiltering ? (
+                  <div className="patterns-grid">
+                    {filteredPatterns.length > 0 ? (
+                      filteredPatterns.map((pattern) => (
+                        <div key={pattern.id} className="card pattern-card">
+                          <h3 className="pattern-name">{pattern.name}</h3>
+                          <p className="pattern-description">
+                            {pattern.description}
+                          </p>
 
-        {/* Pattern listings */}
-        {!isLoadingPatterns && !error && (
-          <>
-            {/* Filtered view - display as a flat grid */}
-            {isFiltering ? (
-              <div className="patterns-grid">
-                {filteredPatterns.length > 0 ? (
-                  filteredPatterns.map((pattern) => (
-                    <div key={pattern.id} className="card pattern-card">
-                      <h3 className="pattern-name">{pattern.name}</h3>
-                      <p className="pattern-description">
-                        {pattern.description}
-                      </p>
+                          {pattern.linkyDinks && pattern.linkyDinks.length > 0 && (
+                            <div className="pattern-links">
+                              <h4>Resources:</h4>
+                              <ul>
+                                {pattern.linkyDinks
+                                  .filter((link) => link.url && link.title) // Only show links that have both URL and title
+                                  .map((link, index) => (
+                                    <li key={index}>
+                                      <a
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        {link.title}
+                                      </a>
+                                    </li>
+                                  ))}
+                              </ul>
+                            </div>
+                          )}
 
-                      {pattern.linkyDinks && pattern.linkyDinks.length > 0 && (
-                        <div className="pattern-links">
-                          <h4>Resources:</h4>
-                          <ul>
-                            {pattern.linkyDinks
-                              .filter((link) => link.url && link.title) // Only show links that have both URL and title
-                              .map((link, index) => (
-                                <li key={index}>
-                                  <a
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                  >
-                                    {link.title}
-                                  </a>
-                                </li>
-                              ))}
-                          </ul>
+                          <div className="pattern-meta">
+                            {pattern.category && (
+                              <div className="pattern-category">
+                                <strong>Platform:</strong> {pattern.category}
+                              </div>
+                            )}
+                            {pattern.parentTitle && (
+                              <div className="pattern-section">
+                                <strong>Section:</strong> {pattern.parentTitle}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-
-                      <div className="pattern-meta">
-                        {pattern.category && (
-                          <div className="pattern-category">
-                            <strong>Platform:</strong> {pattern.category}
-                          </div>
-                        )}
-                        {pattern.parentTitle && (
-                          <div className="pattern-section">
-                            <strong>Section:</strong> {pattern.parentTitle}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
+                      ))
+                    ) : (
+                        <Grid>
+                        <Col start={1} span={12}>
+                          <p>No patterns match the selected filters.</p>
+                        </Col>
+                      </Grid>
+                    )}
+                  </div>
                 ) : (
-                  <div className="container container-content">
-                    <p>No patterns match the selected filters.</p>
+                  /* Grouped view - display patterns by section */
+                  <div className="patterns-by-section">
+                    {groupedPatternsInSections.map((section, sectionIndex) => (
+                      <div
+                        key={`section-${sectionIndex}`}
+                        className="pattern-section mb-6"
+                      >
+                        <h2
+                          id={`section-${sectionIndex}`}
+                          className="section-title"
+                        >
+                          {section.sectionTitle}
+                        </h2>
+
+                        <div className="patterns-grid">
+                          {section.groupedPatterns.map((patternGroup) => {
+                            // Get the group characteristics
+                            const groupHasMultiplePlatforms =
+                              patternGroup.length > 1;
+
+                            return patternGroup
+                              .map((pattern, patternIndex) => {
+                                // Skip rendering empty patterns (those with no name)
+                                if (!pattern.name.trim()) return null;
+
+                                // For groups with same pattern name but different platforms
+                                const isSubsequentPlatformVariant =
+                                  patternIndex > 0;
+
+                                return (
+                                  <div
+                                    key={pattern.id}
+                                    className="card pattern-card"
+                                  >
+                                    {/* Always show the pattern name */}
+                                    <h3 className="pattern-name">{pattern.name}</h3>
+
+                                    {/* Add subtitle for platform-specific variants */}
+                                    {isSubsequentPlatformVariant && (
+                                      <h4 className="pattern-subtitle">
+                                        For {pattern.category} platforms
+                                      </h4>
+                                    )}
+
+                                    {/* First variant with multiple platforms should indicate it's for that specific platform */}
+                                    {!isSubsequentPlatformVariant &&
+                                      groupHasMultiplePlatforms && (
+                                        <h4 className="pattern-subtitle">
+                                          For {pattern.category} platforms
+                                        </h4>
+                                      )}
+
+                                    <p className="pattern-description">
+                                      {pattern.description}
+                                    </p>
+
+                                    {pattern.linkyDinks &&
+                                      pattern.linkyDinks.length > 0 && (
+                                        <div className="pattern-links">
+                                          <ul>
+                                            {pattern.linkyDinks
+                                              .filter(
+                                                (link) => link.url && link.title
+                                              ) // Only show links that have both URL and title
+                                              .map((link, index) => (
+                                                <li key={index}>
+                                                  <a
+                                                    href={link.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                  >
+                                                    {link.title}
+                                                  </a>
+                                                </li>
+                                              ))}
+                                          </ul>
+                                        </div>
+                                      )}
+
+                                    <div className="pattern-meta">
+                                      {pattern.category && (
+                                        <div className="pattern-category">
+                                          <strong>Platform:</strong>{" "}
+                                          {pattern.category}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })
+                              .filter(Boolean); // Filter out any null values
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
-              </div>
-            ) : (
-              /* Grouped view - display patterns by section */
-              <div className="patterns-by-section">
-                {groupedPatternsInSections.map((section, sectionIndex) => (
-                  <div
-                    key={`section-${sectionIndex}`}
-                    className="pattern-section mb-6"
-                  >
-                    <h2
-                      id={`section-${sectionIndex}`}
-                      className="section-title"
-                    >
-                      {section.sectionTitle}
-                    </h2>
-
-                    <div className="patterns-grid">
-                      {section.groupedPatterns.map((patternGroup) => {
-                        // Get the group characteristics
-                        const groupHasMultiplePlatforms =
-                          patternGroup.length > 1;
-
-                        return patternGroup
-                          .map((pattern, patternIndex) => {
-                            // Skip rendering empty patterns (those with no name)
-                            if (!pattern.name.trim()) return null;
-
-                            // For groups with same pattern name but different platforms
-                            const isSubsequentPlatformVariant =
-                              patternIndex > 0;
-
-                            return (
-                              <div
-                                key={pattern.id}
-                                className="card pattern-card"
-                              >
-                                {/* Always show the pattern name */}
-                                <h3 className="pattern-name">{pattern.name}</h3>
-
-                                {/* Add subtitle for platform-specific variants */}
-                                {isSubsequentPlatformVariant && (
-                                  <h4 className="pattern-subtitle">
-                                    For {pattern.category} platforms
-                                  </h4>
-                                )}
-
-                                {/* First variant with multiple platforms should indicate it's for that specific platform */}
-                                {!isSubsequentPlatformVariant &&
-                                  groupHasMultiplePlatforms && (
-                                    <h4 className="pattern-subtitle">
-                                      For {pattern.category} platforms
-                                    </h4>
-                                  )}
-
-                                <p className="pattern-description">
-                                  {pattern.description}
-                                </p>
-
-                                {pattern.linkyDinks &&
-                                  pattern.linkyDinks.length > 0 && (
-                                    <div className="pattern-links">
-                                      <ul>
-                                        {pattern.linkyDinks
-                                          .filter(
-                                            (link) => link.url && link.title
-                                          ) // Only show links that have both URL and title
-                                          .map((link, index) => (
-                                            <li key={index}>
-                                              <a
-                                                href={link.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                              >
-                                                {link.title}
-                                              </a>
-                                            </li>
-                                          ))}
-                                      </ul>
-                                    </div>
-                                  )}
-
-                                <div className="pattern-meta">
-                                  {pattern.category && (
-                                    <div className="pattern-category">
-                                      <strong>Platform:</strong>{" "}
-                                      {pattern.category}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })
-                          .filter(Boolean); // Filter out any null values
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              </>
             )}
-          </>
-        )}
-      </section>
+            </Col>
+          </Grid>
+        </Section>
     </Layout>
   );
 }

@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import Layout from "../components/Layout";
+import Grid, { Col } from "../components/Grid";
 import { Helmet } from 'react-helmet';
 import { useData } from "../context/DataContext";
+import Section from "../components/Section";
 
 export default function Index() {
   const { refreshData } = useData();
@@ -27,22 +29,22 @@ export default function Index() {
         />
       </Helmet>
 
-      <section className="hero-section content-section" aria-labelledby="hero-heading">
-        <div className="container container-content text-center">
-          <p className="hero-eyebrow">Accessibility</p>
-          <h1 id="hero-heading" className="hero-title">
-            Helping teams build better, more inclusive digital experiences
-          </h1>
-          <p className="hero-subtitle">
-            Resources and tools for designers, developers, product managers and
-            QAs.
-          </p>
-        </div>
-      </section>
+      <Section header aria-labelledby="hero-heading">
+        <Grid>
+          <Col span={8} start={1}>
+            <h1 id="hero-heading">
+              Helping teams build better, more inclusive digital experiences
+            </h1>
+            <p className="hero-subtitle">
+              Resources and tools for designers, developers, product managers and
+              QAs.
+            </p>
+          </Col>
+        </Grid>
+      </Section>
 
-      <section
+      <Section
         id="principles"
-        className="principles-section container-full content-section"
         aria-labelledby="principles-heading"
       >
         <h2 id="principles-heading">ustwo&apos;s Inclusivity Principles</h2>
@@ -106,7 +108,7 @@ export default function Index() {
             </a>
           </div>
         </div>
-      </section>
+      </Section>
     </Layout>
   );
 } 
