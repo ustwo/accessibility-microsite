@@ -58,7 +58,7 @@ export default function PatternsSubmit() {
   );
 
   return (
-    <Layout title="Submit a Pattern">
+    <Layout title="Submit a Pattern" theme="patterns">
       <Helmet>
         <title>Submit a Pattern - ustwo Accessibility Microsite</title>
         <meta

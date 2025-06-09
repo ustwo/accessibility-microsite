@@ -4,7 +4,7 @@
 
 /* Essential button styles */
 .button {
-  background-color: var(--color-offBlack);
+  background-color: var(--color-blue);
   color: white;
 
   transition: all 0.2s ease;
@@ -13,7 +13,6 @@
   font-family: var(--bodyFont);
 
   display: inline-block;
-  border: 1px solid rgba(0, 0, 0, 0.5);
   padding: 0 1.5rem;
   height: 2.5rem;
   line-height: 2.5rem;
@@ -25,7 +24,7 @@
 
 .button:hover {
   background-color: var(--color-gray-750);
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
   text-decoration: none;
 }
 
@@ -34,31 +33,79 @@
   outline-offset: 2px;
 }
 
+.button-link {
+  color: var(--color-blue);
+  font-size: calc(0.875rem + (((1.5 - 0.875) * ((100vw - 320px) / (2048 - 320))) * 10));
+  text-decoration: underline;
+}
+
+.callToAction {
+  font-weight: 500;
+  color: var(--color-offBlack);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: calc(1rem + (((1.5 - 1) * ((100vw - 320px) / (2048 - 320))) * 10));
+  transition: color 0.2s ease;
+}
+
+.callToAction::after {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 0.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 8L12 8M8 4L12 8L8 12' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  transition: transform 0.2s ease;
+}
+
+.callToAction:hover {
+  color: var(--color-gray-750);
+  text-decoration: none;
+}
+
+.callToAction:hover::after {
+  transform: translateX(10px);
+}
+
+.callToAction:focus {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+
+
 /* Clean card styling */
-.card, .pattern-card, .principle-card {
+.card, .pattern-card {
   background: white;
   border: 1px solid var(--color-gray-150);
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.2s ease;
+  background-color: transparent;
 }
 
-.card:hover, .pattern-card:hover, .principle-card:hover {
+.pattern-card.tool-card-link,
+.pattern-card .pattern-link-card {
+  background-color: var(--color-gray-50);
+}
+
+.card:hover {
   border-color: var(--color-gray-250);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.card h3, .pattern-card h3, .principle-card h3 {
-  font-size: 1.125rem;
-  font-weight: 500;
-  margin: 0 0 0.75rem 0;
-  color: var(--color-text-primary);
+.pattern-card.tool-card-link:hover {
+  border-color: var(--color-gray-450); /* Keep original border color */
 }
 
 .card p, .pattern-card p, .principle-card p {
   color: var(--color-text-secondary);
   line-height: 1.5;
   margin: 0 0 1rem 0;
+  
 }
 
 .card .button, .pattern-card .button, .principle-card .button {
@@ -71,16 +118,27 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin: 2rem 0;
 }
 
 .principle-card {
+  border-bottom: 1px solid var(--color-gray-150);
+  padding-bottom: 2.5rem;
+  margin-bottom: 1rem;
   /* display: flex;
   flex-direction: column; */
 }
 
 .principle-card p {
   flex-grow: 1;
+}
+
+.principle-card h2 {
+  margin-top: 0;
+}
+
+/* Principle emoji styling */
+.principle-emoji {
+  line-height: 1;
 }
 
 /* Tools and patterns grid */
@@ -148,6 +206,55 @@
   font-size: 0.75rem;
 }
 
+/* Pattern categories styling (same as tool disciplines) */
+.pattern-categories {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pattern-categories span {
+  background: var(--color-gray-75);
+  color: var(--color-text-secondary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+/* Pattern link cards */
+.pattern-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.pattern-link-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border: 1px solid var(--color-gray-150);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: border-color 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.pattern-link-card:hover {
+  border-color: var(--color-gray-450);
+  text-decoration: none;
+}
+
+.pattern-link-card svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-gray-550);
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
 /* Filter components */
 .filters-bar {
   background: var(--color-gray-50);
@@ -165,8 +272,7 @@
 }
 
 .filter-group label {
-  font-size: 0.875rem;
-  font-weight: 500;
+
   color: var(--color-text-primary);
   margin-right: 0.5rem;
 }
@@ -175,7 +281,6 @@
   padding: 0.5rem;
   border: 1px solid var(--color-gray-250);
   border-radius: 4px;
-  font-size: 0.875rem;
   background: white;
 }
 

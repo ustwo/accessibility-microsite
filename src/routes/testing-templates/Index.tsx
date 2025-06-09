@@ -11,6 +11,7 @@ export default function TestingTemplatesIndex() {
       Party', we believe testing should be a collaborative and
       enjoyable process that brings teams together to create more
       accessible products."
+      theme="testing"
     >
       <Helmet>
         <title>Testing Templates - ustwo Accessibility Microsite</title>
@@ -20,7 +21,7 @@ export default function TestingTemplatesIndex() {
         />
       </Helmet>
 
-      <Section>
+      <Section padding="bottom">
         <Grid>
           <Col start={1} span={12}>
             <figure>

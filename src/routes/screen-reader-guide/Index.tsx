@@ -23,6 +23,7 @@ export default function ScreenReaderGuideIndex() {
     <Layout
       title="Screen Reader Guide"
       introText="Welcome to your interactive guide for learning VoiceOver! Follow these steps and practice along to become comfortable with screen reader testing."
+      theme="guide"
     > 
       <Helmet>
         <title>Screen Reader Guide - ustwo Accessibility Microsite</title>
@@ -32,7 +33,7 @@ export default function ScreenReaderGuideIndex() {
         />
       </Helmet>
 
-      <Section>
+      <Section padding="bottom">
         <Grid>
           <Col start={1} span={12}>
             <div className="guide-sections">

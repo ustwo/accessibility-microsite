@@ -27,6 +27,7 @@ export default function ToolsIndex() {
       title="Accessibility Tools"
       introText="Our first principle is to level-up your gear. These are the tools we recommend for testing and developing
       accessible digital products."
+      theme="tools"
     >
       <Helmet>
         <title>Accessibility Tools - ustwo Accessibility Microsite</title>
@@ -45,7 +46,7 @@ export default function ToolsIndex() {
                   Filter tools
                 </h2>
                 <div className="filters-row">
-                  <div className="filter-group">
+                  <div className="filter-group smallBodyText">
                     <label htmlFor="disciplineFilter">Filter by discipline:</label>
                     <select
                       id="disciplineFilter"
@@ -62,12 +63,12 @@ export default function ToolsIndex() {
                     </select>
                   </div>
 
-                  <span>
+                  <span className="smallBodyText">
                     Showing {filteredTools.length} of {tools.length} tools
                   </span>
 
                   <button
-                    className="button"
+                    className="button-link"
                     onClick={() => {
                       setFilterDiscipline(null);
                     }}
@@ -98,35 +99,53 @@ export default function ToolsIndex() {
                     <div className="patterns-grid">
                       {filteredTools.length > 0 ? (
                         filteredTools.map((tool) => (
-                          <div key={tool.id} className="card pattern-card">
-                            <h3 className="tool-name">{tool.name}</h3>
-                            <p className="tool-description">{tool.description}</p>
-                            <div className="tool-meta">
-                              {tool.discipline.length > 0 && (
-                                <div className="tool-disciplines">
-                                  <strong className="sr-only">For:</strong>{" "}
-                                  {tool.discipline.map((d) => (
-                                    <span key={d}>{d}</span>
-                                  ))}
-                                </div>
-                              )}
+                          tool.url ? (
+                            <a
+                              key={tool.id}
+                              href={
+                                tool.url.startsWith("http")
+                                  ? tool.url
+                                  : `https://${tool.url}`
+                              }
+                              className="card pattern-card tool-card-link"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`Visit ${tool.name} - ${tool.description}`}
+                            >
+                              <h3>{tool.name}</h3>
+                              <p className="smallBodyText">{tool.description}</p>
+                              <div className="tool-meta">
+                                {tool.discipline.length > 0 && (
+                                  <div className="tool-disciplines">
+                                    <strong className="sr-only">For:</strong>{" "}
+                                    {tool.discipline.map((d) => (
+                                      <span key={d}>{d}</span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="external-link-icon">
+                              <svg fill="#666666" width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M19,14 L19,19 C19,20.1045695 18.1045695,21 17,21 L5,21 C3.8954305,21 3,20.1045695 3,19 L3,7 C3,5.8954305 3.8954305,5 5,5 L10,5 L10,7 L5,7 L5,19 L17,19 L17,14 L19,14 Z M18.9971001,6.41421356 L11.7042068,13.7071068 L10.2899933,12.2928932 L17.5828865,5 L12.9971001,5 L12.9971001,3 L20.9971001,3 L20.9971001,11 L18.9971001,11 L18.9971001,6.41421356 Z"/>
+                              </svg>
+                              </div>
+                            </a>
+                          ) : (
+                            <div key={tool.id} className="card pattern-card">
+                              <h3 className="tool-name">{tool.name}</h3>
+                              <p className="tool-description">{tool.description}</p>
+                              <div className="tool-meta">
+                                {tool.discipline.length > 0 && (
+                                  <div className="tool-disciplines">
+                                    <strong className="sr-only">For:</strong>{" "}
+                                    {tool.discipline.map((d) => (
+                                      <span key={d}>{d}</span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            {tool.url && (
-                              <a
-                                href={
-                                  tool.url.startsWith("http")
-                                    ? tool.url
-                                    : `https://${tool.url}`
-                                }
-                                className="tool-link button"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label={`Visit ${tool.name}`}
-                              >
-                                Visit tool
-                              </a>
-                            )}
-                          </div>
+                          )
                         ))
                       ) : (
                         <p>No tools match the selected filters.</p>

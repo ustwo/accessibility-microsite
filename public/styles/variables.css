@@ -152,11 +152,17 @@
   --color-blue        : #323BFF;
   --color-lightBlue   : #5EE0F7;
   --color-mint        : #29FFAD;
+  --color-yellow      : #FFE500;
   --color-red         : #FF515A;
   
+  /* Section theme colors - for the 5 main principles */
+  --theme-tools       : var(--color-mint);        /* Tools - Level-up your gear */
+  --theme-patterns    : var(--color-red);         /* Patterns - Enjoy the patterns */
+  --theme-checklist   : var(--color-blue);        /* Checklist - Think beyond touch */
+  --theme-guide       : var(--color-yellow);      /* Screen Reader Guide - Close your eyes */
+  --theme-testing     : var(--color-lightBlue);   /* Testing Templates - Party party (test) party */
   
   --color-darkGrey    : #666666;
-  --color-yellow      : #FFE500;
   --color-link-green  : #DEFF5C;
 
   --color-white       : #FFFFFF;
@@ -181,7 +187,7 @@
   
   /* Dashboard text colors */
   --color-text-primary: var(--color-offBlack);
-  --color-text-secondary: var(--color-gray-550);
+  --color-text-secondary: var(--color-gray-650);
   --color-text-muted: var(--color-gray-450);
   --color-text-subtle: var(--color-gray-350);
   

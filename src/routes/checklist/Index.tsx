@@ -9,6 +9,7 @@ export default function ChecklistIndex() {
       title="Accessibility Checklist"
       introText="Our comprehensive accessibility checklist helps you ensure your digital products 
       meet accessibility standards. Use this interactive guide to review and track your progress."
+      theme="checklist"
     >
       <Helmet>
         <title>Accessibility Checklist - ustwo Accessibility Microsite</title>
@@ -18,9 +19,9 @@ export default function ChecklistIndex() {
         />
       </Helmet>
 
-      <Section aria-labelledby="page-header">
+      <Section aria-labelledby="page-header" padding="bottom">
         <Grid>
-          <Col start={3} span={8}>
+          <Col start={1} span={12}>
             <div 
               className="checklist-iframe-container"
               role="region" 
@@ -40,8 +41,9 @@ export default function ChecklistIndex() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Open accessibility checklist in Figma (opens in new tab)"
+              className="button"
             >
-              View checklist directly in Figma
+              View checklist in Figma
             </a>
           </Col>
         </Grid>

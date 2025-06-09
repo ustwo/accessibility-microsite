@@ -126,7 +126,7 @@
 
 .site-nav a {
   position: relative;
-  font-size: calc(12px + (18 - 12) * ((100vw - 320px) / (3200 - 320)));
+  font-size: calc(0.875rem + (((1.5 - 0.875) * ((100vw - 320px) / (2048 - 320))) * 10));
   color: var(--color-offBlack);
   transition: var(--transition);
   padding: var(--space-2);
@@ -138,13 +138,12 @@
 }
 
 .site-nav a[aria-current="page"] {
-  font-weight: 600;
-  color: var(--color-blue);
+  border-bottom: 2px solid var(--color-blue);
 }
 
 @media (min-width: 1250px) {
   .site-nav a {
-    font-size: calc(14px + (18 - 14) * ((100vw - 320px) / (3200 - 320)));
+    /* font-size: calc(14px + (18 - 14) * ((100vw - 320px) / (3200 - 320))); */
   }
 }
 
@@ -156,7 +155,7 @@
   }
   
   .site-nav a {
-    font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (768 - 320)));
+    /* font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (768 - 320))); */
   }
 }
 
@@ -220,26 +219,21 @@
 
 .footer-links a, .company-links a {
   padding: var(--space-2);
-  font-size: var(--font-size-base);
-  font-weight: 500;
   display: inline-block;
-  border-radius: var(--border-radius-sm);
   text-decoration: underline;
-  text-underline-offset: 0.1rem;
-  text-decoration-thickness: 0.025rem;
   position: relative;
+  color: white !important;
 }
 
 /* Add styling for active footer links */
 .footer-links a[aria-current="page"],
 .company-links a[aria-current="page"]  {
-  font-weight: 700; /* Bold font weight */
   position: relative;
-  text-decoration-thickness: 0.1rem;
+  color: white !important;
 }
 
 .company-links a[aria-current="page"] {
-  color: var(--color-secondary);
+  color: white !important;
 }
 
 /* Footer divider */
@@ -253,8 +247,8 @@
 .company-footer {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: var(--space-4);
 }
 
@@ -265,6 +259,8 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  font-size: calc(0.875rem + (((1.5 - 0.875) * ((100vw - 320px) / (2048 - 320))) * 10));
+  color: white !important;
 }
 
 .social-icons {
@@ -459,3 +455,10 @@
   .lg\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .lg\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 } 
+
+.backgroundOffWhite {
+  background-color: var(--color-offWhite);
+}
+.backgroundOffBlack {
+  background-color: var(--color-offBlack);
+}

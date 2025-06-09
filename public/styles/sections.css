@@ -25,13 +25,7 @@ section[aria-labelledby="hero-heading"] .hero-subtitle {
   margin-bottom: 2rem;
 }
 
-/* Section headers */
-section h2 {
-  margin-bottom: 2rem;
-  font-size: 1.75rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
+
 
 /* Content sections */
 .content-section {
@@ -42,16 +36,6 @@ section h2 {
   background: var(--color-gray-50);
 }
 
-/* Principle section styling */
-section[id="principles"] {
-  background: var(--color-gray-50);
-  padding: 4rem 0;
-}
-
-section[id="principles"] h2 {
-  margin-bottom: 3rem;
-  font-size: 2rem;
-}
 
 /* Reduce margin for tight layouts */
 .tight-section {

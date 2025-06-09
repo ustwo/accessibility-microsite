@@ -32,7 +32,7 @@ export default function ToolsSubmit() {
   );
 
   return (
-    <Layout title="Submit a Tool">
+    <Layout title="Submit a Tool" theme="tools">
       <Helmet>
         <title>Submit a Tool - ustwo Accessibility Microsite</title>
         <meta
