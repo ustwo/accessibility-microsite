@@ -228,6 +228,7 @@
   left: 11rem;
   z-index: 100;
   transition: var(--transition);
+  /* display: none; */
 }
 
 .skip-to-content > a:focus-visible {

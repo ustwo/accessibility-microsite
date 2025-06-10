@@ -148,10 +148,11 @@
 
   /* Colours */
   /* Core */ 
-  --color-offBlack    : #191B36;
+  --color-offBlack    : var(--color-gray-850);
   --color-blue        : #323BFF;
   --color-lightBlue   : #5EE0F7;
   --color-mint        : #29FFAD;
+  
   --color-yellow      : #FFE500;
   --color-red         : #FF515A;
   
@@ -166,7 +167,7 @@
   --color-link-green  : #DEFF5C;
 
   --color-white       : #FFFFFF;
-  --color-offWhite    : var(--color-gray-150);
+  --color-offWhite    : var(--color-gray-100);
   --color-lightGrey   : #C4C3C9;
   --color-lighterGrey : #eeeeee;
   --color-offBlackDarker: #14162b;

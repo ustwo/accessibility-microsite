@@ -25,6 +25,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
 
   return (
     <div className={`page-wrapper ${theme ? `theme-${theme}` : ''}`}>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <header className="site-header" role="banner">
         <div className="header-inner">          
           <Link 
@@ -235,7 +236,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                 <ul className="company-links">
                   <li>
                   <div className="company-logo">
-                  <span>ustwo © 2025</span>
+                  <span>Copyright © ustwo Ltd 2025. All rights reserved.</span>
                 </div>
                   </li>
                   <li><a href="https://ustwo.com/legal/" target="_blank" rel="noopener noreferrer">Legal</a></li>

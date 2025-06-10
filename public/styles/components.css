@@ -136,8 +136,8 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  transition: background-color 0.2s ease;
-  /* border-radius: 8px; */
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .principle-card-link:hover {
@@ -145,9 +145,30 @@
   text-decoration: none;
 }
 
+/* Ensure text remains readable when card is focused/hovered */
+.principle-card-link:hover h2,
+.principle-card-link:focus h2,
+.principle-card-link:focus-visible h2 {
+  color: inherit;
+}
+
+/* Improve contrast for better accessibility */
+.principle-card-link:hover p,
+.principle-card-link:focus p,
+.principle-card-link:focus-visible p {
+  color: inherit;
+}
+
 .principle-card-link:focus {
-  outline: 2px solid var(--color-blue);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-blue);
+  outline-offset: 3px;
+  background-color: rgba(50, 59, 255, 0.05);
+}
+
+.principle-card-link:focus-visible {
+  outline: 3px solid var(--color-blue);
+  outline-offset: 3px;
+  background-color: rgba(50, 59, 255, 0.05);
 }
 
 /* Make the arrow transition when hovering the whole card */
@@ -160,6 +181,10 @@
   padding: 3rem;
   /* display: flex;
   flex-direction: column; */
+}
+
+.principle-card-no-border {
+  border: none;
 }
 
 .principle-card p {
@@ -177,6 +202,11 @@
   display: inline-block;
   margin-right: 10px;
   /* transform: translateY(0.4rem); */
+}
+
+.principle-icon {
+  width: 60px;
+  height: 60px;
 }
 
 /* Tools grid - card-based external links */

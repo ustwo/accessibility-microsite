@@ -47,10 +47,10 @@ export default function Index() {
       </Section>
 
       <Section id="principles" padding="bottom">
-          <Link to="/tools" className="principle-card-link">
+          <Link to="/tools" className="principle-card-link" aria-label="Go to recommended accessibility tools - Level-up your gear">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <div className="h1 colorDarkGrey">1</div>
+                <img src="/img/icon-tools.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
               <h2 className="h2Biggest">Level-up your gear</h2>
@@ -61,17 +61,17 @@ export default function Index() {
                   tools (contrast checkers, checklists, simulators) to
                   ensure your work meets basic accessibility standards.
                 </p>
-                <div className="callToAction">
-                  <span className="principle-emoji">⭐</span> Recommended tools
+                <div className="callToAction" aria-hidden="true">
+                  Recommended tools
                 </div>
               </Col>
             </Grid>
           </Link>
 
-          <Link to="/patterns" className="principle-card-link">
+          <Link to="/patterns" className="principle-card-link" aria-label="Go to accessibility pattern library - Enjoy the patterns">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <div className="h1 colorDarkGrey">2</div>
+                <img src="/img/icon-patterns.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
               <h2 className="h2Biggest">Enjoy the patterns</h2>
@@ -81,17 +81,17 @@ export default function Index() {
                   An accessible design pattern is a repeatable solution that
                   solves a common accessibility problem.
                 </p>
-                <div className="callToAction callToAction--red">
-                  <span className="principle-emoji">🎨</span> Pattern library
+                <div className="callToAction callToAction--red" aria-hidden="true">
+                  Pattern library
                 </div>
               </Col>
             </Grid>
           </Link>
 
-          <Link to="/checklist" className="principle-card-link">
+          <Link to="/checklist" className="principle-card-link" aria-label="Go to accessibility checklist - Think beyond touch">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <div className="h1 colorDarkGrey">3</div>
+                <img src="/img/icon-keyboard.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
               <h2 className="h2Biggest">Think beyond touch</h2>
@@ -101,38 +101,37 @@ export default function Index() {
                   Try navigating your product using only a keyboard — it's a great
                   way to test for perceivability, operability, and robustness.
                 </p>
-                <div className="callToAction callToAction--blue">
-                  <span className="principle-emoji">⌨️</span> Accessibility checklist
+                <div className="callToAction callToAction--blue" aria-hidden="true">
+                  Accessibility checklist
                 </div>
               </Col>
             </Grid>
           </Link>
 
-          <Link to="/screen-reader-guide" className="principle-card-link">
+          <Link to="/screen-reader-guide" className="principle-card-link" aria-label="Go to screen reader tutorial - Close your eyes">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <div className="h1 colorDarkGrey">4</div>
+                <img src="/img/icon-close-eyes.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
               <h2 className="h2Biggest">Close your eyes</h2>
               </Col>
               <Col start={5} span={5}>
                 <p className="smallBodyText">
-                  Learn and regularly test using at least one
-                  screen reader. If it works with a keyboard, there&apos;s a good
+                  Learn and regularly test using a screen reader. If it works with a keyboard, there&apos;s a good
                   chance it&apos;ll work with assistive tech.
                 </p>
-                <div className="callToAction callToAction--yellow">
-                  <span className="principle-emoji">🙈</span> Screenreader tutorial
+                <div className="callToAction callToAction--yellow" aria-hidden="true">
+                  Screenreader tutorial
                 </div>
               </Col>
             </Grid>
           </Link>
 
-          <Link to="/testing-templates" className="principle-card-link">
-            <Grid className="principle-card">
+          <Link to="/testing-templates" className="principle-card-link" aria-label="Go to testing templates - Party party test party">
+            <Grid className="principle-card principle-card-no-border">
               <Col start={1} span={1}>
-                <div className="h1 colorDarkGrey">5</div>
+                <img src="/img/icon-test.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
               <h2 className="h2Biggest">Party party (test) party!</h2>
@@ -143,8 +142,8 @@ export default function Index() {
                   test on different devices, and wherever possible, test with real
                   users with access needs.
                 </p>
-                <div className="callToAction callToAction--lightBlue">
-                  <span className="principle-emoji">🎉</span> Testing templates
+                <div className="callToAction callToAction--lightBlue" aria-hidden="true">
+                  Testing templates
                 </div>
               </Col>
             </Grid>
