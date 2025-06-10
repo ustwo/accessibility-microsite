@@ -131,11 +131,33 @@
   gap: 1.5rem;
 }
 
+/* Principle card link wrapper */
+.principle-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease;
+  /* border-radius: 8px; */
+}
+
+.principle-card-link:hover {
+  background-color: var(--color-gray-100);
+  text-decoration: none;
+}
+
+.principle-card-link:focus {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+/* Make the arrow transition when hovering the whole card */
+.principle-card-link:hover .callToAction::after {
+  transform: translateX(10px);
+}
+
 .principle-card {
-  border-bottom: 1px solid var(--color-gray-150);
-  padding-bottom: 2.5rem;
-  margin-bottom: 1rem;
-  padding-right: 20px;
+  border-bottom: 1px solid var(--color-gray-250);
+  padding: 3rem;
   /* display: flex;
   flex-direction: column; */
 }
@@ -151,10 +173,10 @@
 /* Principle emoji styling */
 .principle-emoji {
   line-height: 1;
-  font-size: calc(1.5rem + (((5.5 - 1.5) * ((100vw - 320px) / (2048 - 320))) * 10));
+  /* font-size: calc(1.5rem + (((5.5 - 1.5) * ((100vw - 320px) / (2048 - 320))) * 10)); */
   display: inline-block;
   margin-right: 10px;
-  transform: translateY(0.4rem);
+  /* transform: translateY(0.4rem); */
 }
 
 /* Tools grid - card-based external links */

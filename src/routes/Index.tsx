@@ -40,72 +40,115 @@ export default function Index() {
         <Grid>
           <Col span={6} start={1}>
             <p className="introText">
-              Resources and tools for designers, developers, product managers and QAs built around <strong>ustwo’s five inclusivity principles</strong>.
+              Resources and tools for designers, developers, product managers and QAs built around <strong>ustwo's five inclusivity principles</strong>.
             </p>
           </Col>
         </Grid>
       </Section>
 
       <Section id="principles" padding="bottom">
-        <div className="principles-row homepage-principles">
-          <div className="principle-card">
-            <h2><span className="principle-emoji">⭐</span> Level-up your gear</h2>
-            <p className="smallBodyText">
-              Use accessibility testing
-              tools (contrast checkers, checklists, simulators) to
-              ensure your work meets basic accessibility standards.
-            </p>
-            <Link to="/tools" className="callToAction">
-              Recommended tools
-            </Link>
-          </div>
+          <Link to="/tools" className="principle-card-link">
+            <Grid className="principle-card">
+              <Col start={1} span={1}>
+                <div className="h1 colorDarkGrey">1</div>
+              </Col>
+              <Col start={2} span={3}>
+              <h2 className="h2Biggest">Level-up your gear</h2>
+              </Col>
+              <Col start={5} span={5}>
+                <p className="smallBodyText">
+                  Use accessibility testing
+                  tools (contrast checkers, checklists, simulators) to
+                  ensure your work meets basic accessibility standards.
+                </p>
+                <div className="callToAction">
+                  <span className="principle-emoji">⭐</span> Recommended tools
+                </div>
+              </Col>
+            </Grid>
+          </Link>
 
-          <div className="principle-card">
-            <h2><span className="principle-emoji">🎨</span> Enjoy the patterns</h2>
-            <p className="smallBodyText">
-              An accessible design pattern is a repeatable solution that
-              solves a common accessibility problem.
-            </p>
-            <Link to="/patterns" className="callToAction callToAction--red">
-              Pattern library
-            </Link>
-          </div>
+          <Link to="/patterns" className="principle-card-link">
+            <Grid className="principle-card">
+              <Col start={1} span={1}>
+                <div className="h1 colorDarkGrey">2</div>
+              </Col>
+              <Col start={2} span={3}>
+              <h2 className="h2Biggest">Enjoy the patterns</h2>
+              </Col>
+              <Col start={5} span={5}>
+                <p className="smallBodyText">
+                  An accessible design pattern is a repeatable solution that
+                  solves a common accessibility problem.
+                </p>
+                <div className="callToAction callToAction--red">
+                  <span className="principle-emoji">🎨</span> Pattern library
+                </div>
+              </Col>
+            </Grid>
+          </Link>
 
-          <div className="principle-card">
-            <h2><span className="principle-emoji">⌨️</span> Think beyond touch</h2>
-            <p className="smallBodyText">
-              Try navigating your product using only a keyboard — it's a great
-              way to test for perceivability, operability, and robustness.
-            </p>
-            <Link to="/checklist" className="callToAction callToAction--blue">
-              Accessibility checklist
-            </Link>
-          </div>
+          <Link to="/checklist" className="principle-card-link">
+            <Grid className="principle-card">
+              <Col start={1} span={1}>
+                <div className="h1 colorDarkGrey">3</div>
+              </Col>
+              <Col start={2} span={3}>
+              <h2 className="h2Biggest">Think beyond touch</h2>
+              </Col>
+              <Col start={5} span={5}>
+                <p className="smallBodyText">
+                  Try navigating your product using only a keyboard — it's a great
+                  way to test for perceivability, operability, and robustness.
+                </p>
+                <div className="callToAction callToAction--blue">
+                  <span className="principle-emoji">⌨️</span> Accessibility checklist
+                </div>
+              </Col>
+            </Grid>
+          </Link>
 
-          <div className="principle-card">
-            <h2><span className="principle-emoji">🙈</span> Close your eyes</h2>
-            <p className="smallBodyText">
-              Learn and regularly test using at least one
-              screen reader. If it works with a keyboard, there&apos;s a good
-              chance it&apos;ll work with assistive tech.
-            </p>
-            <Link to="/screen-reader-guide" className="callToAction callToAction--yellow">
-              Screenreader tutorial
-            </Link>
-          </div>
+          <Link to="/screen-reader-guide" className="principle-card-link">
+            <Grid className="principle-card">
+              <Col start={1} span={1}>
+                <div className="h1 colorDarkGrey">4</div>
+              </Col>
+              <Col start={2} span={3}>
+              <h2 className="h2Biggest">Close your eyes</h2>
+              </Col>
+              <Col start={5} span={5}>
+                <p className="smallBodyText">
+                  Learn and regularly test using at least one
+                  screen reader. If it works with a keyboard, there&apos;s a good
+                  chance it&apos;ll work with assistive tech.
+                </p>
+                <div className="callToAction callToAction--yellow">
+                  <span className="principle-emoji">🙈</span> Screenreader tutorial
+                </div>
+              </Col>
+            </Grid>
+          </Link>
 
-          <div className="principle-card">
-            <h2><span className="principle-emoji">🎉</span> Party party (test) party!</h2>
-            <p className="smallBodyText">
-              Not just for QA. Get the team together,
-              test on different devices, and wherever possible, test with real
-              users with access needs.
-            </p>
-            <a href="/testing-templates" className="callToAction callToAction--lightBlue">
-              Testing templates
-            </a>
-          </div>
-        </div>
+          <Link to="/testing-templates" className="principle-card-link">
+            <Grid className="principle-card">
+              <Col start={1} span={1}>
+                <div className="h1 colorDarkGrey">5</div>
+              </Col>
+              <Col start={2} span={3}>
+              <h2 className="h2Biggest">Party party (test) party!</h2>
+              </Col>
+              <Col start={5} span={5}>
+                <p className="smallBodyText">
+                  Not just for QA. Get the team together,
+                  test on different devices, and wherever possible, test with real
+                  users with access needs.
+                </p>
+                <div className="callToAction callToAction--lightBlue">
+                  <span className="principle-emoji">🎉</span> Testing templates
+                </div>
+              </Col>
+            </Grid>
+          </Link>
       </Section>
     </Layout>
   );
