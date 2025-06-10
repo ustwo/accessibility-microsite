@@ -17,7 +17,7 @@ export default function PatternsSubmitSuccess() {
 
       <Section>
         <Grid>
-          <Col start={1} span={12}>
+          <Col start={1} span={6}>
             <h2 id="success-heading">Your pattern has been submitted successfully!</h2>
             <p className="mb-6">
               Thank you for your submission. We&apos;ll review it shortly.

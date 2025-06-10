@@ -107,7 +107,7 @@ export default function PatternsIndex() {
       </Helmet>
 
       {/* Filters */}
-      <Section>
+      <Section className="light-background">
         <Grid>
           <Col start={1} span={12}>
             <div className="filters-bar">
@@ -184,9 +184,9 @@ export default function PatternsIndex() {
           </Grid>
         )}
       </Section>
-      <Section padding="bottom">
-        <Grid>
-          <Col start={1} span={12}>
+      <div>
+        <div>
+          <div>
             {/* Pattern listings */}
             {!isLoadingPatterns && !error && (
               <>
@@ -227,6 +227,20 @@ export default function PatternsIndex() {
                                     rel="noopener noreferrer"
                                     className="pattern-link-card smallBodyText"
                                   >
+                                    <img 
+                                      src={`https://www.google.com/s2/favicons?domain=${
+                                        // Special case for Salesforce URLs
+                                        link.url.toLowerCase().includes('salesforce') 
+                                          ? 'salesforce.com' 
+                                          : link.url.replace(/^https?:\/\//, '').split('/')[0]
+                                      }&sz=64`}
+                                      alt=""
+                                      className="pattern-link-favicon"
+                                      aria-hidden="true"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
                                     {link.title}
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                       <path fillRule="evenodd" d="M19,14 L19,19 C19,20.1045695 18.1045695,21 17,21 L5,21 C3.8954305,21 3,20.1045695 3,19 L3,7 C3,5.8954305 3.8954305,5 5,5 L10,5 L10,7 L5,7 L5,19 L17,19 L17,14 L19,14 Z M18.9971001,6.41421356 L11.7042068,13.7071068 L10.2899933,12.2928932 L17.5828865,5 L12.9971001,5 L12.9971001,3 L20.9971001,3 L20.9971001,11 L18.9971001,11 L18.9971001,6.41421356 Z" fill="currentColor"/>
@@ -251,12 +265,12 @@ export default function PatternsIndex() {
                   /* Grouped view - display patterns by section */
                   <div className="patterns-by-section">
                     {groupedPatternsInSections.map((section, sectionIndex) => (
-                      <div
+                      <Section
                         key={`section-${sectionIndex}`}
-                        className="pattern-section mb-6"
+                        padding="bottom"
                       >
                         <h2
-                          id={`section-${sectionIndex} h2Bigger`}
+                          id={`section-${sectionIndex}`}
                           className="section-title"
                         >
                           {section.sectionTitle}
@@ -309,8 +323,8 @@ export default function PatternsIndex() {
                                         <div className="pattern-categories">
                                           {pattern.category.toLowerCase() === 'all' ? (
                                             <>
-                                              <span>mob</span>
-                                              <span>web</span>
+                                              <span>Mob</span>
+                                              <span>Web</span>
                                             </>
                                           ) : (
                                             <span>{pattern.category.toLowerCase()}</span>
@@ -334,6 +348,20 @@ export default function PatternsIndex() {
                                                 rel="noopener noreferrer"
                                                 className="pattern-link-card smallBodyText"
                                               >
+                                                <img 
+                                                  src={`https://www.google.com/s2/favicons?domain=${
+                                                    // Special case for Salesforce URLs
+                                                    link.url.toLowerCase().includes('salesforce') 
+                                                      ? 'salesforce.com' 
+                                                      : link.url.replace(/^https?:\/\//, '').split('/')[0]
+                                                  }&sz=64`}
+                                                  alt=""
+                                                  className="pattern-link-favicon"
+                                                  aria-hidden="true"
+                                                  onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                  }}
+                                                />
                                                 {link.title}
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                   <path fillRule="evenodd" d="M19,14 L19,19 C19,20.1045695 18.1045695,21 17,21 L5,21 C3.8954305,21 3,20.1045695 3,19 L3,7 C3,5.8954305 3.8954305,5 5,5 L10,5 L10,7 L5,7 L5,19 L17,19 L17,14 L19,14 Z M18.9971001,6.41421356 L11.7042068,13.7071068 L10.2899933,12.2928932 L17.5828865,5 L12.9971001,5 L12.9971001,3 L20.9971001,3 L20.9971001,11 L18.9971001,11 L18.9971001,6.41421356 Z" fill="currentColor"/>
@@ -350,15 +378,15 @@ export default function PatternsIndex() {
                               .filter(Boolean); // Filter out any null values
                           })}
                         </div>
-                      </div>
+                      </Section>
                     ))}
                   </div>
                 )}
               </>
             )}
-            </Col>
-          </Grid>
-        </Section>
+            </div>
+          </div>
+        </div>
     </Layout>
   );
 }

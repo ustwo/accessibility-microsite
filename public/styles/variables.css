@@ -166,7 +166,7 @@
   --color-link-green  : #DEFF5C;
 
   --color-white       : #FFFFFF;
-  --color-offWhite    : #F4F4F4;
+  --color-offWhite    : var(--color-gray-150);
   --color-lightGrey   : #C4C3C9;
   --color-lighterGrey : #eeeeee;
   --color-offBlackDarker: #14162b;

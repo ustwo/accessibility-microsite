@@ -130,10 +130,11 @@
   color: var(--color-offBlack);
   transition: var(--transition);
   padding: var(--space-2);
+  font-weight: 400;
 }
 
 .site-nav a:hover {
-  color: var(--color-darkGrey);
+  color: var(--color-blue);
   text-decoration: none;
 }
 

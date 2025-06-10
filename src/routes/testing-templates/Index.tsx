@@ -23,12 +23,13 @@ export default function TestingTemplatesIndex() {
 
       <Section padding="bottom">
         <Grid>
-          <Col start={1} span={12}>
+          <Col start={1} span={5}>
             <figure>
               <img src="/img/testing-template.png" alt="Testing templates" />
               <figcaption>Screenshot of the testing template on Miro</figcaption>
             </figure>
-
+          </Col>
+          <Col start={7} span={5}>
             <p>
               Our accessibility review template provides a structured approach to
               testing digital products across different platforms and interaction
@@ -36,21 +37,18 @@ export default function TestingTemplatesIndex() {
               principles and ensure comprehensive coverage of accessibility
               requirements.
             </p>
-
-            <div className="template-cta">
-              <p>
-                Ready to start testing? Access our template on Miro and begin your
-                accessibility review journey.
-              </p>
-              <a
-                href="https://miro.com/miroverse/accessibility-audit-issue-tracker/"
-                className="button"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Template on Miro
-              </a>
-            </div>
+            <p>
+              Ready to start testing? Access our template on Miro and begin your
+              accessibility review journey.
+            </p>
+            <a
+              href="https://miro.com/miroverse/accessibility-audit-issue-tracker/"
+              className="button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Template on Miro
+            </a>
           </Col>
         </Grid>
       </Section>

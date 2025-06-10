@@ -140,7 +140,9 @@ h6 {
   line-height: 1.5;
 }
 
-p {
+p,
+ul,
+ol {
   margin-top: 0;
   margin-bottom: var(--space-4);
   line-height: var(--line-height-normal);
@@ -165,7 +167,6 @@ p a:hover,
 li:not(.site-nav li, .pattern-links li) a:hover,
 .regular-link:hover {
   color: var(--color-blue);
-  background-color: rgba(50, 59, 255, 0.1);
 }
 
 /* Default link styles that apply to all links */

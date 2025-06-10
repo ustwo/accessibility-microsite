@@ -15,9 +15,9 @@ export default function About() {
         />
       </Helmet>
 
-      <Section aria-labelledby="about-intro">
+      <Section aria-labelledby="about-intro" padding="bottom">
         <Grid>
-          <Col start={3} span={8}>
+          <Col start={1} span={8}>
             <h2 id="about-intro">Our commitment to accessibility</h2>
             <p>
               At ustwo, we believe that digital experiences should be accessible to everyone. We&apos;re a world-leading digital product studio renowned for creating experiences that delight and empower users. When we craft digital products, we ensure that each user – in all their beautiful diversity – can access the information and services our clients provide.
@@ -29,9 +29,9 @@ export default function About() {
         </Grid>
       </Section>
 
-      <Section aria-labelledby="about-principles">
+      <Section aria-labelledby="about-principles" padding="bottom">
         <Grid>
-          <Col start={3} span={8}>
+          <Col start={1} span={8}>
             <h2 id="about-principles">Our inclusivity principles</h2>
             <p>
               We&apos;ve developed a set of guiding principles to help teams create accessible digital experiences. These principles are designed to be practical, engaging, and effective:
@@ -47,9 +47,9 @@ export default function About() {
         </Grid>
       </Section>
 
-      <Section aria-labelledby="about-facts">
+      <Section aria-labelledby="about-facts" padding="bottom">
         <Grid>
-          <Col start={3} span={8}>
+          <Col start={1} span={8}>
             <h2 id="about-facts">Why accessibility matters</h2>
             <ul>
               <li>Inclusive design improves the experience for everyone</li>
@@ -60,9 +60,9 @@ export default function About() {
         </Grid>
       </Section>
 
-      <Section aria-labelledby="about-examples">
+      <Section aria-labelledby="about-examples" padding="bottom">
         <Grid>
-          <Col start={3} span={8}>
+          <Col start={1} span={8}>
             <h2 id="about-examples">Real-world impact</h2>
             <p>
               Our commitment to accessibility has led to significant achievements:
@@ -72,25 +72,6 @@ export default function About() {
               <li>Accessible payment flows handling billions in transactions</li>
               <li>Comprehensive design systems with accessibility built-in</li>
             </ul>
-          </Col>
-        </Grid>
-      </Section>
-
-      <Section aria-labelledby="about-contribute">
-        <Grid>
-          <Col start={3} span={8}>
-            <h2 id="about-contribute">Join the community</h2>
-            <p>
-              We&apos;re building this resource to help everyone create better, more accessible digital experiences. We welcome contributions from the accessibility community.
-            </p>
-            <div className="flex gap-4">
-              <Link to="/tools/submit" className="button">
-                Submit a Tool
-              </Link>
-              <Link to="/patterns/submit" className="button">
-                Submit a Pattern
-              </Link>
-            </div>
           </Col>
         </Grid>
       </Section>
