@@ -241,6 +241,36 @@
   outline-offset: 2px;
 }
 
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .button {
+    border: 2px solid;
+  }
+  
+  .card, .pattern-card {
+    border: 2px solid;
+  }
+  
+  .skip-link, .skip-to-content a {
+    border: 2px solid;
+  }
+}
+
+/* Windows High Contrast Mode */
+@media screen and (-ms-high-contrast: active) {
+  .button {
+    border: 2px solid ButtonText;
+  }
+  
+  .card, .pattern-card {
+    border: 1px solid WindowText;
+  }
+  
+  .skip-link, .skip-to-content a {
+    border: 2px solid ButtonText;
+  }
+}
+
 /* Box model utilities */
 *,
 *::before,

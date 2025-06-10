@@ -75,6 +75,7 @@ h2, .h2 {
 .h2Biggest {
   font-size: calc(1.5rem + (((3.5 - 1.5) * ((100vw - 320px) / (2048 - 320))) * 10));
   line-height: 1.2;
+  font-weight: 300;
 }
 
 .h2Bigger {

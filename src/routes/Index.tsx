@@ -46,14 +46,19 @@ export default function Index() {
         </Grid>
       </Section>
 
-      <Section id="principles" padding="bottom">
+      <Section id="principles" padding="bottom" aria-labelledby="principles-heading">
+        <Grid>
+          <Col start={1} span={12}>
+            <h2 id="principles-heading" className="sr-only">ustwo's Five Accessibility Principles</h2>
+          </Col>
+        </Grid>
           <Link to="/tools" className="principle-card-link" aria-label="Go to recommended accessibility tools - Level-up your gear">
             <Grid className="principle-card">
               <Col start={1} span={1}>
                 <img src="/img/icon-tools.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
-              <h2 className="h2Biggest">Level-up your gear</h2>
+              <h3 className="h2Biggest">Level-up your gear</h3>
               </Col>
               <Col start={5} span={5}>
                 <p className="smallBodyText">
@@ -74,7 +79,7 @@ export default function Index() {
                 <img src="/img/icon-patterns.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
-              <h2 className="h2Biggest">Enjoy the patterns</h2>
+              <h3 className="h2Biggest">Enjoy the patterns</h3>
               </Col>
               <Col start={5} span={5}>
                 <p className="smallBodyText">
@@ -94,7 +99,7 @@ export default function Index() {
                 <img src="/img/icon-keyboard.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
-              <h2 className="h2Biggest">Think beyond touch</h2>
+              <h3 className="h2Biggest">Think beyond touch</h3>
               </Col>
               <Col start={5} span={5}>
                 <p className="smallBodyText">
@@ -114,7 +119,7 @@ export default function Index() {
                 <img src="/img/icon-close-eyes.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
-              <h2 className="h2Biggest">Close your eyes</h2>
+              <h3 className="h2Biggest">Close your eyes</h3>
               </Col>
               <Col start={5} span={5}>
                 <p className="smallBodyText">
@@ -134,7 +139,7 @@ export default function Index() {
                 <img src="/img/icon-test.png" alt="" aria-hidden="true" className="principle-icon" />
               </Col>
               <Col start={2} span={3}>
-              <h2 className="h2Biggest">Party party (test) party!</h2>
+              <h3 className="h2Biggest">Party party (test) party!</h3>
               </Col>
               <Col start={5} span={5}>
                 <p className="smallBodyText">

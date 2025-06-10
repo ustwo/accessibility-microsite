@@ -14,14 +14,18 @@ export default function Error() {
   }
 
   return (
-    <div className="error-container">
+    <div className="error-container" role="alert">
       <div className="container container-content">
-        <h1>Oops!</h1>
+        <h1 id="error-heading">Oops!</h1>
         <p>Sorry, an unexpected error has occurred.</p>
         <p>
-          <i>{errorMessage}</i>
+          <strong>Error details:</strong> {errorMessage}
         </p>
-        <button onClick={() => window.location.href = '/'}>
+        <button 
+          onClick={() => window.location.href = '/'}
+          className="button"
+          aria-describedby="error-heading"
+        >
           Return to Home
         </button>
       </div>
