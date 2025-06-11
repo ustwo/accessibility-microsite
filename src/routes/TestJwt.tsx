@@ -2,6 +2,8 @@ import { useState } from "react";
 import Layout from "../components/Layout";
 import { Helmet } from 'react-helmet';
 import { testJwtGeneration } from "../utils/googleSheets";
+import Section from "../components/Section";
+import Grid, { Col } from "../components/Grid";
 
 export default function TestJwt() {
   const [result, setResult] = useState<{
@@ -28,58 +30,60 @@ export default function TestJwt() {
   };
 
   return (
-    <Layout title="JWT Testing">
+    <Layout title="Test JWT">
       <Helmet>
-        <title>JWT Testing - ustwo Accessibility Microsite</title>
+        <title>Test JWT - ustwo Accessibility Microsite</title>
         <meta
           name="description"
-          content="Testing JWT functionality for the accessibility microsite."
+          content="Test JWT token functionality."
         />
       </Helmet>
 
-      <section className="content-section" aria-labelledby="jwt-heading">
-        <div className="container container-content">
-          <h2 id="jwt-heading">JWT Testing</h2>
-          <p className="intro-text">
-            This page is for testing JWT generation for Google API authentication.
-          </p>
-          
-          <div className="test-container">
-            <button
-              className="button"
-              onClick={handleTestJwt}
-              disabled={loading}
-            >
-              {loading ? "Testing..." : "Test JWT Generation"}
-            </button>
+      <Section>
+        <Grid>
+          <Col start={1} span={12}>
+            <h2 id="jwt-heading">JWT Token Test</h2>
+            <p className="intro-text">
+              Test JWT token functionality and authentication.
+            </p>
             
-            {result && (
-              <div className={`result-box ${result.success ? "success" : "error"}`}>
-                <h3>{result.success ? "Success" : "Failed"}</h3>
-                <p>{result.message}</p>
-                {result.jwt && (
-                  <div className="jwt-sample">
-                    <p><strong>JWT Sample:</strong> {result.jwt}</p>
-                  </div>
-                )}
+            <div className="test-container">
+              <button
+                className="button"
+                onClick={handleTestJwt}
+                disabled={loading}
+              >
+                {loading ? "Testing..." : "Test JWT Generation"}
+              </button>
+              
+              {result && (
+                <div className={`result-box ${result.success ? "success" : "error"}`}>
+                  <h3>{result.success ? "Success" : "Failed"}</h3>
+                  <p>{result.message}</p>
+                  {result.jwt && (
+                    <div className="jwt-sample">
+                      <p><strong>JWT Sample:</strong> {result.jwt}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              <div className="info-box mt-6">
+                <h3>About JWT Authentication</h3>
+                <p>
+                  JWT (JSON Web Token) is used to authenticate with Google APIs. 
+                  This test verifies that the application can generate a valid JWT
+                  using the service account credentials.
+                </p>
+                <p>
+                  If this test fails, check that your service account credentials
+                  are correctly configured in the environment variables.
+                </p>
               </div>
-            )}
-            
-            <div className="info-box mt-6">
-              <h3>About JWT Authentication</h3>
-              <p>
-                JWT (JSON Web Token) is used to authenticate with Google APIs. 
-                This test verifies that the application can generate a valid JWT
-                using the service account credentials.
-              </p>
-              <p>
-                If this test fails, check that your service account credentials
-                are correctly configured in the environment variables.
-              </p>
             </div>
-          </div>
-        </div>
-      </section>
+          </Col>
+        </Grid>
+      </Section>
     </Layout>
   );
 } 

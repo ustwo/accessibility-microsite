@@ -1,70 +1,216 @@
 /* 
- * ustwo Accessibility Microsite - Grid Styles
+ * ustwo Accessibility Microsite - Grid System
+ * Based on ustwo-website Grid component
  */
 
-/* Basic grid styles are in layout.css */
-/* This file adds specific responsive behavior for tools and patterns grids */
-
-/* Tools Grid - Default is 1 column */
-.tools-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-6);
+/* Flex fallback */
+.grid-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
-/* The tools-list class should always be full width */
-.tools-list {
+.grid-container > div:not(:last-child) {
+  margin-right: var(--grid-gap);
+}
+
+@media (max-width: 1023px) {
+  .grid-container > div:not(:last-child) {
+    margin-bottom: var(--grid-gap);
+  }
+  .grid-container .small-mobile-margin:not(:last-child) {
+    margin-bottom: var(--bodyText-margin);
+  }
+}
+
+.grid-container.reverse-order {
+  flex-direction: row-reverse;
+  direction: rtl;
+  text-align: left;
+}
+.grid-container.reverse-order * {
+  direction: ltr;
+}
+
+@media (min-width: 768px) {
+  .grid-container > div,
+  .two-columns > div,
+  .three-columns > div,
+  .four-columns > div {
+    width: calc(50% - var(--grid-gap) / 2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .four-columns > div {
+    width: calc(25% - var(--grid-gap) / 2);
+  }
+}
+
+@media (min-width: 1250px) {
+  .three-columns > div {
+    width: calc(33% - var(--grid-gap) / 2);
+  }
+}
+
+/* Grid enhancement */
+@supports (display: grid) {
+  .grid-container {
+    width: 100%;
+  }
+  .grid-container > div {
+    width: inherit;
+  }
+  .grid-container > div:not(:last-child) {
+    margin-right: 0;
+    gap: var(--grid-gap);
+  }
+
+  @media (min-width: 768px) {
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--grid-gap);
+    }
+    /* Reset widths from flex styles */
+    .grid-container > div {
+      width: inherit;
+      margin-bottom: 0;
+    }
+
+    /* Default grid behavior for children without explicit grid-column */
+    .grid-container > * {
+      grid-column: span 6;
+    }
+    .one-column > * {
+      grid-column: span 12;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* Reset widths from flex styles */
+    .grid-container > div,
+    .two-columns > div,
+    .four-columns > div {
+      width: inherit;
+    }
+
+    /* Grid */
+    .two-columns > * {
+      grid-column: span 6;
+    }
+    .three-columns > * {
+      grid-column: span 4;
+    }
+    .four-columns > * {
+      grid-column: span 3;
+    }
+    .five-columns > * {
+      grid-column: span 2;
+    }
+    .one-column > * {
+      grid-column: span 12;
+    }
+
+    /* singleColumn */
+    .single-column > * {
+      grid-column: 3 / span 8;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .order-fix > div:first-child {
+      order: 2;
+      margin-bottom: 0;
+    }
+    .order-fix > div:last-child {
+      order: 1;
+      margin-bottom: var(--grid-gap);
+    }
+  }
+}
+
+@media (min-width: 1250px) {
+  .three-columns > div {
+    width: inherit;
+  }
+  
+  .four-columns > * {
+    grid-column: span 3;
+  }
+
+  .five-columns > * {
+    grid-column: span 2;
+  }
+}
+
+/* Additional styles */
+.grid-padding-top {
+  padding-top: var(--grid-vertical-padding);
+}
+
+.grid-padding-bottom {
+  padding-bottom: var(--grid-vertical-padding);
+}
+
+/* Feature / Showcase */
+.vertical-center > * {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  justify-content: center;
+  align-items: normal;
 }
 
-/* Patterns Grid - Default is 1 column */
-.patterns-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-8);
+.vertical-end > * {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: normal;
 }
 
-/* 
- * Responsive breakpoints using the same ones as layout.css
- */
+.vertical-space-between > * {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: normal;
+}
 
-/* Tablet (min-width: 768px) */
 @media (min-width: 768px) {
-  .tools-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .feature-small > * {
+    height: 35vh;
   }
-  
-  /* Tools list remains full width at all breakpoints */
-  .tools-list {
-    display: flex;
-    flex-direction: column;
+  .feature-large > * {
+    height: 50vh;
   }
 }
 
-/* Large tablet (min-width: 1024px) */
-@media (min-width: 1024px) {
-  .tools-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  /* Patterns get 2 columns at large tablet size */
-  .patterns-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* Col */
+.grid-col {
+  position: relative;
+}
+
+@media (max-width: 1023px) {
+  .grid-col {
+    grid-column: 1 / span 12 !important;
   }
 }
 
-/* Desktop (min-width: 1250px) */
-@media (min-width: 1250px) {
-  .tools-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.grid-col.vertical-stretch {
+  display: flex;
+  flex-direction: column;
 }
 
-/* Large desktop (min-width: 1550px) */
-@media (min-width: 1550px) {
-  .tools-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.grid-col.vertical-stretch > * {
+  flex: 1;
+}
+
+.grid-col.vertical-stretch > * a,
+.grid-col.vertical-stretch > * button {
+  height: 100%;
+}
+
+.grid-col.no-bottom-margin {
+  margin-bottom: 0;
 } 

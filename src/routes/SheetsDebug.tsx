@@ -1,5 +1,7 @@
 import Layout from "../components/Layout";
 import { Helmet } from 'react-helmet';
+import Section from "../components/Section";
+import Grid, { Col } from "../components/Grid";
 
 export default function SheetsDebug() {
   return (
@@ -8,23 +10,25 @@ export default function SheetsDebug() {
         <title>Sheets Debug - ustwo Accessibility Microsite</title>
         <meta
           name="description"
-          content="Debugging Google Sheets integration for the accessibility microsite."
+          content="Debug Google Sheets integration."
         />
       </Helmet>
 
-      <section className="content-section" aria-labelledby="sheets-debug-heading">
-        <div className="container container-content">
-          <h2 id="sheets-debug-heading">Sheets Debug</h2>
-          <p className="intro-text">
-            This page is for debugging Google Sheets integration.
-          </p>
-          
-          {/* Sheets debug content would go here */}
-          <div className="sheets-debug-content">
-            <p>Sheets debug content will be here</p>
-          </div>
-        </div>
-      </section>
+      <Section>
+        <Grid>
+          <Col start={1} span={12}>
+            <h2 id="sheets-debug-heading">Google Sheets Debug</h2>
+            <p className="intro-text">
+              Debug information for Google Sheets integration.
+            </p>
+            
+            {/* Debug content would go here */}
+            <div className="debug-content">
+              <p>Debug content will be here</p>
+            </div>
+          </Col>
+        </Grid>
+      </Section>
     </Layout>
   );
 } 

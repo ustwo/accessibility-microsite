@@ -1,0 +1,202 @@
+/* 
+ * ustwo Accessibility Microsite - Section Theme Styles
+ * Subtle color theming for the 5 main principles/sections
+ */
+
+/* Tools Theme - Blue */
+.theme-tools,
+[data-theme="tools"] {
+  --current-theme-color: var(--theme-tools);
+}
+
+/* Patterns Theme - Light Blue */
+.theme-patterns,
+[data-theme="patterns"] {
+  --current-theme-color: var(--theme-patterns);
+}
+
+/* Checklist Theme - Mint */
+.theme-checklist,
+[data-theme="checklist"] {
+  --current-theme-color: var(--theme-checklist);
+}
+
+/* Screen Reader Guide Theme - Yellow */
+.theme-guide,
+[data-theme="guide"] {
+  --current-theme-color: var(--theme-guide);
+}
+
+/* Testing Templates Theme - Red */
+.theme-testing,
+[data-theme="testing"] {
+  --current-theme-color: var(--theme-testing);
+}
+
+/* Homepage principle cards - thick borders without colors */
+.homepage-principles .principle-card {
+  /* border: 2px solid var(--color-gray-250);
+  border-radius: 8px; */
+}
+
+
+
+
+
+
+
+/* Card layout improvements - align buttons to bottom */
+.pattern-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Clickable tool cards */
+.tool-card-link.pattern-card {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  border: 1px solid var(--color-gray-250);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+}
+
+/* Tool header with favicon */
+.tool-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-right: 2.5rem;
+}
+
+.tool-favicon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Pattern link favicons - smaller for inline links */
+.pattern-link-favicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+
+.tool-card-link.pattern-card h3 {
+  font-size: 1.125rem;
+  font-weight: 400;
+  margin: 0;
+  color: var(--color-offBlack);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.tool-card-link.pattern-card p {
+  font-size: calc(0.8125rem + (((1.3 - 0.8125) * ((100vw - 320px) / (2048 - 320))) * 10));
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.tool-card-link.pattern-card:focus {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+/* External link icon */
+.external-link-icon {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  font-size: calc(0.8125rem + (((1.3 - 0.8125) * ((100vw - 320px) / (2048 - 320))) * 10));
+  color: var(--color-blue);
+}
+
+/* .external-link-icon::before {
+  content: "↗";
+} */
+
+.external-link-icon svg {
+  /* display: none; */
+  fill: var(--color-gray-450);
+  transition: fill 0.2s ease;
+}
+
+.tool-card-link:hover .external-link-icon svg {
+  fill: var(--color-blue);
+}
+
+/* Pattern links (for patterns page) */
+.pattern-card .pattern-link {
+  margin-top: auto;
+  color: var(--color-offBlack);
+  font-weight: 400;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pattern-card .pattern-link::after {
+  content: '↗';
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.pattern-card .pattern-link:hover {
+  text-decoration: underline;
+}
+
+.tool-card-link.pattern-card:hover h3 {
+  color: var(--color-blue);
+  text-decoration: underline;
+}
+
+/* Section-specific hover effects for cards */
+.theme-tools .pattern-card:hover,
+[data-theme="tools"] .pattern-card:hover,
+.theme-patterns .pattern-card:hover,
+[data-theme="patterns"] .pattern-card:hover,
+.theme-checklist .pattern-card:hover,
+[data-theme="checklist"] .pattern-card:hover,
+.theme-guide .pattern-card:hover,
+[data-theme="guide"] .pattern-card:hover,
+.theme-testing .pattern-card:hover,
+[data-theme="testing"] .pattern-card:hover {
+  /* border-color: var(--color-gray-450); */
+}
+
+/* Homepage principle cards styling */
+.homepage-principles .principle-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.homepage-principles .principle-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.homepage-principles .principle-card .button {
+  margin-top: auto;
+  background-color: var(--color-gray-150);
+  color: var(--color-offBlack);
+  border: 1px solid var(--color-gray-350);
+  font-weight: 500;
+}
+
+.homepage-principles .principle-card .button:hover {
+  background-color: var(--color-gray-250);
+  border-color: var(--color-gray-450);
+  transform: none;
+} 

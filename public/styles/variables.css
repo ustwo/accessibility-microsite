@@ -1,269 +1,326 @@
 @font-face {
-    font-family: DM Sans;
-    src: url("../fonts/dm-sans-regular.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-  }
+  font-family: DM Sans;
+  src: url("../fonts/dm-sans-regular.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: DM Sans;
+  src: url("../fonts/dm-sans-light.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: DM Sans;
+  src: url("../fonts/dm-sans-medium.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: La Nord;
+  src: url("../fonts/LaNord-Bold.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: La Nord;
+  src: url("../fonts/LaNord-Medium.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: La Nord;
+  src: url("../fonts/LaNord-SemiLight.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: La Nord;
+  src: url("../fonts/LaNord-Light.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Noto Sans JP;
+  src: url("../fonts/NotoSansJP-Regular.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Murecho;
+  src: url("../fonts/Murecho-Regular.woff2") format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@custom-media --for-up-to-tablet (max-width: 767px);
+@custom-media --for-tablet (min-width: 768px);
+@custom-media --for-up-to-large-tablet (max-width: 1023px);
+@custom-media --for-large-tablet (min-width: 1024px);
+/* Above: mobile/burger menu. Below: desktop menu. */
+@custom-media --for-up-to-desktop (max-width: 1249px);
+@custom-media --for-desktop (min-width: 1250px);
+@custom-media --for-large-desktop (min-width: 1550px);
+
   
-  @font-face {
-    font-family: DM Sans;
-    src: url("../fonts/dm-sans-light.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 100;
-    font-display: swap;
-  }
-  
-  @font-face {
-    font-family: DM Sans;
-    src: url("../fonts/dm-sans-medium.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-  }
-  
-  @font-face {
-    font-family: La Nord;
-    src: url("../fonts/LaNord-Bold.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-  }
-  
-  @font-face {
-    font-family: La Nord;
-    src: url("../fonts/LaNord-Medium.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-  }
-  
-  @font-face {
-    font-family: La Nord;
-    src: url("../fonts/LaNord-SemiLight.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 300;
-    font-display: swap;
-  }
-  
-  @font-face {
-    font-family: La Nord;
-    src: url("../fonts/LaNord-Light.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 100;
-    font-display: swap;
-  }
-  
-  @font-face {
-    font-family: Noto Sans JP;
-    src: url("../fonts/NotoSansJP-Regular.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-  }
-  
-  @font-face {
-    font-family: Murecho;
-    src: url("../fonts/Murecho-Regular.woff2") format('woff2');
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-  }
-  
-  @custom-media --for-up-to-tablet (max-width: 767px);
-  @custom-media --for-tablet (min-width: 768px);
-  @custom-media --for-up-to-large-tablet (max-width: 1023px);
-  @custom-media --for-large-tablet (min-width: 1024px);
-  /* Above: mobile/burger menu. Below: desktop menu. */
-  @custom-media --for-up-to-desktop (max-width: 1249px);
-  @custom-media --for-desktop (min-width: 1250px);
-  @custom-media --for-large-desktop (min-width: 1550px);
-  
-   
-  @media screen and (--for-tablet) {
-    :root {
-      --grid-gap: 20px;
-      --app-gap: 32px;
-    }
-  }
-  
-  @media screen and (--for-large-tablet) {
-    :root {
-      --grid-gap: 24px;
-      --header-height: 70px;
-      --section-vertical-padding: 12vh;
-      --grid-vertical-padding: 10vh;
-      --smallTileHeight: 35vh;
-      --mediumTileHeight: 45vh;
-      --largeTileHeight: 55vh;
-      --extraLargeTileHeight: 65vh;
-      --border-radius: 4px;
-      --heroHeight: 95vh;
-    }
-  }
-  
-  @media screen and (--for-deskto) {
-    :root {
-      --app-gap: 40px;
-    }
-  }
-  
+@media screen and (--for-tablet) {
   :root {
-  
-    /* Fonts */
-    --bodyFont: "Dm Sans", "Helvetica", "Arial", sans-serif;
-    --titleFont: "La Nord", "Helvetica", "Arial", sans-serif;
-  
-    /* Layout */
-    --grid-max-width: 2048px;
-    --grid-gap: 16px;
-    --app-gap: 20px;
-  
-    --app-gutter: 4vw;
-    --app-gutter-desktop: 60px;
-    --showcase-image-height: 100vh;
-    --header-height: 50px;
-    
-    --section-vertical-padding: 7vh;
-    --grid-vertical-padding: 5vh;
-  
-    --app-width-two-thirds: 880px;
-    --app-width-half: 660px;
-  
-    --bodyText-margin: 0.8em;
-  
-    --border-radius: 4px;
-  
-    /* Look further below for desktop versions */
-    --extraSmallTileHeight: 25vh;
-    --smallTileHeight: 30vh;
-    --mediumTileHeight: 30vh;
-    --largeTileHeight: 35vh;
-    --extraLargeTileHeight: 40vh;
-    --tallTileHeight: 65vh;
-  
-    --transition: all .3s ease-out;
-  
-    --heroHeight: 88vh;
-  
-    /* Colours */
-    /* Core */ 
-    --color-blue        : #323BFF;
-    --color-yellow      : #FFE500;
-    --color-darkGrey    : #666666;
-    --color-offBlack    : #191B36;
-    --color-mint        : #29FFAD;
-    --color-link-green  : #DEFF5C;
-  
-    --color-discover    : #5EE0F7;
-    --color-discoverText: #22A2B8;
-    --color-pilot       : #ebaafa;
-    --color-pilotText   : #D565E0;
-    --color-launch      : #7cd9a0;
-    --color-launchText  : #31A76F;
-    --color-boost       : #f2a055;
-    --color-boostText   : #F06C00;
-    --color-a11y        : var(--color-yellow);
-    --color-a11yText    : #1db87c;
-            
-    --color-white       : #FFFFFF;
-    --color-offWhite    : #F4F4F4;
-    --color-lightGrey   : #C4C3C9;
-    --color-lighterGrey : #eeeeee;
-    --color-red         : #FF515A;
-    --color-lightBlue   : #5EE0F7;
-    --color-offBlackDarker: #14162b;
-    --color-offBlackLighter: #252740;
-    
-    /* The rest */
-    --color-darkRed     : #980039;
-    --color-orange      : #ff6736;
-    --color-orange-with-white-text      : #f16131;
-    --color-lime        : #C2F741;
-    --color-darkBlue    : #1D2677;
-    --color-pink        : #F7A5FF;
-    --color-green       : #006837;
-    --color-purple      : #9D48F7;
-    --color-darkPink    : #95456e;
-  
-    --color-highlight   : #323BFF;
-  
-    /* Error colors */
-    --color-error       : #FF515A; /* Same as --color-red for errors */
-    --color-error-rgb   : 255, 81, 90; /* RGB values for --color-error */
-  
-    /* ustwo brand colors */
-    --color-primary: var(--color-orange); 
-    --color-secondary: var(--color-pilot);  
-    --color-tertiary: var(--color-lime);
-    --color-dark: #14161F; /* ustwo dark */
-    --color-light: #FFFFFF; /* white */
-    --color-footer-text: #E5E7EB; /* Light gray for footer text */
-    --color-gray-100: #F5F6F7;
-    --color-gray-200: #E5E7EB;
-    --color-gray-300: #D1D5DB;
-    --color-gray-400: #9CA3AF;
-    --color-gray-500: #6B7280;
-    --color-gray-600: #4B5563;
-    --color-gray-700: #374151;
-    --color-gray-800: #1F2937;
-    --color-gray-900: #111827;
-    
-    /* focus styles for keyboard users */
-    --focus-ring-color: var(--color-blue);
-    --focus-ring-width: 3px;
-    --focus-ring-color-rgb: 50, 59, 255; /* RGB values for --color-blue */
-    
-    /* Spacing units */
-    --space-1: 0.25rem;
-    --space-2: 0.5rem;
-    --space-3: 0.75rem;
-    --space-4: 1rem;
-    --space-5: 1.25rem;
-    --space-6: 1.5rem;
-    --space-8: 2rem;
-    --space-10: 2.5rem;
-    --space-12: 3rem;
-    --space-16: 4rem;
-    --space-20: 5rem;
-    --space-24: 6rem;
-    
-    /* Typography */
-    --font-family-base: var(--bodyFont);
-    --font-family-heading: var(--titleFont);
-    
-    /* Font sizes */
-    --font-size-base: 1rem;
-    --font-size-sm: 0.875rem;
-    --font-size-lg: 1.125rem;
-    --font-size-xl: 1.25rem;
-    --font-size-2xl: 1.5rem;
-    --font-size-3xl: 1.875rem;
-    --font-size-4xl: 2.25rem;
-    --font-size-5xl: 3rem;
-    --font-size-section-title: 2rem;
-    
-    /* Line heights */
-    --line-height-none: 1;
-    --line-height-tight: 1.25;
-    --line-height-snug: 1.375;
-    --line-height-normal: 1.5;
-    --line-height-relaxed: 1.625;
-    --line-height-loose: 2;
-    
-    /* Border radius */
-    --border-radius-sm: 0.125rem;
-    --border-radius: 0.25rem;
-    --border-radius-md: 0.375rem;
-    --border-radius-lg: 0.5rem;
-    --border-radius-xl: 0.75rem;
-    --border-radius-2xl: 1rem;
-    --border-radius-3xl: 1.5rem;
-    --border-radius-full: 9999px;
-    
-    /* Max width containers */
-    --container-sm: 640px;
-    --container-md: 768px;
-    --container-lg: 1024px;
-    --container-xl: 1280px;
+    --grid-gap: 20px;
+    --app-gap: 32px;
   }
+}
+
+@media screen and (--for-large-tablet) {
+  :root {
+    --grid-gap: 24px;
+    --header-height: 70px;
+    --section-vertical-padding: 12vh;
+    --grid-vertical-padding: 5vh;
+    --smallTileHeight: 35vh;
+    --mediumTileHeight: 45vh;
+    --largeTileHeight: 55vh;
+    --extraLargeTileHeight: 65vh;
+    --border-radius: 4px;
+    --heroHeight: 100svh;
+  }
+}
+
+@media screen and (--for-deskto) {
+  :root {
+    --app-gap: 40px;
+  }
+}
+
+:root {
+
+  /* Fonts */
+  --bodyFont: "Dm Sans", "Helvetica", "Arial", sans-serif;
+  --titleFont: "La Nord", "Helvetica", "Arial", sans-serif;
+
+  /* Layout */
+  --grid-max-width: 2048px;
+  --grid-gap: 16px;
+  --app-gap: 20px;
+
+  --app-gutter: 4vw;
+  --app-gutter-desktop: 60px;
+  --showcase-image-height: 100vh;
+  --header-height: 50px;
+  
+  --section-vertical-padding: 5vh;
+  --grid-vertical-padding: 5vh;
+
+  --app-width-two-thirds: 880px;
+  --app-width-half: 660px;
+
+  --bodyText-margin: 0.8em;
+
+  --border-radius: 4px;
+
+  /* Look further below for desktop versions */
+  --extraSmallTileHeight: 25vh;
+  --smallTileHeight: 30vh;
+  --mediumTileHeight: 30vh;
+  --largeTileHeight: 35vh;
+  --extraLargeTileHeight: 40vh;
+  --tallTileHeight: 65vh;
+
+  --transition: all .3s ease-out;
+
+  --heroHeight: 100svh;
+
+  /* Colours */
+  /* Core */ 
+  --color-offBlack    : var(--color-gray-850);
+  --color-blue        : #323BFF;
+  --color-lightBlue   : #5EE0F7;
+  --color-mint        : #29FFAD;
+  
+  --color-yellow      : #FFE500;
+  --color-red         : #FF515A;
+  
+  /* Section theme colors - for the 5 main principles */
+  --theme-tools       : var(--color-mint);        /* Tools - Level-up your gear */
+  --theme-patterns    : var(--color-red);         /* Patterns - Enjoy the patterns */
+  --theme-checklist   : var(--color-blue);        /* Checklist - Think beyond touch */
+  --theme-guide       : var(--color-yellow);      /* Screen Reader Guide - Close your eyes */
+  --theme-testing     : var(--color-lightBlue);   /* Testing Templates - Party party (test) party */
+  
+  --color-darkGrey    : #666666;
+  --color-link-green  : #DEFF5C;
+
+  --color-white       : #FFFFFF;
+  --color-offWhite    : var(--color-gray-100);
+  --color-lightGrey   : #C4C3C9;
+  --color-lighterGrey : #eeeeee;
+  --color-offBlackDarker: #14162b;
+  --color-offBlackLighter: #252740;
+  
+  /* Additional dashboard greys */
+  --color-gray-50     : #FAFAFA;
+  --color-gray-75     : #F7F7F7;
+  --color-gray-125    : #F2F2F2;
+  --color-gray-150    : #EDEDED;
+  --color-gray-250    : #DBDBDB;
+  --color-gray-350    : #B8B8B8;
+  --color-gray-450    : #999999;
+  --color-gray-550    : #777777;
+  --color-gray-650    : #555555;
+  --color-gray-750    : #333333;
+  --color-gray-850    : #222222;
+  
+  /* Dashboard text colors */
+  --color-text-primary: var(--color-offBlack);
+  --color-text-secondary: var(--color-gray-650);
+  --color-text-muted: var(--color-gray-450);
+  --color-text-subtle: var(--color-gray-350);
+  
+  /* The rest */
+  --color-darkRed     : #980039;
+  --color-orange      : #FF6736;
+  --color-orange-with-white-text      : #f16131;
+  --color-lime        : #C2F741;
+  --color-darkBlue    : #1D2677;
+  --color-pink        : #F7A5FF;
+  --color-green       : #006837;
+  --color-purple      : #9D48F7;
+  --color-darkPink    : #95456e;
+
+  --color-highlight   : #323BFF;
+
+  /* Error colors */
+  --color-error       : #FF515A; /* Same as --color-red for errors */
+  --color-error-rgb   : 255, 81, 90; /* RGB values for --color-error */
+
+  /* ustwo brand colors */
+  --color-primary: var(--color-orange); 
+  --color-secondary: var(--color-pilot);  
+  --color-tertiary: var(--color-lime);
+  --color-dark: #14161F; /* ustwo dark */
+  --color-light: #FFFFFF; /* white */
+  --color-footer-text: #E5E7EB; /* Light gray for footer text */
+  --color-gray-100: #F5F6F7;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-400: #9CA3AF;
+  --color-gray-500: #6B7280;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
+  
+  /* focus styles for keyboard users */
+  --focus-ring-color: var(--color-blue);
+  --focus-ring-width: 3px;
+  --focus-ring-color-rgb: 50, 59, 255; /* RGB values for --color-blue */
+  
+  /* Spacing units */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  
+  /* Typography */
+  --font-family-base: var(--bodyFont);
+  --font-family-heading: var(--titleFont);
+  
+  /* Font sizes - refined for dashboard */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --font-size-section-title: 2rem;
+  
+  /* Card-specific typography */
+  --font-size-card-title: 1.125rem;
+  --font-size-card-subtitle: 0.9rem;
+  --font-size-card-body: 0.875rem;
+  --font-size-card-meta: 0.8rem;
+  
+  /* Line heights */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+  
+  /* Border radius */
+  --border-radius-sm: 0.125rem;
+  --border-radius-md: 0.375rem;
+  --border-radius-lg: 0.5rem;
+  --border-radius-xl: 0.75rem;
+  
+  /* Container widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  
+  /* Z-index scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+@media screen and (min-width: 768px) {
+  :root {
+    --grid-gap: 20px;
+    --app-gap: 32px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  :root {
+    --grid-gap: 24px;
+    --header-height: 70px;
+    --section-vertical-padding: 9vh;
+    --grid-vertical-padding: 5vh;
+    --smallTileHeight: 35vh;
+    --mediumTileHeight: 45vh;
+    --largeTileHeight: 55vh;
+    --extraLargeTileHeight: 65vh;
+    --border-radius: 4px;
+    --heroHeight: 100svh;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  :root {
+    --app-gap: 40px;
+  }
+}
