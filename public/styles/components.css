@@ -93,7 +93,7 @@
 
 .card:hover {
   border-color: #e5e7eb;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Pattern card overrides - remove card styling */
@@ -178,9 +178,15 @@
 
 .principle-card {
   border-bottom: 1px solid var(--color-gray-250);
-  padding: 3rem;
+  padding: 2rem 0rem;
   /* display: flex;
   flex-direction: column; */
+}
+
+@media (min-width: 768px) {
+  .principle-card {
+    padding: 3rem;
+  }
 }
 
 .principle-card-no-border {
@@ -553,6 +559,81 @@ input:focus, textarea:focus, select:focus {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Dark Mode Toggle Button */
+.dark-mode-toggle {
+  background: transparent;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--color-text-primary);
+  margin-left: var(--space-4);
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  z-index: 9999;
+}
+
+@media (min-width: 1024px) {
+  .dark-mode-toggle {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--color-gray-300);
+    right: auto;
+    top: auto
+  }
+}
+
+.dark-mode-toggle:hover {
+  border-color: var(--color-blue);
+  background: var(--color-gray-50);
+}
+
+.dark-mode-toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.dark-mode-toggle .dark-mode-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-mode-toggle svg {
+  transition: var(--transition);
+}
+
+/* Dark mode styles for toggle */
+.dark .dark-mode-toggle {
+  border-color: var(--color-gray-600);
+  color: var(--color-light);
+}
+
+.dark .dark-mode-toggle:hover {
+  background: var(--color-gray-800);
+}
+
+/* Responsive styles for dark mode toggle */
+@media (max-width: 768px) {
+  .dark-mode-toggle {
+    width: 40px;
+    height: 40px;
+    margin-left: var(--space-2);
+  }
+  
+  .dark-mode-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 /* Respect user's motion preferences */

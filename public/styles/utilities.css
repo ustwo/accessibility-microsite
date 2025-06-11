@@ -254,6 +254,10 @@
   .skip-link, .skip-to-content a {
     border: 2px solid;
   }
+  
+  .dark-mode-toggle {
+    border: 3px solid;
+  }
 }
 
 /* Windows High Contrast Mode */
@@ -267,6 +271,10 @@
   }
   
   .skip-link, .skip-to-content a {
+    border: 2px solid ButtonText;
+  }
+  
+  .dark-mode-toggle {
     border: 2px solid ButtonText;
   }
 }
@@ -312,6 +320,26 @@
 .colorLightGrey { color: var(--color-lightGrey); }
 .colorLightBlue { color: var(--color-lightBlue); }
 .colorDarkPink { color: var(--color-darkPink); }
+
+/* Dark mode overrides for color utilities */
+.dark .colorOffBlack { color: var(--color-gray-100); }
+.dark .colorOffWhite { color: var(--color-gray-800); }
+.dark .colorDarkGrey { color: var(--color-gray-300); }
+.dark .colorLightGrey { color: var(--color-gray-500); }
+
+/* Utility background overrides */
+.dark .bg-white { background-color: var(--color-gray-800); }
+.dark .bg-gray-50 { background-color: var(--color-gray-850); }
+.dark .bg-gray-100 { background-color: var(--color-gray-800); }
+
+/* Utility text color overrides */
+.dark .text-primary { color: var(--color-gray-100); }
+.dark .text-secondary { color: var(--color-gray-300); }
+.dark .text-muted { color: var(--color-gray-400); }
+
+/* Border utility overrides */
+.dark .border { border-color: var(--color-gray-700); }
+.dark .border-gray-200 { border-color: var(--color-gray-700); }
 
 /* Asterisk utility */
 .asterisk {
@@ -360,3 +388,4 @@
 
 .fill-current { fill: var(--color-light); }
 .dark .fill-current { fill: var(--color-dark); }
+

@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { ReactNode } from "react";
 import UsTwo from "./UsTwo";
 import Grid, { Col } from "./Grid";
-import Section from "./Section";  
+import Section from "./Section";
+import DarkModeToggle from "./DarkModeToggle";  
 
 interface LayoutProps {
   children: ReactNode;
@@ -82,6 +83,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                 </li>
               </ul>
             </nav>
+            <DarkModeToggle />
           </div>
         </div>
       </header>

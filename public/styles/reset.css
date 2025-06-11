@@ -27,7 +27,6 @@ html {
 
 body {
   margin: 0;
-  padding-top: var(--header-height);
   color: var(--color-offBlack);
   -webkit-overflow-scrolling: touch;
   overflow-y: scroll;
