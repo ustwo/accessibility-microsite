@@ -36,11 +36,11 @@
 .button-link {
   color: var(--color-blue);
   font-size: calc(0.8125rem + (((1.3 - 0.8125) * ((100vw - 320px) / (2048 - 320))) * 10));
-  text-decoration: none;
+  text-decoration: underline;
   cursor: pointer;
 }
 .button-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .callToAction {

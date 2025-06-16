@@ -194,8 +194,15 @@ footer p,
 }
 
 .dark .pattern-categories span, 
-.dark .tool-disciplines span {
+.dark .tool-disciplines span,
+.dark .responsible-pills span {
+  color: var(--color-gray-300);
   background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .completion-footer span {
+  /* background: var(--color-gray-800); */
+  color: black;
 }
 
 /* Button styles in dark mode */
@@ -262,7 +269,10 @@ footer p,
 }
 
 /* Links in dark mode */
-.dark a {
+.dark a,
+.dark p a, 
+.dark li:not(.site-nav li, .pattern-links li) a,
+.dark .regular-link {
   color: var(--color-lightBlue);
 }
 
@@ -459,3 +469,8 @@ footer p,
   }
 }
 
+
+
+.dark .checklist-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05);
+}

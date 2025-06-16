@@ -1,0 +1,31 @@
+{
+  "Understandable": {
+    "Level A": [
+      { "criteria": "3.1.1", "name": "Language of Page", "responsible": ["Design"], "description": "Set page language in code.", "example": "<html lang=\"en\">", "status": "Must comply" },
+      { "criteria": "3.2.1", "name": "On Focus", "responsible": ["Dev"], "description": "Focus must not trigger unexpected changes.", "example": "Dropdown opens only when clicked.", "status": "Must comply" },
+      { "criteria": "3.2.2", "name": "On Input", "responsible": ["Dev"], "description": "Input should not auto-trigger unexpected changes.", "example": "Input field doesn't auto-submit.", "status": "Must comply" },
+      { "criteria": "3.2.6", "name": "Consistent Help", "responsible": ["Design"], "description": "Help options should be consistent across pages.", "status": "Must comply" },
+      { "criteria": "3.3.1", "name": "Error Identification", "responsible": ["Design"], "description": "Clearly identify and explain errors.", "status": "Must comply" },
+      { "criteria": "3.3.2", "name": "Labels or Instructions", "responsible": ["Design"], "description": "Forms must have clear labels.", "example": "Password field with instruction.", "status": "Must comply" },
+      { "criteria": "3.3.7", "name": "Redundant Entry", "responsible": ["Design", "Dev"], "description": "Don't require duplicate data input.", "example": "Autofill shipping if matches billing.", "status": "Must comply" }
+    ],
+    "Level AA": [
+      { "criteria": "3.1.2", "name": "Language of Parts", "responsible": ["Design", "Dev"], "description": "Indicate changes in language in content.", "example": "<p lang=\"fr\">Bonjour...</p>", "status": "Must comply" },
+      { "criteria": "3.2.3", "name": "Consistent Navigation", "responsible": ["Design", "Dev"], "description": "Navigation must be consistent.", "example": "Main nav in same spot on all pages.", "status": "Must comply" },
+      { "criteria": "3.2.4", "name": "Consistent Identification", "responsible": ["Design", "Dev"], "description": "Same elements = same labels everywhere.", "example": "Button always labeled 'Search'.", "status": "Must comply" },
+      { "criteria": "3.3.3", "name": "Error Suggestion", "responsible": ["Design", "Dev"], "description": "Suggest corrections for form errors.", "example": "Suggest including country code.", "status": "Must comply" },
+      { "criteria": "3.3.4", "name": "Error Prevention (Legal, Financial, Data)", "responsible": ["Design", "Dev"], "description": "Confirm entries before submission.", "example": "Cart summary before purchase.", "status": "Must comply" },
+      { "criteria": "3.3.8", "name": "Accessible Authentication (Minimum)", "responsible": ["Design", "Dev"], "description": "Use authentication that doesn't rely on memory.", "example": "One-time code via email, not CAPTCHA.", "status": "Must comply" }
+    ],
+    "Level AAA (Optional)": [
+      { "criteria": "3.1.3", "name": "Unusual Words", "responsible": ["Design", "Dev"], "description": "Provide definitions for unusual words.", "example": "Define 'quorum'.", "status": "" },
+      { "criteria": "3.1.4", "name": "Abbreviations", "responsible": ["Design", "Dev"], "description": "Expand abbreviations on first use.", "example": "'World Wide Web (WWW)'", "status": "" },
+      { "criteria": "3.1.5", "name": "Reading Level", "responsible": ["Design", "Dev"], "description": "Use plain language or simplified version.", "example": "'Hypertension' → 'high blood pressure'.", "status": "" },
+      { "criteria": "3.1.6", "name": "Pronunciation", "responsible": ["Design", "Dev"], "description": "Provide pronunciation if needed.", "example": "'Déjà vu (day zhah voo)'", "status": "" },
+      { "criteria": "3.2.5", "name": "Change on Request", "responsible": ["Design", "Dev"], "description": "Only update content when user initiates.", "example": "Submit button triggers page refresh.", "status": "" },
+      { "criteria": "3.3.5", "name": "Help", "responsible": ["Design", "Dev"], "description": "Provide contextual help for forms.", "example": "Tooltip for 'legal name'.", "status": "" },
+      { "criteria": "3.3.6", "name": "Error Prevention (All)", "responsible": ["Design", "Dev"], "description": "Confirm before critical actions.", "example": "'Delete All' requires confirmation.", "status": "" },
+      { "criteria": "3.3.9", "name": "Accessible Authentication (Enhanced)", "responsible": ["Design", "Dev"], "description": "Offer password-free authentication options.", "example": "Biometric login (e.g., fingerprint).", "status": "" }
+    ]
+  }
+}

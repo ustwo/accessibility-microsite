@@ -1,0 +1,174 @@
+{
+  "Perceivable": {
+    "Level A": [
+      {
+        "criteria": "1.1.1",
+        "name": "Non-text Content",
+        "responsible": ["Design"],
+        "description": "Text alternatives are provided for non-text content that provides value to the user.",
+        "example": "Image of a dog with alt text; decorative image with null alt attribute.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.2.1",
+        "name": "Audio-only and Video-only (Pre-recorded)",
+        "responsible": ["Design", "Dev"],
+        "description": "Transcript for audio-only; transcript or audio description for video-only.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.2.2",
+        "name": "Captions (Pre-recorded)",
+        "responsible": ["Design", "Dev"],
+        "description": "Captions for video with audio.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.2.3",
+        "name": "Audio Description or Media Alternative (Pre-recorded)",
+        "responsible": ["Design", "Dev"],
+        "description": "Transcript and/or audio descriptions for videos with audio.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.3.1",
+        "name": "Info and Relationships",
+        "responsible": ["Dev"],
+        "description": "Information and relationships must be perceivable by assistive tech.",
+        "example": "Form labels correctly associated.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.3.2",
+        "name": "Meaningful Sequence",
+        "responsible": ["Design", "Dev"],
+        "description": "Content reading order must be logical.",
+        "example": "Step-by-step recipe accessible to screen readers.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.3.3",
+        "name": "Sensory Characteristics",
+        "responsible": ["Dev"],
+        "description": "Instructions must not rely solely on sensory characteristics.",
+        "example": "Use of descriptive instructions over visual-only cues.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.1",
+        "name": "Use of Colour",
+        "responsible": ["Design"],
+        "description": "Color not used as the only visual means.",
+        "example": "Hyperlink has underline; graph uses patterns.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.2",
+        "name": "Audio Control",
+        "responsible": ["Design", "Dev"],
+        "description": "User must be able to stop or adjust audio playing automatically.",
+        "example": "Control panel for auto-playing music.",
+        "status": "Must comply"
+      }
+    ],
+    "Level AA": [
+      {
+        "criteria": "1.2.4",
+        "name": "Captions (Live)",
+        "responsible": ["Design", "Dev"],
+        "description": "Captions for live video with audio.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.2.5",
+        "name": "Audio Description (Pre-recorded)",
+        "responsible": ["Design", "Dev"],
+        "description": "Audio description of visual content in videos.",
+        "example": "Baking video with narration of actions.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.3.4",
+        "name": "Orientation",
+        "responsible": ["Design", "Dev"],
+        "description": "Content adaptable to different orientations.",
+        "example": "Fitness app layout adapts to portrait and landscape.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.3.5",
+        "name": "Identify Input Purpose",
+        "responsible": ["Dev"],
+        "description": "Input purposes must be programmatically identifiable.",
+        "example": "Input fields labelled for assistive tools.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.3",
+        "name": "Contrast (Minimum)",
+        "responsible": ["Design"],
+        "description": "Text contrast ratios: 4.5:1 (normal), 3:1 (large).",
+        "example": "Button text meets contrast ratio.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.4",
+        "name": "Resize Text",
+        "responsible": ["Design", "Dev"],
+        "description": "Text can scale to 200% without loss of function.",
+        "example": "Navigation adapts on zoom (Apple example).",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.5",
+        "name": "Images of Text",
+        "responsible": ["Design"],
+        "description": "Use real text, not images of text unless necessary.",
+        "example": "Promo banner uses styled CSS text.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.10",
+        "name": "Reflow",
+        "responsible": ["Design", "Dev"],
+        "description": "Content must avoid horizontal scrolling.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.11",
+        "name": "Non-Text Contrast",
+        "responsible": ["Design"],
+        "description": "Non-text elements must meet 3:1 contrast ratio.",
+        "example": "Active border contrast with background.",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.12",
+        "name": "Text Spacing",
+        "responsible": ["Design", "Dev"],
+        "description": "Text spacing can be customized without loss.",
+        "example": "Text spacing plugin (Chrome).",
+        "status": "Must comply"
+      },
+      {
+        "criteria": "1.4.13",
+        "name": "Content on Hover Focus",
+        "responsible": ["Design", "Dev"],
+        "description": "Additional hover/focus content must be dismissible.",
+        "example": "Tooltip remains visible, dismissible by Esc.",
+        "status": "Must comply"
+      }
+    ],
+    "Level AAA (Optional)": [
+      { "criteria": "1.2.6", "name": "Sign Language (Pre-recorded)", "responsible": ["Design", "Dev"], "description": "Sign-language for pre-recorded videos." },
+      { "criteria": "1.2.7", "name": "Extended Audio Description (Pre-recorded)", "responsible": ["Design", "Dev"], "description": "Extend video duration for audio descriptions." },
+      { "criteria": "1.2.8", "name": "Media Alternative (Pre-recorded)", "responsible": ["Design", "Dev"], "description": "Text or audio alternative for media." },
+      { "criteria": "1.2.9", "name": "Audio-only (Live)", "responsible": ["Design", "Dev"], "description": "Live text or transcript for live audio." },
+      { "criteria": "1.3.6", "name": "Identify Purpose", "responsible": ["Design", "Dev"], "description": "Declare purpose programmatically via metadata." },
+      { "criteria": "1.4.6", "name": "Contrast (Enhanced)", "responsible": ["Design"], "description": "Contrast of 7:1 for normal text and background." },
+      { "criteria": "1.4.7", "name": "Low or No Background Audio", "responsible": ["Design", "Dev"], "description": "Minimal or no background noise in audio." },
+      { "criteria": "1.4.8", "name": "Visual Presentation", "responsible": ["Design", "Dev"], "description": "Simpler layouts and enhanced visual presentation." },
+      { "criteria": "1.4.9", "name": "Images of Text (No Exception)", "responsible": ["Design", "Dev"], "description": "Never use text in images unless essential." }
+    ]
+  }
+}
