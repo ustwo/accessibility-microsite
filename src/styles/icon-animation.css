@@ -1,0 +1,57 @@
+.principle-icon {
+  width: 48px;
+  height: 48px;
+  background-size: 48px auto;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+/* Arrow icon animation */
+.principle-card:hover .principle-icon[data-icon="arrow"] {
+  animation: arrowAnimation 2.5s steps(30) forwards;
+}
+
+@keyframes arrowAnimation {
+  from { background-position: 0 0; }
+  to { background-position: 0 -1440px; } /* 48px * 30 frames */
+}
+
+/* Plus icon animation */
+.principle-card:hover .principle-icon[data-icon="plus"] {
+  animation: plusAnimation 6.25s steps(75) forwards;
+}
+
+@keyframes plusAnimation {
+  from { background-position: 0 0; }
+  to { background-position: 0 -3600px; } /* 48px * 75 frames */
+}
+
+/* Click icon animation */
+.principle-card:hover .principle-icon[data-icon="click"] {
+  animation: clickAnimation 4.75s steps(57) forwards;
+}
+
+@keyframes clickAnimation {
+  from { background-position: 0 0; }
+  to { background-position: 0 -2736px; } /* 48px * 57 frames */
+}
+
+/* Blink icon animation */
+.principle-card:hover .principle-icon[data-icon="blink"] {
+  animation: blinkAnimation 5s steps(60) forwards;
+}
+
+@keyframes blinkAnimation {
+  from { background-position: 0 0; }
+  to { background-position: 0 -2880px; } /* 48px * 60 frames */
+}
+
+/* Tick icon animation */
+.principle-card:hover .principle-icon[data-icon="tick"] {
+  animation: tickAnimation 1.92s steps(23) forwards;
+}
+
+@keyframes tickAnimation {
+  from { background-position: 0 0; }
+  to { background-position: 0 -1104px; } /* 48px * 23 frames */
+} 

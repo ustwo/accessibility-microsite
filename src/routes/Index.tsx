@@ -55,7 +55,12 @@ export default function Index() {
           <Link to="/tools" className="principle-card-link" aria-label="Go to recommended accessibility tools - Level-up your gear">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <img src="/img/icon-tools.png" alt="" aria-hidden="true" className="principle-icon" />
+                <div 
+                  className="principle-icon" 
+                  data-icon="arrow"
+                  style={{ backgroundImage: 'url(/img/animate-icon-arrow.png)' }}
+                  aria-hidden="true"
+                />
               </Col>
               <Col start={2} span={3}>
               <h3 className="h2Biggest">Level-up your gear</h3>
@@ -76,7 +81,12 @@ export default function Index() {
           <Link to="/patterns" className="principle-card-link" aria-label="Go to accessibility pattern library - Enjoy the patterns">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <img src="/img/icon-patterns.png" alt="" aria-hidden="true" className="principle-icon" />
+                <div 
+                  className="principle-icon" 
+                  data-icon="plus"
+                  style={{ backgroundImage: 'url(/img/animate-icon-plus2.png)' }}
+                  aria-hidden="true"
+                />
               </Col>
               <Col start={2} span={3}>
               <h3 className="h2Biggest">Enjoy the patterns</h3>
@@ -96,7 +106,12 @@ export default function Index() {
           <Link to="/checklist" className="principle-card-link" aria-label="Go to accessibility checklist - Think beyond touch">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <img src="/img/icon-keyboard.png" alt="" aria-hidden="true" className="principle-icon" />
+                <div 
+                  className="principle-icon" 
+                  data-icon="click"
+                  style={{ backgroundImage: 'url(/img/animate-icon-click.png)' }}
+                  aria-hidden="true"
+                />
               </Col>
               <Col start={2} span={3}>
               <h3 className="h2Biggest">Think beyond touch</h3>
@@ -116,7 +131,12 @@ export default function Index() {
           <Link to="/screen-reader-guide" className="principle-card-link" aria-label="Go to screen reader tutorial - Close your eyes">
             <Grid className="principle-card">
               <Col start={1} span={1}>
-                <img src="/img/icon-close-eyes.png" alt="" aria-hidden="true" className="principle-icon" />
+                <div 
+                  className="principle-icon" 
+                  data-icon="blink"
+                  style={{ backgroundImage: 'url(/img/animate-icon-blink.png)' }}
+                  aria-hidden="true"
+                />
               </Col>
               <Col start={2} span={3}>
               <h3 className="h2Biggest">Close your eyes</h3>
@@ -136,7 +156,12 @@ export default function Index() {
           <Link to="/testing-templates" className="principle-card-link" aria-label="Go to testing templates - Party party test party">
             <Grid className="principle-card principle-card-no-border">
               <Col start={1} span={1}>
-                <img src="/img/icon-test.png" alt="" aria-hidden="true" className="principle-icon" />
+                <div 
+                  className="principle-icon" 
+                  data-icon="tick"
+                  style={{ backgroundImage: 'url(/img/animate-icon-tick.png)' }}
+                  aria-hidden="true"
+                />
               </Col>
               <Col start={2} span={3}>
               <h3 className="h2Biggest">Party party (test) party!</h3>
