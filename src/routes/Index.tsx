@@ -108,8 +108,8 @@ export default function Index() {
               <Col start={1} span={1}>
                 <div 
                   className="principle-icon" 
-                  data-icon="click"
-                  style={{ backgroundImage: 'url(/img/animate-icon-click.png)' }}
+                  data-icon="tick"
+                  style={{ backgroundImage: 'url(/img/animate-icon-tick.png)' }}
                   aria-hidden="true"
                 />
               </Col>
@@ -158,8 +158,8 @@ export default function Index() {
               <Col start={1} span={1}>
                 <div 
                   className="principle-icon" 
-                  data-icon="tick"
-                  style={{ backgroundImage: 'url(/img/animate-icon-tick.png)' }}
+                  data-icon="click"
+                  style={{ backgroundImage: 'url(/img/animate-icon-click.png)' }}
                   aria-hidden="true"
                 />
               </Col>

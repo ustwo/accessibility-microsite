@@ -22,14 +22,15 @@
 /* Arrow icon animation */
 .principle-icon[data-icon="arrow"] {
   background-position: 0 0;
+  transform: rotate(90deg);
 }
 .principle-card:hover .principle-icon[data-icon="arrow"] {
-  animation: arrowAnimation 1s steps(31) forwards;
+  animation: arrowAnimation 0.6s steps(15) 2;
 }
 
 @keyframes arrowAnimation {
   from { background-position: 0 0; }
-  to { background-position: 0 -1860px; } /* 60px * 30 frames */
+  to { background-position: 0 -900px; } /* 60px * 30 frames */
 }
 
 /* Plus icon animation */
@@ -37,12 +38,13 @@
   background-position: 0 -480px;
 }
 .principle-card:hover .principle-icon[data-icon="plus"] {
-  animation: plusAnimation 0.32s steps(8) forwards;
+  animation: plusAnimation 0.72s steps(8) forwards;
 }
 
 @keyframes plusAnimation {
-  from { background-position: 0 0; }
-  to { background-position: 0 -480px; } /* 60px * 75 frames */
+  from { background-position: 0 -480px; }
+  50% { background-position: 0 0; } /* 60px * 75 frames */
+  100% { background-position: 0 -480px; }
 }
 
 /* Click icon animation */
@@ -63,7 +65,7 @@
   background-position: 0 0;
 }
 .principle-card:hover .principle-icon[data-icon="blink"] {
-  animation: blinkAnimation 0.32s steps(6) forwards;
+  animation: blinkAnimation 0.3s steps(6) forwards;
 }
 
 @keyframes blinkAnimation {
@@ -75,7 +77,7 @@
   background-position: 0 -540px;
 }
 .principle-card:hover .principle-icon[data-icon="tick"] {
-  animation: tickAnimation 0.32s steps(9) forwards;
+  animation: tickAnimation 0.2s steps(9) forwards;
 }
 
 @keyframes tickAnimation {
