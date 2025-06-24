@@ -43,13 +43,6 @@ export default function ChecklistTemplate({ title, allData }: ChecklistTemplateP
   const [filterResponsible, setFilterResponsible] = useState<string | null>(null);
   const [currentSection, setCurrentSection] = useState<string>("");
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
-  const [completionStats, setCompletionStats] = useState({
-    perceivable: 0,
-    operable: 0,
-    understandable: 0,
-    robust: 0,
-    total: 0
-  });
 
   // Add clear all function
   const handleClearAll = () => {
@@ -192,75 +185,6 @@ export default function ChecklistTemplate({ title, allData }: ChecklistTemplateP
     : 0;
   const totalFiltered = filteredLevelA.length + filteredLevelAA.length + filteredLevelAAA.length;
   const isFiltering = filterResponsible && filterResponsible !== "All";
-
-  // Calculate completion statistics
-  useEffect(() => {
-    const calculateCompletion = (data: ChecklistData) => {
-      let total = 0;
-      let completed = 0;
-      
-      // Iterate through each level (A, AA, AAA)
-      Object.values(data).forEach((levelData) => {
-        // Iterate through each item in the level
-        Object.values(levelData).forEach((items: ChecklistItem[]) => {
-          items.forEach((item: ChecklistItem) => {
-            // Only count items that match the current filter
-            if (!filterResponsible || filterResponsible === "All" || 
-                (filterResponsible === "UX & Design" && 
-                 (item.responsible.includes("UX & Design") || 
-                  item.responsible.includes("UX") || 
-                  item.responsible.includes("Design"))) ||
-                (filterResponsible === "Dev" && 
-                 item.responsible.includes("Dev"))) {
-              total++;
-              if (checkedItems.has(item.criteria)) {
-                completed++;
-              }
-            }
-          });
-        });
-      });
-      
-      return total > 0 ? Math.round((completed / total) * 100) : 0;
-    };
-
-    const stats = {
-      perceivable: calculateCompletion(allData.perceivable),
-      operable: calculateCompletion(allData.operable),
-      understandable: calculateCompletion(allData.understandable),
-      robust: calculateCompletion(allData.robust),
-      total: 0
-    };
-
-    // Calculate total completion
-    let totalItems = 0;
-    let totalCompleted = 0;
-
-    Object.values(allData).forEach((data) => {
-      Object.values(data).forEach((levelData) => {
-        Object.values(levelData).forEach((items: ChecklistItem[]) => {
-          items.forEach((item: ChecklistItem) => {
-            // Only count items that match the current filter
-            if (!filterResponsible || filterResponsible === "All" || 
-                (filterResponsible === "UX & Design" && 
-                 (item.responsible.includes("UX & Design") || 
-                  item.responsible.includes("UX") || 
-                  item.responsible.includes("Design"))) ||
-                (filterResponsible === "Dev" && 
-                 item.responsible.includes("Dev"))) {
-              totalItems++;
-              if (checkedItems.has(item.criteria)) {
-                totalCompleted++;
-              }
-            }
-          });
-        });
-      });
-    });
-
-    stats.total = totalItems > 0 ? Math.round((totalCompleted / totalItems) * 100) : 0;
-    setCompletionStats(stats);
-  }, [checkedItems, allData, filterResponsible]);
 
   const renderTable = (items: ChecklistItem[], level: string, hasExampleColumn: boolean = true) => {
     if (items.length === 0) return null;
@@ -421,17 +345,6 @@ export default function ChecklistTemplate({ title, allData }: ChecklistTemplateP
           </Col>
         </Grid>
       </Section>
-
-      <div className="completion-footer">
-        <div className="completion-stats">
-          <span className="filter-indicator">Progress: {filterResponsible || "All"}</span>
-          <span>Perceivable: {completionStats.perceivable}%</span>
-          <span>Operable: {completionStats.operable}%</span>
-          <span>Understandable: {completionStats.understandable}%</span>
-          <span>Robust: {completionStats.robust}%</span>
-          <span className="total">TOTAL: {completionStats.total}%</span>
-        </div>
-      </div>
     </Layout>
   );
 } 
