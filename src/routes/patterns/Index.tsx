@@ -10,6 +10,15 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import { useData } from "../../context/DataContext";
 import Grid, { Col } from "../../components/Grid";  
 
+// Helper function to capitalize "mob" and "web"
+const capitalizePlatform = (text: string): string => {
+  if (!text) return text;
+  const lowerText = text.toLowerCase();
+  if (lowerText === 'mob') return 'Mob';
+  if (lowerText === 'web') return 'Web';
+  return text;
+};
+
 export default function PatternsIndex() {
   const { patterns, isLoadingPatterns, error, clearCache } = useData();
 
@@ -123,7 +132,7 @@ export default function PatternsIndex() {
                         <option value="">All Platforms</option>
                         {availableFilters.categories.map((category) => (
                           <option key={category} value={category}>
-                            {category}
+                            {capitalizePlatform(category)}
                           </option>
                         ))}
                       </select>
@@ -205,11 +214,11 @@ export default function PatternsIndex() {
                               <div className="pattern-categories">
                                 {pattern.category.toLowerCase() === 'all' ? (
                                   <>
-                                    <span>mob</span>
-                                    <span>web</span>
+                                    <span>Mob</span>
+                                    <span>Web</span>
                                   </>
                                 ) : (
-                                  <span>{pattern.category.toLowerCase()}</span>
+                                  <span>{capitalizePlatform(pattern.category)}</span>
                                 )}
                               </div>
                             )}
@@ -302,7 +311,7 @@ export default function PatternsIndex() {
                                     {/* Add subtitle for platform-specific variants */}
                                     {isSubsequentPlatformVariant && (
                                       <h4 className="pattern-subtitle">
-                                        For {pattern.category} platforms
+                                        For {capitalizePlatform(pattern.category)} platforms
                                       </h4>
                                     )}
 
@@ -310,7 +319,7 @@ export default function PatternsIndex() {
                                     {!isSubsequentPlatformVariant &&
                                       groupHasMultiplePlatforms && (
                                         <h4 className="pattern-subtitle">
-                                          For {pattern.category} platforms
+                                          For {capitalizePlatform(pattern.category)} platforms
                                         </h4>
                                       )}
 
@@ -327,7 +336,7 @@ export default function PatternsIndex() {
                                               <span>Web</span>
                                             </>
                                           ) : (
-                                            <span>{pattern.category.toLowerCase()}</span>
+                                            <span>{capitalizePlatform(pattern.category)}</span>
                                           )}
                                         </div>
                                       )}
