@@ -50,7 +50,7 @@ select:disabled,
 fieldset:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-  background-color: var(--color-gray-100);
+  background-color: var(--color-gray-700);
 }
 
 /* Form group */
