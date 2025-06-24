@@ -184,7 +184,7 @@ export default function PatternsIndex() {
           </Grid>
         )}
       </Section>
-      <div>
+      <Section>
         <div>
           <div>
             {/* Pattern listings */}
@@ -265,9 +265,8 @@ export default function PatternsIndex() {
                   /* Grouped view - display patterns by section */
                   <div className="patterns-by-section">
                     {groupedPatternsInSections.map((section, sectionIndex) => (
-                      <Section
+                      <div
                         key={`section-${sectionIndex}`}
-                        padding="bottom"
                       >
                         <h2
                           id={`section-${sectionIndex}`}
@@ -378,7 +377,7 @@ export default function PatternsIndex() {
                               .filter(Boolean); // Filter out any null values
                           })}
                         </div>
-                      </Section>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -386,7 +385,7 @@ export default function PatternsIndex() {
             )}
             </div>
           </div>
-        </div>
+        </Section>
     </Layout>
   );
 }
