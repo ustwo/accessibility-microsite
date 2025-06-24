@@ -104,28 +104,6 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
           </Section>
         )}
         {children}
-        <Section aria-labelledby="contribute-heading" backgroundColor="offWhite" padding="both">
-          <Grid>
-            <Col start={1} span={7}>
-              <h2 id="contribute-heading" className="h2Bigger textMarginBottom">
-                Contribute Your Knowledge
-              </h2>
-              <p className=" textMarginBottomLarge">
-                We welcome contributions from the accessibility community. Share
-                your favorite tools or patterns to help others create more
-                accessible digital experiences.
-              </p>
-              <div className="flex" style={{ gap: 'var(--space-4)' }}>
-                <Link to="/tools/submit" className="button">
-                  Submit a Tool
-                </Link>
-                <Link to="/patterns/submit" className="button buttonInvert">
-                  Submit a Pattern
-                </Link>
-              </div>
-            </Col>
-          </Grid>
-        </Section>
       </main>
 
       <footer className="site-footer backgroundOffBlack lightOnDark" role="contentinfo">
