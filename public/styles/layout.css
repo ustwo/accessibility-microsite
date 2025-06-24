@@ -120,6 +120,9 @@
   transition: var(--transition);
   text-decoration: underline;
   font-weight: 400;
+  padding: var(--space-2);
+  text-decoration: none;
+  font-size: 0.875rem;
 }
 
 .site-nav a:hover {
@@ -206,6 +209,11 @@
   background-color: var(--color-offWhite);
 }
 
+/* Dark mode hover styles for mobile nav button */
+.dark .mobile-nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .mobile-nav-button:focus {
   outline: 2px solid var(--color-blue);
   outline-offset: 2px;
@@ -271,6 +279,36 @@
   flex-direction: column;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
   animation: slideInRight 0.3s ease-out;
+}
+
+/* Dark mode styles for mobile navigation */
+.dark .mobile-nav-content {
+  background-color: var(--color-offBlack);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark .mobile-nav-backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Dark mode styles for hamburger menu lines */
+.dark .mobile-nav-line {
+  background-color: white;
+}
+
+/* Dark mode styles for mobile navigation links */
+.dark .mobile-nav a {
+  color: white;
+  border-bottom-color: var(--color-gray-700);
+}
+
+.dark .mobile-nav a:hover {
+  color: var(--color-blue-light);
+}
+
+.dark .mobile-nav a[aria-current="page"] {
+  color: var(--color-blue-light);
+  border-bottom-color: var(--color-blue-light);
 }
 
 @keyframes slideInRight {
@@ -344,7 +382,7 @@
 }
 
 /* Mobile-specific hiding */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .desktop-nav {
     display: none;
   }
@@ -371,7 +409,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .mobile-nav-wrapper {
     display: none;
   }
