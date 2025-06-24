@@ -340,16 +340,12 @@
   color: #64748b;
 }
 
-.pattern-item .pattern-meta {
-  padding-bottom: 1rem;
-}
-
 /* Pattern references - creative new approach */
 .pattern-links {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin: 0;
+  gap: 0.25rem;
+  margin: 0.75rem 0;
 }
 
 .pattern-links-title {
@@ -520,6 +516,10 @@ input:focus, textarea:focus, select:focus {
 
 .patterns-by-section {
   margin-top: 2rem;
+}
+
+.pattern-section {
+  margin-bottom: 4rem;
 }
 
 /* Loading Spinner Styles */

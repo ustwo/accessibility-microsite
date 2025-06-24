@@ -1,0 +1,40 @@
+,Platform,Description,Linky dinks,,,Internal-only links
+,,,,,,
+General patterns to follow,,,,,,
+Put the user in control,"mob, web",Considering auto-playing a video? Just make sure you provide playback controls!,,,,
+Be more alternative,web,"Caption your videos, add descriptions to your images",How a blind person uses a website,,,
+"Support all devices
+",web,Use responsive design,,,,
+,mob,Support portrait and landscape orientations,,,,
+Structure your content,web,Use semantic HTML ,Make use of: 8 semantic tags,,,
+,mob,Setting up the accessibility tree correctly in iOS and Android makes TDD easier.,,,,
+Support dark mode,mob,But make sure you honour the user's setting,UXDesign: Peering into the a11y of Dark Mode,,,
+Zoom all the way,"web, mob",People should be able to zoom in up to 200% in order to read larger text without losing any content or functionality.,Access guide,,,
+,web,Set all units in rem. This ensures all content on the page scales when users change the default font-size.,CSS Tricks,,,
+,mob,Careful consideration required on mobile,Medium: Font-scaling in React Native apps,,,
+Colour blindness pallete - Graphs,"web, mob",Accessible Colour Palletes,Accessible Colour Palettes,,,
+Charts,"web, mob",Better data Visualisation,Smashing Maganize,,,
+Patterns for good forms,,,,,,
+Start with one thing per page,"web, mob",Asking one thing at a time turns forms into more of a conversation and works well on mobile and web.,GOV.UK Service manual,,,
+Structure your form to help users,"web, mob","Asking a question doesn’t necessarily mean you should use one form field. For example, date of birth is best captured with 3 text fields.",GOV.UK Service manual,,,
+Recovering from form errors,mob,"One input per page
+Validation on blur (not keypress i.e. not live)
+Error messages read out
+Focus moves straight back to the input",,,,
+,web,"Validate on submit, move focus to an Error summary component, link to the input with the error.",GOV.UK Design system,,,National Grid's new bank account form
+Inputting dates,"mob, web","Allow users to enter day, month and year themselves. Only use calendar controls if users need to pick a date in the near future or recent past, or in other limited situations.",GOV.UK Design system,,,
+Patterns for interactions,,,,,,
+Support reduce motion setting,web,"Use a CSS media query to disable all animations for users who have set their system preferences to ""reduce motion""",Elijah Manor's website,,,
+Working with drag'n'drop,"mob, web",Drag and drop doesn't need to be a terrible user experience for people who don't like mice.,Salesforce UX,,,
+Resizing in one dimension,"mob, web",Ensure you can use the keyboard and arrow keys for this typically-mouse-based interaction,Salesforce UX,,,
+Working with lists,"web, mob",Some great examples of making common list-based interactions accessible,Salesforce UX,,,
+"""Learn more"" links",web,Retain the Learn More format and add descriptive keywords for screen readers.,NN Group: 'Learn More' Links – You Can Do Better,,,
+Patterns for components,,,,,,
+Text input,"web, mob","Include hint text in the input's label, so it is read out when input is focused / entered e.g. ""Email address, You must enter your government email...""",U.S. Web Design System,,,
+Checkbox,"web, mob","Tab moves you between checkbox options, in addition, group label is read",U.S. Web Design System,,,
+Datepickers,"web, mob","If you must use calendar control (see Inputting dates pattern above), use arrow keys to navigate between date picker dates. Use an off-the-shelf accessible date picker.",GOV.UK Design system,,,
+Tooltips,"web, mob","Tooltips should support hover, click, tap and the revealed content should be read out by screen readers.",,,,National Grid's accessible tooltip
+Graphs,"web, mob","Use a charting library that supports accessibility out-of-the-box, such as HighCharts. Define a logical keyboard navigation using ↑ ↓ → ← on keyboard",Highcharts examples,,,
+Error summary,web,Show a list of errors with links to individual errors,GOV.UK Design system,,,
+Error message,web,Make sure error messages appear after the label and before the input.,GOV.UK Design system,,,
+Carousel,"web, mob",Complex gestures must have a simple alternative to meet WCAG AA compliance. Here are some examples I usually refer to as inspiration for Carousel:,Carousel with arrows as sliders,Carousel with Pips as sliders,Article on Accessible Carousels,

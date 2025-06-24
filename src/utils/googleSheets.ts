@@ -1,4 +1,4 @@
-import { mockTools, mockPatterns } from '../data/mockData';
+import { mockTools, mockPatterns } from '../data/mockData.new';
 import { CACHE_KEYS, getFromCache, saveToCache, getCacheVersion } from './cacheUtils';
 
 /**
@@ -576,6 +576,7 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
 function processPatternRows(rows: string[][]): AccessibilityPattern[] {
   const patterns: AccessibilityPattern[] = [];
   let currentParentTitle = "";
+  let lastPatternName = ""; // Track the last pattern name for inheritance
   
   rows.forEach((row, index) => {
     // Check if row is a section title (has only one cell with content)
@@ -595,14 +596,25 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
     }
     
     // Skip empty rows or invalid rows
-    if (row.length < 2 || !row[0] && !row[1]) {
+    if (row.length < 2 || (!row[0] && !row[1] && !row[2])) {
       return;
     }
 
     try {
       const name = row[0]?.trim() || "";
-      const where = row[1]?.trim() || "";
+      const category = row[1]?.trim() || ""; // This is now the category (mob, web, both)
       const description = row[2]?.trim() || "";
+      
+      // Determine the pattern name - inherit from previous if empty
+      let patternName = name;
+      if (!patternName && lastPatternName) {
+        patternName = lastPatternName;
+      }
+      
+      // Update last pattern name if this row has a name
+      if (name) {
+        lastPatternName = name;
+      }
       
       // Parse links from columns 4, 5, and 6 (indices 3, 4, and 5)
       const linkyDinks: Array<{ title: string; url: string }> = [];
@@ -615,25 +627,37 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
           try {
             const parsedJson = JSON.parse(linkFormula);
             if (parsedJson.url && parsedJson.title) {
-              linkyDinks.push(parsedJson);
+              // Check if this link is already in the array to avoid duplicates
+              const isDuplicate = linkyDinks.some(link => 
+                link.url === parsedJson.url && link.title === parsedJson.title
+              );
+              if (!isDuplicate) {
+                linkyDinks.push(parsedJson);
+              }
             }
           } catch (jsonError) {
             // If not JSON, try parsing as HYPERLINK formula
             const parsed = parseHyperlinkFormula(linkFormula);
             if (parsed) {
-              linkyDinks.push(parsed);
+              // Check if this link is already in the array to avoid duplicates
+              const isDuplicate = linkyDinks.some(link => 
+                link.url === parsed.url && link.title === parsed.title
+              );
+              if (!isDuplicate) {
+                linkyDinks.push(parsed);
+              }
             }
           }
         }
       }
       
-      // Only create a pattern if it has a 'where' value or a name
-      if (where || name) {
+      // Create a pattern if we have a name (either from this row or inherited) and some content
+      if (patternName && (category || description || linkyDinks.length > 0)) {
         const pattern: AccessibilityPattern = {
           id: `pattern-${index + 1}`,
-          name: name,
-          category: where,  // Using 'where' as the category for filtering
-          where: where,     // Keep the original 'where' field for compatibility
+          name: patternName,
+          category: category,  // This is now mob, web, or both
+          where: category,     // Keep the original 'where' field for compatibility
           description: description,
           linkyDinks,
           parentTitle: currentParentTitle
@@ -642,6 +666,7 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
         patterns.push(pattern);
       }
     } catch (error) {
+      console.error('Error processing pattern row:', error, row);
     }
   });
   

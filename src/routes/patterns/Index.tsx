@@ -10,15 +10,6 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import { useData } from "../../context/DataContext";
 import Grid, { Col } from "../../components/Grid";  
 
-// Helper function to capitalize "mob" and "web"
-const capitalizePlatform = (text: string): string => {
-  if (!text) return text;
-  const lowerText = text.toLowerCase();
-  if (lowerText === 'mob') return 'Mob';
-  if (lowerText === 'web') return 'Web';
-  return text;
-};
-
 export default function PatternsIndex() {
   const { patterns, isLoadingPatterns, error, clearCache } = useData();
 
@@ -27,6 +18,8 @@ export default function PatternsIndex() {
   const [filterParentTitle, setFilterParentTitle] = useState<string | null>(
     null
   );
+  console.log(patterns);
+
 
   // Compute filter options directly from the patterns data
   const availableFilters = getPatternsFilterOptions(patterns);
@@ -38,8 +31,14 @@ export default function PatternsIndex() {
       return false;
     }
 
-    if (filterCategory && pattern.category !== filterCategory) {
-      return false;
+    if (filterCategory && filterCategory !== "All Platforms") {
+      // Handle "both" category - show for both Web and Mobile filters
+      if (filterCategory === "Web" && pattern.category.toLowerCase() !== "web" && pattern.category.toLowerCase() !== "both") {
+        return false;
+      }
+      if (filterCategory === "Mobile" && pattern.category.toLowerCase() !== "mob" && pattern.category.toLowerCase() !== "both") {
+        return false;
+      }
     }
 
     if (filterParentTitle && pattern.parentTitle !== filterParentTitle) {
@@ -56,9 +55,18 @@ export default function PatternsIndex() {
         sectionTitle: pattern.name,
         patterns: [],
       });
-    } else if (acc.length > 0) {
-      const lastSection = acc[acc.length - 1];
-      lastSection.patterns.push(pattern);
+    } else {
+      // If we have sections, add to the last section
+      if (acc.length > 0) {
+        const lastSection = acc[acc.length - 1];
+        lastSection.patterns.push(pattern);
+      } else {
+        // If no sections exist, create a default section for ungrouped patterns
+        acc.push({
+          sectionTitle: "Patterns",
+          patterns: [pattern],
+        });
+      }
     }
     return acc;
   }, [] as { sectionTitle: string; patterns: AccessibilityPattern[] }[]);
@@ -88,9 +96,8 @@ export default function PatternsIndex() {
 
   // Determine if we're filtering
   const isFiltering =
-    filterCategory !== null ||
+    (filterCategory !== null && filterCategory !== "All Platforms") ||
     filterParentTitle !== null;
-
   return (
     <Layout
       title="Accessibility Patterns"
@@ -117,15 +124,12 @@ export default function PatternsIndex() {
                       <label htmlFor="categoryFilter">Platform:</label>
                       <select
                         id="categoryFilter"
-                        value={filterCategory || ""}
-                        onChange={(e) => setFilterCategory(e.target.value || null)}
+                        value={filterCategory || "All Platforms"}
+                        onChange={(e) => setFilterCategory(e.target.value === "All Platforms" ? null : e.target.value)}
                       >
-                        <option value="">All Platforms</option>
-                        {availableFilters.categories.map((category) => (
-                          <option key={category} value={category}>
-                            {capitalizePlatform(category)}
-                          </option>
-                        ))}
+                        <option value="All Platforms">All Platforms</option>
+                        <option value="Web">Web</option>
+                        <option value="Mobile">Mobile</option>
                       </select>
                     </div>
 
@@ -166,7 +170,6 @@ export default function PatternsIndex() {
         </Grid>
       </Section>
 
-
       <Section>
         {/* Loading and error states */}
         {isLoadingPatterns && (
@@ -184,7 +187,8 @@ export default function PatternsIndex() {
           </Grid>
         )}
       </Section>
-      <Section>
+
+      <Section padding="bottom">
         <div>
           <div>
             {/* Pattern listings */}
@@ -197,28 +201,14 @@ export default function PatternsIndex() {
                       filteredPatterns.map((pattern) => (
                         <div key={pattern.id} className="pattern-item">
                           <h3>{pattern.name}</h3>
-                          <p className="smallBodyText">
+                          <p className="smallBodyText noMargin">
                             {pattern.description}
                           </p>
-                          <div className="pattern-meta">
-                            {pattern.category && (
-                              <div className="pattern-categories">
-                                {pattern.category.toLowerCase() === 'all' ? (
-                                  <>
-                                    <span>Mob</span>
-                                    <span>Web</span>
-                                  </>
-                                ) : (
-                                  <span>{capitalizePlatform(pattern.category)}</span>
-                                )}
-                              </div>
-                            )}
-                          </div>
 
                           {pattern.linkyDinks && pattern.linkyDinks.length > 0 && (
                             <div className="pattern-links">
                               {pattern.linkyDinks
-                                .filter((link) => link.url && link.title) // Only show links that have both URL and title
+                                .filter((link) => link.url) // Show links that have at least a URL
                                 .map((link, index) => (
                                   <a
                                     key={index}
@@ -241,7 +231,7 @@ export default function PatternsIndex() {
                                         e.currentTarget.style.display = 'none';
                                       }}
                                     />
-                                    {link.title}
+                                    {link.title || link.url}
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                       <path fillRule="evenodd" d="M19,14 L19,19 C19,20.1045695 18.1045695,21 17,21 L5,21 C3.8954305,21 3,20.1045695 3,19 L3,7 C3,5.8954305 3.8954305,5 5,5 L10,5 L10,7 L5,7 L5,19 L17,19 L17,14 L19,14 Z M18.9971001,6.41421356 L11.7042068,13.7071068 L10.2899933,12.2928932 L17.5828865,5 L12.9971001,5 L12.9971001,3 L20.9971001,3 L20.9971001,11 L18.9971001,11 L18.9971001,6.41421356 Z" fill="currentColor"/>
                                     </svg>
@@ -249,6 +239,21 @@ export default function PatternsIndex() {
                                 ))}
                             </div>
                           )}
+
+                          <div className="pattern-meta">
+                            {pattern.category && (
+                              <div className="pattern-categories">
+                                {pattern.category.toLowerCase() === 'both' ? (
+                                  <>
+                                    <span>Mobile</span>
+                                    <span>Web</span>
+                                  </>
+                                ) : (
+                                  <span>{pattern.category.toLowerCase() === 'mob' ? 'Mobile' : 'Web'}</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
 
                           
                         </div>
@@ -267,6 +272,7 @@ export default function PatternsIndex() {
                     {groupedPatternsInSections.map((section, sectionIndex) => (
                       <div
                         key={`section-${sectionIndex}`}
+                        className="pattern-section"
                       >
                         <h2
                           id={`section-${sectionIndex}`}
@@ -298,47 +304,15 @@ export default function PatternsIndex() {
                                     {/* Always show the pattern name */}
                                     <h3 className="pattern-name">{pattern.name}</h3>
 
-                                    {/* Add subtitle for platform-specific variants */}
-                                    {isSubsequentPlatformVariant && (
-                                      <h4 className="pattern-subtitle">
-                                        For {capitalizePlatform(pattern.category)} platforms
-                                      </h4>
-                                    )}
-
-                                    {/* First variant with multiple platforms should indicate it's for that specific platform */}
-                                    {!isSubsequentPlatformVariant &&
-                                      groupHasMultiplePlatforms && (
-                                        <h4 className="pattern-subtitle">
-                                          For {capitalizePlatform(pattern.category)} platforms
-                                        </h4>
-                                      )}
-
-                                    <p className="smallBodyText">
+                                    <p className="smallBodyText noMargin">
                                       {pattern.description}
                                     </p>
-
-                                    <div className="pattern-meta">
-                                      {pattern.category && (
-                                        <div className="pattern-categories">
-                                          {pattern.category.toLowerCase() === 'all' ? (
-                                            <>
-                                              <span>Mob</span>
-                                              <span>Web</span>
-                                            </>
-                                          ) : (
-                                            <span>{capitalizePlatform(pattern.category)}</span>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
 
                                     {pattern.linkyDinks &&
                                       pattern.linkyDinks.length > 0 && (
                                         <div className="pattern-links">
                                           {pattern.linkyDinks
-                                            .filter(
-                                              (link) => link.url && link.title
-                                            ) // Only show links that have both URL and title
+                                            .filter((link) => link.url) // Show links that have at least a URL
                                             .map((link, index) => (
                                               <a
                                                 key={index}
@@ -361,7 +335,7 @@ export default function PatternsIndex() {
                                                     e.currentTarget.style.display = 'none';
                                                   }}
                                                 />
-                                                {link.title}
+                                                {link.title || link.url}
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                   <path fillRule="evenodd" d="M19,14 L19,19 C19,20.1045695 18.1045695,21 17,21 L5,21 C3.8954305,21 3,20.1045695 3,19 L3,7 C3,5.8954305 3.8954305,5 5,5 L10,5 L10,7 L5,7 L5,19 L17,19 L17,14 L19,14 Z M18.9971001,6.41421356 L11.7042068,13.7071068 L10.2899933,12.2928932 L17.5828865,5 L12.9971001,5 L12.9971001,3 L20.9971001,3 L20.9971001,11 L18.9971001,11 L18.9971001,6.41421356 Z" fill="currentColor"/>
                                                 </svg>
@@ -370,7 +344,21 @@ export default function PatternsIndex() {
                                         </div>
                                       )}
 
-                                   
+                                    <div className="pattern-meta">
+                                      {pattern.category && (
+                                        <div className="pattern-categories">
+                                          {pattern.category.toLowerCase() === 'both' ? (
+                                            <>
+                                              <span>Mobile</span>
+                                              <span>Web</span>
+                                            </>
+                                          ) : (
+                                            <span>{pattern.category.toLowerCase() === 'mob' ? 'Mobile' : 'Web'}</span>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+
                                   </div>
                                 );
                               })
