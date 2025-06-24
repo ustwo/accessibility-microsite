@@ -139,13 +139,10 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
           <Grid>
             <Col start={1} span={12}>
               <div className="company-footer">
-
-                <ul className="company-links">
-                  <li>
-                  <div className="company-logo">
+                <div className="company-logo">
                   <span>Copyright © ustwo Ltd 2025. All rights reserved.</span>
                 </div>
-                  </li>
+                <ul className="company-links">
                   <li><a href="https://ustwo.com/legal/" target="_blank" rel="noopener noreferrer">Legal</a></li>
                   <li><a href="https://ustwo.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Privacy<span className="hideOnTinyScreens"> Policy</span></a></li>
                   <li><Link aria-current={isCurrentPage("/about") ? "page" : undefined} to="/about">About this site</Link></li>
