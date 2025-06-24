@@ -35,7 +35,11 @@
   padding: 0 var(--app-gap);
   max-width: var(--grid-max-width);
   margin: 0 auto;
-  display: block;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
 }
 
 .site-header a {
@@ -151,7 +155,7 @@
   .site-logo .logo-svg {
     width: 80px;
   }
-  .site-nav-wrapper {
+  .site-nav-wrapper.desktop-nav {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -176,6 +180,206 @@
 
 /* Responsive navigation - simplified */
 
+/* Mobile Navigation Styles */
+.mobile-nav-wrapper {
+  display: none;
+}
+
+.mobile-nav-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 21px;
+  height: 21px;
+  transition: all 0.3s ease;
+  z-index: 1001;
+  position: relative;
+  box-sizing: content-box;
+}
+
+.mobile-nav-button:hover {
+  background-color: var(--color-offWhite);
+}
+
+.mobile-nav-button:focus {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+.mobile-nav-line {
+  display: block;
+  width: 21px;
+  height: 2px;
+  background-color: var(--color-offBlack);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  border-radius: 6px;
+  position: relative;
+  transform-origin: 1px;
+}
+
+.mobile-nav-button.active .mobile-nav-line.top {
+  transform: rotate(45deg) translate(5px, 0px);
+}
+
+.mobile-nav-button.active .mobile-nav-line.middle {
+  opacity: 0;
+  transform: translateX(6px);
+  width: 0;
+}
+
+.mobile-nav-button.active .mobile-nav-line.bottom {
+  transform: rotate(-45deg) translate(4px, 1px);
+}
+
+/* Mobile Navigation Overlay */
+.mobile-nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.mobile-nav-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.mobile-nav-content {
+  position: relative;
+  background-color: white;
+  width: 280px;
+  height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile navigation header with dark mode toggle */
+.mobile-nav-header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  transform: translateY(-12px);
+}
+
+/* Override dark mode toggle positioning in mobile nav */
+.mobile-nav-header .dark-mode-toggle {
+  position: relative;
+  right: auto;
+  top: auto;
+  margin-left: 0;
+}
+
+.mobile-nav {
+  flex: 1;
+}
+
+.mobile-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-nav li {
+  margin: 0;
+}
+
+.mobile-nav a {
+  display: block;
+  padding: 16px 0;
+  color: var(--color-offBlack);
+  text-decoration: none;
+  font-size: 1.125rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--color-offWhite);
+  transition: color 0.2s ease;
+}
+
+.mobile-nav a:hover {
+  color: var(--color-blue);
+}
+
+.mobile-nav a:focus {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.mobile-nav a[aria-current="page"] {
+  color: var(--color-blue);
+  border-bottom-color: var(--color-blue);
+  border-bottom-width: 2px;
+}
+
+/* Mobile-specific hiding */
+@media (max-width: 767px) {
+  .desktop-nav {
+    display: none;
+  }
+  
+  .mobile-nav-wrapper {
+    display: block;
+  }
+  
+  .header-inner {
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .site-logo {
+    padding: 0.5rem 0;
+  }
+  
+  .site-logo .logo-svg {
+    width: 50px;
+  }
+  
+  .accessibility-text {
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-nav-wrapper {
+    display: none;
+  }
+  
+  .desktop-nav {
+    display: flex;
+  }
+}
 
 /* Footer layout */
 .site-footer {

@@ -22,13 +22,6 @@ const capitalizePlatform = (text: string): string => {
 export default function PatternsIndex() {
   const { patterns, isLoadingPatterns, error, clearCache } = useData();
 
-  // Add debug logging
-  console.log("Patterns data in component:", patterns);
-  console.log(
-    "Patterns with links:",
-    patterns.filter((p) => p.linkyDinks && p.linkyDinks.length > 0)
-  );
-
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
 
   const [filterParentTitle, setFilterParentTitle] = useState<string | null>(
@@ -48,8 +41,6 @@ export default function PatternsIndex() {
     if (filterCategory && pattern.category !== filterCategory) {
       return false;
     }
-
-
 
     if (filterParentTitle && pattern.parentTitle !== filterParentTitle) {
       return false;

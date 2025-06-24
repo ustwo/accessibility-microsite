@@ -41,7 +41,6 @@ export function getFromCache<T>(key: string, version: string): T | null {
     
     // Check if cache version matches (to handle schema changes)
     if (parsed.version !== version) {
-      console.log(`Cache version mismatch for ${key}, invalidating`);
       localStorage.removeItem(key);
       return null;
     }
@@ -56,15 +55,12 @@ export function getFromCache<T>(key: string, version: string): T | null {
         : DEFAULT_CACHE_DURATION.PATTERNS;
 
     if (cacheAge > maxAge) {
-      console.log(`Cache expired for ${key}, age: ${cacheAge}ms, max age: ${maxAge}ms`);
       localStorage.removeItem(key);
       return null;
     }
 
-    console.log(`Cache hit for ${key}, age: ${Math.round(cacheAge / 1000)}s`);
     return parsed.data;
   } catch (error) {
-    console.error(`Error getting data from cache (${key}):`, error);
     localStorage.removeItem(key);
     return null;
   }
@@ -81,9 +77,7 @@ export function saveToCache<T>(key: string, data: T, version: string): void {
       version
     };
     localStorage.setItem(key, JSON.stringify(cacheItem));
-    console.log(`Data saved to cache: ${key}`);
   } catch (error) {
-    console.error(`Error saving data to cache (${key}):`, error);
     // If error is due to quota exceeded, try to clear other caches
     if (error instanceof DOMException && error.name === 'QuotaExceededError') {
       try {
@@ -98,7 +92,6 @@ export function saveToCache<T>(key: string, data: T, version: string): void {
           version
         }));
       } catch (retryError) {
-        console.error(`Failed to save cache even after clearing:`, retryError);
       }
     }
   }
@@ -111,7 +104,6 @@ export function clearAllCaches(): void {
   Object.values(CACHE_KEYS).forEach(key => {
     localStorage.removeItem(key);
   });
-  console.log('All caches cleared');
 }
 
 /**

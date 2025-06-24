@@ -1,9 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import UsTwo from "./UsTwo";
 import Grid, { Col } from "./Grid";
 import Section from "./Section";
-import DarkModeToggle from "./DarkModeToggle";  
+import DarkModeToggle from "./DarkModeToggle";
+import MobileNavButton from "./MobileNavButton";
+import MobileNavOverlay from "./MobileNavOverlay";
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,6 +17,7 @@ interface LayoutProps {
 export default function Layout({ children, title, introText, theme }: LayoutProps) {
   const location = useLocation();
   const currentPath = location.pathname;
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Helper function to check if a link path matches the current path
   const isCurrentPage = (linkPath: string) => {
@@ -22,6 +25,14 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
     const cleanCurrentPath = currentPath.replace(/\/$/, '');
     const cleanLinkPath = linkPath.replace(/\/$/, '');
     return cleanCurrentPath === cleanLinkPath;
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -38,7 +49,8 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
             <div className="accessibility-text">Accessibility</div>
           </Link>
           
-          <div className="site-nav-wrapper">
+          {/* Desktop Navigation */}
+          <div className="site-nav-wrapper desktop-nav">
             <nav className="site-nav" aria-label="Main navigation">
               <ul>
                 <li>
@@ -85,8 +97,24 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
             </nav>
             <DarkModeToggle />
           </div>
+
+          {/* Mobile Navigation Button */}
+          <div className="mobile-nav-wrapper">
+            <MobileNavButton 
+              isOpen={isMobileMenuOpen}
+              onToggle={toggleMobileMenu}
+              ariaControls="mobile-nav-menu"
+            />
+          </div>
         </div>
       </header>
+
+      {/* Mobile Navigation Overlay */}
+      <MobileNavOverlay 
+        isOpen={isMobileMenuOpen}
+        onClose={closeMobileMenu}
+        id="mobile-nav-menu"
+      />
 
       <main id="main-content" className="site-main">
         {title && (

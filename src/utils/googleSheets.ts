@@ -55,7 +55,6 @@ async function applyRateLimit(): Promise<void> {
   const timeSinceLastRequest = lastRequestTime ? now - lastRequestTime : Infinity;
   if (timeSinceLastRequest < API_CONFIG.REQUEST_INTERVAL_MS) {
     const waitTime = API_CONFIG.REQUEST_INTERVAL_MS - timeSinceLastRequest;
-    console.log(`Rate limiting: waiting ${waitTime}ms between requests`);
     await new Promise(resolve => setTimeout(resolve, waitTime));
   }
   
@@ -65,7 +64,6 @@ async function applyRateLimit(): Promise<void> {
     const oldestTimestamp = requestTimestamps[0];
     const timeToWait = 60000 - (now - oldestTimestamp) + 100; // add a small buffer
     
-    console.log(`Rate limit reached (${requestTimestamps.length} requests this minute). Waiting ${timeToWait}ms...`);
     await new Promise(resolve => setTimeout(resolve, timeToWait));
     
     // Recursive call to check again after waiting
@@ -153,7 +151,6 @@ try {
 // Helper function to check if required API credentials are available
 export function hasApiCredentials(): boolean {
   const hasCredentials = Boolean(serviceAccountCredentials?.client_email && serviceAccountCredentials?.private_key);
-  console.log('hasApiCredentials check result:', hasCredentials);
   return hasCredentials;
 }
 
@@ -162,7 +159,6 @@ export function hasApiCredentials(): boolean {
  */
 async function generateJWT(): Promise<string | null> {
   if (!serviceAccountCredentials) {
-    console.error('Service account credentials not available');
     return null;
   }
 
@@ -185,8 +181,6 @@ async function generateJWT(): Promise<string | null> {
       scope: "https://www.googleapis.com/auth/spreadsheets"
     };
 
-    console.log('Preparing JWT with header:', header, 'and payload:', payload);
-    
     try {
       // Convert the private key from PEM format to a CryptoKey
       // First, clean up the private key by removing the header, footer, and any whitespace
@@ -242,17 +236,13 @@ async function generateJWT(): Promise<string | null> {
       
       return jwt;
     } catch (cryptoError) {
-      console.error('Error during JWT crypto operations:', cryptoError);
-      
       // Fallback to returning a mock token for development/testing
       if (IS_DEVELOPMENT) {
-        console.warn('Running in development mode - providing a mock JWT for testing');
         return 'mock.jwt.token';
       }
       return null;
     }
   } catch (error) {
-    console.error('Error generating JWT:', error);
     return null;
   }
 }
@@ -265,24 +255,19 @@ export async function getAccessToken(): Promise<string | null> {
     // Check for cached JWT first
     const cachedJwt = getFromCache<string>(CACHE_KEYS.JWT, getCacheVersion('jwt'));
     if (cachedJwt) {
-      console.log('Using cached JWT token');
       return cachedJwt;
     }
 
     const jwt = await generateJWT();
     if (!jwt) {
-      console.error('Failed to generate JWT');
       return null;
     }
 
     // For development with mock JWT
     if (jwt === 'mock.jwt.token' && IS_DEVELOPMENT) {
-      console.warn('Using mock access token for development');
       return 'mock_access_token';
     }
 
-    console.log('Attempting to exchange JWT for access token...');
-    
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
@@ -296,8 +281,6 @@ export async function getAccessToken(): Promise<string | null> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Error getting access token: ${response.status} ${response.statusText}`);
-      console.error(`Error details: ${errorText}`);
       
       // Provide more helpful error messages for common issues
       try {
@@ -318,10 +301,8 @@ export async function getAccessToken(): Promise<string | null> {
       return null;
     }
 
-    console.log('Successfully obtained access token');
     const data = await response.json();
     if (!data.access_token) {
-      console.error('Access token not found in response:', data);
       return null;
     }
     
@@ -330,7 +311,6 @@ export async function getAccessToken(): Promise<string | null> {
     
     return data.access_token;
   } catch (error) {
-    console.error('Error getting access token:', error);
     return null;
   }
 }
@@ -358,18 +338,12 @@ export async function fetchSheetValues(
   range: string, 
   retryCount = 2
 ): Promise<string[][] | null> {
-  console.log('fetchSheetValues called with:', { spreadsheetId, range, retryCount });
-  
   if (!spreadsheetId || !range) {
-    console.error('Missing required parameters for fetchSheetValues');
     return null;
   }
 
   // For development and testing, use mock data if no auth available
   if (IS_DEVELOPMENT && !hasApiCredentials()) {
-    console.log('Development mode without auth, returning mock data');
-    console.warn('Using mock data for spreadsheet in development mode');
-    // Return some fake data to simulate a successful response
     return [
       ['Header1', 'Header2', 'Header3'],
       ['Row1Col1', 'Row1Col2', 'Row1Col3'],
@@ -389,14 +363,11 @@ export async function fetchSheetValues(
       
       // Use cached data if it's less than the configured cache duration
       if (cacheAge < API_CONFIG.SHEETS_CACHE_DURATION) {
-        console.log(`Using cached sheet data for ${range}, age: ${Math.round(cacheAge / 1000)}s`);
         return data;
       } else {
-        console.log(`Cache expired for ${range}, age: ${Math.round(cacheAge / 1000)}s`);
         localStorage.removeItem(cacheKey);
       }
     } catch (err) {
-      console.error('Error parsing cached sheet data:', err);
       localStorage.removeItem(cacheKey);
     }
   }
@@ -406,20 +377,15 @@ export async function fetchSheetValues(
     `fetch_sheet_${spreadsheetId}_${range}`,
     async () => {
       // Make sure we have a valid access token
-      console.log('Getting access token...');
       const accessToken = await getAccessToken();
       if (!accessToken) {
-        console.error('No access token available to fetch sheet data');
         return null;
       }
-      console.log('Access token obtained successfully');
 
       // We'll make up to retryCount + 1 attempts to fetch the data
       for (let attempt = 0; attempt <= retryCount; attempt++) {
         try {
-          console.log(`Fetch attempt ${attempt + 1} of ${retryCount + 1}`);
           const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueRenderOption=FORMULA&majorDimension=ROWS`;
-          console.log('Fetching from URL:', apiUrl);
           
           // Fetch the data from Google Sheets API
           const response = await fetch(
@@ -433,15 +399,10 @@ export async function fetchSheetValues(
             }
           );
 
-          console.log('Response status:', response.status, response.statusText);
-          
           if (response.ok) {
             const responseData = await response.json() as GoogleSheetsResponse;
-            console.log('Response data received:', responseData);
             
             if (responseData.values && responseData.values.length > 0) {
-              console.log(`Found ${responseData.values.length} rows of data`);
-              
               // Process any HYPERLINK formulas in the data
               const processedData = responseData.values.map(row => 
                 row.map(cell => {
@@ -461,46 +422,34 @@ export async function fetchSheetValues(
                   data: processedData,
                   timestamp: Date.now()
                 }));
-                console.log(`Sheet data cached with key: ${cacheKey}`);
               } catch (cacheError) {
-                console.error('Error caching sheet data:', cacheError);
               }
               
               return processedData;
             } else {
-              console.warn('No values found in sheet response:', responseData);
               return [];
             }
           } else {
             const errorText = await response.text();
-            console.error(`Error fetching sheet data (attempt ${attempt + 1}): ${response.status} ${response.statusText}`);
-            console.error(`Error details: ${errorText}`);
             
             // Check if we hit a quota limit (429)
             if (response.status === 429) {
-              console.warn('Quota exceeded - need to wait longer before retrying');
-              // Wait significantly longer for quota errors
               await new Promise(resolve => setTimeout(resolve, 5000 + Math.pow(2, attempt) * 1000));
             } else if (attempt < retryCount) {
               // Wait a bit longer before each retry (exponential backoff)
               const waitTime = Math.pow(2, attempt) * 1000;  // 1s, 2s, 4s, etc.
-              console.log(`Retrying in ${waitTime}ms...`);
               await new Promise(resolve => setTimeout(resolve, waitTime));
             }
           }
         } catch (error) {
-          console.error(`Error in fetch attempt ${attempt + 1}:`, error);
-          
           if (attempt < retryCount) {
             // Wait before retrying
             const waitTime = Math.pow(2, attempt) * 1000;
-            console.log(`Retrying in ${waitTime}ms...`);
             await new Promise(resolve => setTimeout(resolve, waitTime));
           }
         }
       }
 
-      console.error(`Failed to fetch sheet data after ${retryCount + 1} attempts`);
       return null;
     }
   );
@@ -511,19 +460,16 @@ export async function fetchSheetValues(
  */
 async function appendSheetValues(spreadsheetId: string, sheetRange: string, values: string[][]): Promise<boolean> {
   if (!spreadsheetId || !sheetRange || !values || values.length === 0) {
-    console.error('Missing required parameters for appendSheetValues');
     return false;
   }
 
   // For development and testing, just log the values
   if (IS_DEVELOPMENT && !hasApiCredentials()) {
-    console.warn('Development mode: Would append to spreadsheet:', { spreadsheetId, sheetRange, values });
     return true;
   }
 
   const accessToken = await getAccessToken();
   if (!accessToken) {
-    console.error('No access token available to append sheet data');
     return false;
   }
 
@@ -546,17 +492,8 @@ async function appendSheetValues(spreadsheetId: string, sheetRange: string, valu
           }
         );
 
-        if (response.ok) {
-          console.log('Successfully appended data to sheet');
-          return true;
-        } else {
-          const errorText = await response.text();
-          console.error(`Error appending to sheet: ${response.status} ${response.statusText}`);
-          console.error(`Error details: ${errorText}`);
-          return false;
-        }
+        return response.ok;
       } catch (error) {
-        console.error('Error appending to sheet:', error);
         return false;
       }
     }
@@ -568,18 +505,14 @@ async function appendSheetValues(spreadsheetId: string, sheetRange: string, valu
  */
 export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
   try {
-    console.log('Fetching accessibility tools...');
-    
     // Check for cached tools first
     const cachedTools = getFromCache<AccessibilityTool[]>(CACHE_KEYS.TOOLS, getCacheVersion('tools'));
     if (cachedTools) {
-      console.log('Using cached tools');
       return cachedTools;
     }
     
     // For development without API access
     if (IS_DEVELOPMENT && !hasApiCredentials()) {
-      console.log('Using mock tools data in development mode');
       return mockTools;
     }
     
@@ -623,18 +556,13 @@ export async function fetchAccessibilityTools(): Promise<AccessibilityTool[]> {
         };
       });
     
-    console.log(`Fetched ${tools.length} external tools`);
-    
     // Cache the result
     saveToCache(CACHE_KEYS.TOOLS, tools, getCacheVersion('tools'));
     
     return tools;
   } catch (error) {
-    console.error('Error fetching accessibility tools:', error);
-    
     // Return mock data in case of error during development
     if (IS_DEVELOPMENT) {
-      console.log('Using mock tools data due to error');
       return mockTools;
     }
     
@@ -649,15 +577,10 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
   const patterns: AccessibilityPattern[] = [];
   let currentParentTitle = "";
   
-  console.log('Starting to process pattern rows...');
-  
   rows.forEach((row, index) => {
-    console.log(`Processing row ${index}:`, row);
-    
     // Check if row is a section title (has only one cell with content)
     if (row.length === 1 && row[0]?.trim()) {
       currentParentTitle = row[0].trim();
-      console.log(`Found section title: ${currentParentTitle}`);
       // Add as a section header
       patterns.push({
         id: `section-${index + 1}`,
@@ -673,7 +596,6 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
     
     // Skip empty rows or invalid rows
     if (row.length < 2 || !row[0] && !row[1]) {
-      console.log(`Skipping invalid row ${index}`);
       return;
     }
 
@@ -682,8 +604,6 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
       const where = row[1]?.trim() || "";
       const description = row[2]?.trim() || "";
       
-      console.log(`Processing pattern: ${name} (${where})`);
-      
       // Parse links from columns 4, 5, and 6 (indices 3, 4, and 5)
       const linkyDinks: Array<{ title: string; url: string }> = [];
       
@@ -691,23 +611,17 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
       for (let i = 3; i <= 5; i++) {
         const linkFormula = row[i]?.trim() || "";
         if (linkFormula) {
-          console.log(`Found link formula in column ${i}:`, linkFormula);
-          
           // Try to parse as JSON first (in case it's already parsed)
           try {
             const parsedJson = JSON.parse(linkFormula);
             if (parsedJson.url && parsedJson.title) {
-              console.log(`Successfully parsed JSON link:`, parsedJson);
               linkyDinks.push(parsedJson);
             }
           } catch (jsonError) {
             // If not JSON, try parsing as HYPERLINK formula
             const parsed = parseHyperlinkFormula(linkFormula);
             if (parsed) {
-              console.log(`Successfully parsed HYPERLINK formula:`, parsed);
               linkyDinks.push(parsed);
-            } else {
-              console.log(`Failed to parse link formula:`, linkFormula);
             }
           }
         }
@@ -725,15 +639,12 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
           parentTitle: currentParentTitle
         };
         
-        console.log(`Created pattern with ${linkyDinks.length} links:`, pattern);
         patterns.push(pattern);
       }
     } catch (error) {
-      console.error(`Error processing pattern row ${index}:`, error, row);
     }
   });
   
-  console.log('Finished processing all rows. Total patterns:', patterns.length);
   return patterns;
 }
 
@@ -743,33 +654,16 @@ function processPatternRows(rows: string[][]): AccessibilityPattern[] {
 export async function fetchAccessibilityPatterns(): Promise<AccessibilityPattern[]> {
   // For development without credentials, use mock data
   if (IS_DEVELOPMENT && !hasApiCredentials()) {
-    console.warn('Using mock patterns data for development');
     return mockPatterns;
   }
 
-  console.log('Fetching fresh patterns data from spreadsheet...');
   const rows = await fetchSheetValues(PATTERNS_SHEET_ID, 'ustwo pattern library!A:H');
   
   if (!rows) {
-    console.error('Failed to fetch patterns data, falling back to mock data');
     return mockPatterns;
   }
 
-  console.log('Raw spreadsheet data:', rows);
-  console.log('Number of rows:', rows.length);
-  console.log('First row (headers):', rows[0]);
-  
-  // Log the link columns (E, F, G) from the first few rows
-  rows.slice(0, 5).forEach((row, index) => {
-    console.log(`Row ${index} link columns:`, {
-      columnE: row[4],
-      columnF: row[5],
-      columnG: row[6]
-    });
-  });
-
   const patterns = processPatternRows(rows);
-  console.log('Processed patterns:', patterns);
   
   // Cache the processed data
   saveToCache(CACHE_KEYS.PATTERNS, patterns, getCacheVersion('patterns'));
@@ -842,7 +736,6 @@ export async function submitNewItem(
     // Let's use the append values API to add a new row
     return await appendSheetValues(spreadsheetId, sheetRange, values);
   } catch (error) {
-    console.error(`Error submitting new ${type}:`, error);
     return false;
   }
 }
@@ -915,7 +808,6 @@ export async function testJwtGeneration(): Promise<{ success: boolean; message: 
       jwt: jwt.substring(0, 20) + '...' // Only return the beginning for security
     };
   } catch (error) {
-    console.error('Error in JWT test:', error);
     return {
       success: false,
       message: `Error testing JWT: ${error instanceof Error ? error.message : String(error)}`
@@ -981,7 +873,6 @@ export async function checkSheetPermission(spreadsheetId: string): Promise<{
       }
     );
   } catch (error) {
-    console.error('Error checking permissions:', error);
     return {
       hasAccess: false,
       message: `Error checking permissions: ${error instanceof Error ? error.message : String(error)}`
@@ -1038,7 +929,6 @@ export async function checkSheetExists(spreadsheetId: string, sheetName: string)
         
         if (response.ok) {
           const data = await response.json();
-          console.log('Spreadsheet metadata:', data);
           
           if (!data.sheets || !Array.isArray(data.sheets)) {
             return {
@@ -1078,7 +968,6 @@ export async function checkSheetExists(spreadsheetId: string, sheetName: string)
       }
     );
   } catch (error) {
-    console.error('Error checking sheet existence:', error);
     return {
       exists: false,
       message: `Error checking sheet: ${error instanceof Error ? error.message : String(error)}`

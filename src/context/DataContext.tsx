@@ -65,7 +65,6 @@ export function DataProvider({ children }: DataProviderProps) {
       const shouldClearCache = forceRefresh && timeSinceLastLoad > MIN_REFRESH_INTERVAL;
       
       if (shouldClearCache) {
-        console.log(`Forcing refresh of tools data - clearing cache (last refresh was ${Math.round(timeSinceLastLoad/1000)}s ago)`);
         // Only clear tool-related caches, not everything
         try {
           // Clear matching cache entries
@@ -84,7 +83,6 @@ export function DataProvider({ children }: DataProviderProps) {
       
       setIsLoadingTools(true);
       const data = await fetchAccessibilityTools();
-      console.log('Loaded tools:', data);
       setTools(data);
       
       // Update the last load timestamp
@@ -108,7 +106,6 @@ export function DataProvider({ children }: DataProviderProps) {
       const shouldClearCache = forceRefresh && timeSinceLastLoad > MIN_REFRESH_INTERVAL;
       
       if (shouldClearCache) {
-        console.log(`Forcing refresh of patterns data - clearing cache (last refresh was ${Math.round(timeSinceLastLoad/1000)}s ago)`);
         // Only clear pattern-related caches
         try {
           // Clear matching cache entries
