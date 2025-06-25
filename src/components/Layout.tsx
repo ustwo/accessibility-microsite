@@ -145,6 +145,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                 <ul className="company-links">
                   <li><a href="https://ustwo.com/legal/" target="_blank" rel="noopener noreferrer">Legal</a></li>
                   <li><a href="https://ustwo.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Privacy<span className="hideOnTinyScreens"> Policy</span></a></li>
+                  <li><a href="https://ustwo.com/accessibility-help/" target="_blank" rel="noopener noreferrer">Accessibility <span className="hideOnTinyScreens"> help</span></a></li>
                   <li><Link aria-current={isCurrentPage("/about") ? "page" : undefined} to="/about">About this site</Link></li>
                 </ul>
                 <div className="social-icons">
