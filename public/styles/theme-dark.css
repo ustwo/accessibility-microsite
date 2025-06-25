@@ -207,14 +207,18 @@ footer p,
 
 /* Button styles in dark mode */
 .dark .button {
-  /* background-color: var(--color-blue); */
+  background-color: var(--color-blue);
   color: var(--color-light);
   /* border-color: var(--color-blue); */
 }
 
 
 .dark .button:hover {
-  background-color: var(--color-gray-800);
+  background-color: #434bfe;
+}
+
+.dark figcaption {
+  color: var(--color-gray-300);
 }
 
 .dark .guide-section {

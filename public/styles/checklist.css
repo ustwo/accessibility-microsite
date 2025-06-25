@@ -215,8 +215,7 @@
 
 .checklist-section h2,
 .checklist-section h3 {
-  position: sticky;
-  top: 70px; /* Adjust based on your header height */
+  
   background: white;
   padding: 2rem 0 1rem 0;
   margin: 0;
@@ -225,8 +224,17 @@
 }
 
 /* Dark mode support */
+.dark .checklist-section h2,
 .dark .checklist-section h3 {
   background: var(--color-gray-900);
+}
+
+@media (min-width: 768px) {
+  .checklist-section h2,
+  .checklist-section h3 {
+    position: sticky;
+    top: 70px; /* Adjust based on your header height */
+  }
 }
 
 /* Mobile adjustments */
