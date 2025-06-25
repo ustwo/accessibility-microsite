@@ -114,12 +114,12 @@ export default function ToolsIndex() {
                             >
                               <div className="tool-header">
                                 <img 
-                                  src={`https://www.google.com/s2/favicons?domain=${
+                                  src={`https://icons.duckduckgo.com/ip3/${
                                     // Special case for HMRC tools - use gov.uk domain
                                     tool.name.toLowerCase().includes('hmrc') || tool.name.toLowerCase().includes('virtual') 
                                       ? 'gov.uk' 
                                       : tool.url.replace(/^https?:\/\//, '').split('/')[0]
-                                  }&sz=128`}
+                                  }.ico`}
                                   alt=""
                                   className="tool-favicon"
                                   aria-hidden="true"

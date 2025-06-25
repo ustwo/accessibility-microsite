@@ -218,12 +218,12 @@ export default function PatternsIndex() {
                                     className="pattern-link-card smallBodyText"
                                   >
                                     <img 
-                                      src={`https://www.google.com/s2/favicons?domain=${
+                                      src={`https://icons.duckduckgo.com/ip3/${
                                         // Special case for Salesforce URLs
                                         link.url.toLowerCase().includes('salesforce') 
                                           ? 'salesforce.com' 
                                           : link.url.replace(/^https?:\/\//, '').split('/')[0]
-                                      }&sz=64`}
+                                      }.ico`}
                                       alt=""
                                       className="pattern-link-favicon"
                                       aria-hidden="true"
@@ -322,12 +322,12 @@ export default function PatternsIndex() {
                                                 className="pattern-link-card smallBodyText"
                                               >
                                                 <img 
-                                                  src={`https://www.google.com/s2/favicons?domain=${
+                                                  src={`https://icons.duckduckgo.com/ip3/${
                                                     // Special case for Salesforce URLs
                                                     link.url.toLowerCase().includes('salesforce') 
                                                       ? 'salesforce.com' 
                                                       : link.url.replace(/^https?:\/\//, '').split('/')[0]
-                                                  }&sz=64`}
+                                                  }.ico`}
                                                   alt=""
                                                   className="pattern-link-favicon"
                                                   aria-hidden="true"
