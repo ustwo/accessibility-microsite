@@ -291,7 +291,7 @@ export default function ChecklistTemplate({ title, allData }: ChecklistTemplateP
         <Grid>
           <Col start={1} span={2}>
             <nav className="checklist-sidebar" aria-label="Checklist navigation">
-              <h3>WCAG Principles</h3>
+              <h2 className="h3">WCAG Principles</h2>
               <ul>
                 {checklistPages.map((page) => (
                   <li key={page.hash}>
@@ -320,21 +320,24 @@ export default function ChecklistTemplate({ title, allData }: ChecklistTemplateP
           <Col start={3} span={10}>
             {currentData && currentChecklist ? (
               <>
-                {/* <h2 className="checklist-title">{currentChecklistKey}</h2> */}
-                
-                {/* Level A Requirements */}
-                {renderTable(filteredLevelA, "Level A (Must Comply)")}
+                {/* Add ID to the main content area for each section */}
+                <div id={currentSection} role="region" aria-labelledby={`${currentSection}-title`}>
+                  <h2 id={`${currentSection}-title`} className="checklist-title">{currentChecklistKey}</h2>
+                  
+                  {/* Level A Requirements */}
+                  {renderTable(filteredLevelA, "Level A (Must Comply)")}
 
-                {/* Level AA Requirements */}
-                {renderTable(filteredLevelAA, "Level AA (Must Comply)")}
+                  {/* Level AA Requirements */}
+                  {renderTable(filteredLevelAA, "Level AA (Must Comply)")}
 
-                {/* Level AAA Requirements */}
-                {filteredLevelAAA.length > 0 && 
-                  renderTable(filteredLevelAAA, "Level AAA (Optional)", 
-                    // Check if any item has an example to determine if we need the column
-                    filteredLevelAAA.some((item: ChecklistItem) => item.example)
-                  )
-                }
+                  {/* Level AAA Requirements */}
+                  {filteredLevelAAA.length > 0 && 
+                    renderTable(filteredLevelAAA, "Level AAA (Optional)", 
+                      // Check if any item has an example to determine if we need the column
+                      filteredLevelAAA.some((item: ChecklistItem) => item.example)
+                    )
+                  }
+                </div>
               </>
             ) : (
               <div>

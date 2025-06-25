@@ -124,7 +124,7 @@
   height: fit-content;
 }
 
-.checklist-sidebar h3 {
+.checklist-sidebar h2 {
   position: static; /* Override any sticky positioning */
   margin-bottom: 1rem;
 }
@@ -213,6 +213,7 @@
   position: relative;
 }
 
+.checklist-section h2,
 .checklist-section h3 {
   position: sticky;
   top: 70px; /* Adjust based on your header height */
