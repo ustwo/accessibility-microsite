@@ -100,13 +100,13 @@ export default function PatternsIndex() {
     filterParentTitle !== null;
   return (
     <Layout
-      title="Accessibility Patterns"
+      title="Patterns library"
       introText="Our second principle is to enjoy the patterns. These are the design
       patterns we recommend for creating accessible digital products."
       theme="patterns"
     > 
       <Helmet>
-        <title>Accessibility Patterns - ustwo Accessibility Microsite</title>
+        <title>Patterns library - ustwo Accessibility</title>
         <meta
           name="description"
           content="A collection of accessible design patterns recommended by ustwo."

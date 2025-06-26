@@ -24,13 +24,13 @@ export default function ToolsIndex() {
 
   return (
     <Layout
-      title="Accessibility Tools"
+      title="Recommended tools"
       introText="Our first principle is to level-up your gear. These are the tools we recommend for testing and developing
       accessible digital products."
       theme="tools"
     >
       <Helmet>
-        <title>Accessibility Tools - ustwo Accessibility Microsite</title>
+        <title>Recommended tools - ustwo Accessibility</title>
         <meta
           name="description"
           content="A collection of accessibility testing and development tools recommended by ustwo."

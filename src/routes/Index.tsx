@@ -97,7 +97,7 @@ export default function Index() {
                   solves a common accessibility problem.
                 </p>
                 <div className="callToAction callToAction--red" aria-hidden="true">
-                  Pattern library
+                  Patterns library
                 </div>
               </Col>
             </Grid>
@@ -122,7 +122,7 @@ export default function Index() {
                   way to test for perceivability, operability, and robustness.
                 </p>
                 <div className="callToAction callToAction--blue" aria-hidden="true">
-                  Accessibility checklist
+                  Checklist
                 </div>
               </Col>
             </Grid>
@@ -147,7 +147,7 @@ export default function Index() {
                   chance it&apos;ll work with assistive tech.
                 </p>
                 <div className="callToAction callToAction--yellow" aria-hidden="true">
-                  Screenreader tutorial
+                  Screen reader guide
                 </div>
               </Col>
             </Grid>

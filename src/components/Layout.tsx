@@ -82,7 +82,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                     to="/screen-reader-guide" 
                     aria-current={isCurrentPage("/screen-reader-guide") ? "page" : undefined}
                   >
-                    Screen reader guide
+                    Screen reader
                   </Link>
                 </li>
                 <li>
@@ -90,7 +90,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                     to="/testing-templates" 
                     aria-current={isCurrentPage("/testing-templates") ? "page" : undefined}
                   >
-                    Testing templates
+                    Testing
                   </Link>
                 </li>
               </ul>

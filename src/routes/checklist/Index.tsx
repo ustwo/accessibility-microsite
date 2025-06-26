@@ -13,6 +13,6 @@ export default function ChecklistIndex() {
   };
 
   return (
-    <ChecklistTemplate title="Accessibility Checklist" allData={allData} />
+    <ChecklistTemplate title="Checklist" allData={allData} />
   );
 } 

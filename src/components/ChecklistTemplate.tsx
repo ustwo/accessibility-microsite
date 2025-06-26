@@ -235,16 +235,16 @@ export default function ChecklistTemplate({ title, allData }: ChecklistTemplateP
 
   return (
     <Layout
-      title="Accessibility Checklist"
+      title="Checklist"
       introText="Our comprehensive accessibility checklist helps you track your progress and ensure your digital products 
       meet accessibility standards."
       theme="checklist"
     >
       <Helmet>
-        <title>{title} - ustwo Accessibility Microsite</title>
+        <title>Checklist - ustwo Accessibility</title>
         <meta
           name="description"
-          content={`${title} accessibility checklist and requirements guide to help ensure your digital products meet accessibility standards.`}
+          content={`Checklist and requirements guide to help ensure your digital products meet accessibility standards.`}
         />
       </Helmet>
 

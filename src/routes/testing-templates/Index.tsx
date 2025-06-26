@@ -6,7 +6,7 @@ import Grid, { Col } from "../../components/Grid";
 export default function TestingTemplatesIndex() {
   return (
     <Layout
-      title="Testing Templates"
+      title="Testing templates"
       introText="In line with our fifth principle 'Party Party (Test)
       Party', we believe testing should be a collaborative and
       enjoyable process that brings teams together to create more
@@ -14,10 +14,10 @@ export default function TestingTemplatesIndex() {
       theme="testing"
     >
       <Helmet>
-        <title>Testing Templates - ustwo Accessibility Microsite</title>
+        <title>Testing templates - ustwo Accessibility</title>
         <meta
           name="description"
-          content="Accessibility testing templates and review frameworks to ensure comprehensive accessibility testing across your digital products."
+          content="Testing templates and review frameworks to ensure comprehensive accessibility testing across your digital products."
         />
       </Helmet>
 
