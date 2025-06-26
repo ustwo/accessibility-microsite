@@ -101,8 +101,7 @@ export default function PatternsIndex() {
   return (
     <Layout
       title="Patterns library"
-      introText="Our second principle is to enjoy the patterns. These are the design
-      patterns we recommend for creating accessible digital products."
+      introText="Our second principle is to enjoy the patterns. Reaching for and applying these patterns will help you create accessible digital products."
       theme="patterns"
     > 
       <Helmet>
