@@ -22,7 +22,7 @@ export default function ScreenReaderGuideIndex() {
   return (
     <Layout
       title="Screen reader guide"
-      introText="Welcome to your interactive guide for learning VoiceOver! Follow these steps and practice along to become comfortable with screen reader testing."
+      introText="Our fourth principle encourages you to close your eyes and test your product with a screen reader. Follow these steps and practice along to become comfortable with screen reader testing."
       theme="guide"
     > 
       <Helmet>

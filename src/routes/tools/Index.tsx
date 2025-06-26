@@ -25,7 +25,7 @@ export default function ToolsIndex() {
   return (
     <Layout
       title="Recommended tools"
-      introText="Our first principle is to level-up your gear. These are the tools we recommend for testing and developing
+      introText="Our first inclusivity principle is to level-up your gear. These are the tools we recommend for testing and developing
       accessible digital products."
       theme="tools"
     >

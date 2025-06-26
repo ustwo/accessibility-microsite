@@ -7,10 +7,7 @@ export default function TestingTemplatesIndex() {
   return (
     <Layout
       title="Testing templates"
-      introText="In line with our fifth principle 'Party Party (Test)
-      Party', we believe testing should be a collaborative and
-      enjoyable process that brings teams together to create more
-      accessible products."
+      introText="Our fifth and final principle is to party party (test) party. We believe testing should be a collaborative and enjoyable process that brings teams together to create more accessible products."
       theme="testing"
     >
       <Helmet>
@@ -26,16 +23,18 @@ export default function TestingTemplatesIndex() {
           <Col start={1} span={5}>
             <figure>
               <img src="/img/testing-template.png" alt="Testing templates" />
-              <figcaption>Screenshot of the testing template on Miro</figcaption>
+              <figcaption>
+                Screenshot of the testing template on Miro
+              </figcaption>
             </figure>
           </Col>
           <Col start={7} span={5}>
             <p>
-              Our accessibility review template provides a structured approach to
-              testing digital products across different platforms and interaction
-              methods. It&rsquo;s designed to align with ustwo&rsquo;s inclusivity
-              principles and ensure comprehensive coverage of accessibility
-              requirements.
+              Our accessibility review template provides a structured approach
+              to testing digital products across different platforms and
+              interaction methods. It&rsquo;s designed to align with
+              ustwo&rsquo;s inclusivity principles and ensure comprehensive
+              coverage of accessibility requirements.
             </p>
             <p>
               Ready to start testing? Access our template on Miro and begin your
