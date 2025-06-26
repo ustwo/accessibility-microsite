@@ -58,7 +58,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                     to="/tools" 
                     aria-current={isCurrentPage("/tools") ? "page" : undefined}
                   >
-                    Tools
+                    1. Tools
                   </Link>
                 </li>
                 <li>
@@ -66,7 +66,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                     to="/patterns" 
                     aria-current={isCurrentPage("/patterns") ? "page" : undefined}
                   >
-                    Patterns
+                    2. Patterns
                   </Link>
                 </li>
                 <li>
@@ -74,7 +74,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                     to="/checklist" 
                     aria-current={isCurrentPage("/checklist") ? "page" : undefined}
                   >
-                    Checklist
+                    3. Checklist
                   </Link>
                 </li>
                 <li>
@@ -82,7 +82,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                     to="/screen-reader-guide" 
                     aria-current={isCurrentPage("/screen-reader-guide") ? "page" : undefined}
                   >
-                    Screen reader
+                    4. Screen reader
                   </Link>
                 </li>
                 <li>
@@ -90,7 +90,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
                     to="/testing-templates" 
                     aria-current={isCurrentPage("/testing-templates") ? "page" : undefined}
                   >
-                    Testing
+                    5. Testing
                   </Link>
                 </li>
               </ul>
