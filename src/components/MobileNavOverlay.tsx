@@ -63,7 +63,7 @@ export default function MobileNavOverlay({ isOpen, onClose, id }: MobileNavOverl
                 onClick={onClose}
                 aria-current={isCurrentPage("/tools") ? "page" : undefined}
               >
-                Tools
+                1. Tools
               </Link>
             </li>
             <li>
@@ -72,7 +72,7 @@ export default function MobileNavOverlay({ isOpen, onClose, id }: MobileNavOverl
                 onClick={onClose}
                 aria-current={isCurrentPage("/patterns") ? "page" : undefined}
               >
-                Patterns
+                2. Patterns
               </Link>
             </li>
             <li>
@@ -81,7 +81,7 @@ export default function MobileNavOverlay({ isOpen, onClose, id }: MobileNavOverl
                 onClick={onClose}
                 aria-current={isCurrentPage("/checklist") ? "page" : undefined}
               >
-                Checklist
+                3. Checklist
               </Link>
             </li>
             <li>
@@ -90,7 +90,7 @@ export default function MobileNavOverlay({ isOpen, onClose, id }: MobileNavOverl
                 onClick={onClose}
                 aria-current={isCurrentPage("/screen-reader-guide") ? "page" : undefined}
               >
-                Screen reader guide
+                4. Screen reader guide
               </Link>
             </li>
             <li>
@@ -99,7 +99,7 @@ export default function MobileNavOverlay({ isOpen, onClose, id }: MobileNavOverl
                 onClick={onClose}
                 aria-current={isCurrentPage("/testing-templates") ? "page" : undefined}
               >
-                Testing templates
+                5. Testing templates
               </Link>
             </li>
           </ul>
