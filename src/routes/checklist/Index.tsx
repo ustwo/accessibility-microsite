@@ -13,6 +13,6 @@ export default function ChecklistIndex() {
   };
 
   return (
-    <ChecklistTemplate title="Checklist" allData={allData} />
+    <ChecklistTemplate title="WCAG Checklist" allData={allData} />
   );
 } 

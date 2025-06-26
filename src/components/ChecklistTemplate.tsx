@@ -235,7 +235,7 @@ export default function ChecklistTemplate({ title, allData }: ChecklistTemplateP
 
   return (
     <Layout
-      title="Checklist"
+      title="WCAG Checklist"
       introText="Our comprehensive accessibility checklist helps you track your progress and ensure your digital products 
       meet accessibility standards."
       theme="checklist"

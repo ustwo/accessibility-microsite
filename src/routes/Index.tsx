@@ -122,7 +122,7 @@ export default function Index() {
                   way to test for perceivability, operability, and robustness.
                 </p>
                 <div className="callToAction callToAction--blue" aria-hidden="true">
-                  Checklist
+                  WCAG Checklist
                 </div>
               </Col>
             </Grid>
