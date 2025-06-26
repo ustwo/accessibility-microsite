@@ -125,7 +125,7 @@ export default function Layout({ children, title, introText, theme }: LayoutProp
               </Col>
             </Grid>
             <Grid>
-              <Col start={1} span={6}>
+              <Col start={1} span={7}>
                 {introText && <p className="introText">{introText}</p>}
               </Col>
             </Grid>
